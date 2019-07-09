@@ -1,0 +1,78 @@
+﻿                IntPtr handle = buffer.UserBuffer;
+                unsafe
+                {
+                    byte* ptr = (byte*)handle;
+                    for(int y = fromY; y < toY; y++)
+                    {
+                        for (int x = fromX; x < toX; x++)
+                        {
+                            for (int c = 0; c < 3; c++)
+                            {
+                                byte color = *(ptr + (((y * widthInPixels) + x) * bytesPerPixel) + c);
+                                //Console.WriteLine(color);
+                                totals[c] = color * color;
+                            }
+                        }
+                    }
+
+                }
+                long tot = widthInPixels * heightInLines;
+                int avgB = (int)Math.Sqrt(totals[0] / tot);
+                int avgG = (int)Math.Sqrt(totals[1] / tot);
+                int avgR = (int)Math.Sqrt(totals[2] / tot);
+                res[i] = new CColor(avgR, avgG, avgB);
+            }
+#else
+            byte[] data = new byte[bytes];
+
+            try
+            {
+                Marshal.Copy(buffer.UserBuffer, data, 0, bytes);
+            }
+            catch (AccessViolationException)
+            {
+                logger.Add("AccessViolationException thrown");
+            }
+
+            for (int i = 0; i < res.Length; i++)
+            {
+                ImRectangle currRect = rects[i];
+                long[] totals = new long[] { 0, 0, 0 };
+
+                int width = currRect.Width;
+                int height = currRect.Height;
+
+
+                int fromX = currRect.X + offsetX;
+                int fromY = currRect.Y + offsetY;
+                int toY = currRect.Y + height + offsetY;
+                int toX = currRect.X + width + offsetX;
+
+                int stride = _bitmapWidth * 4;
+
+                //Console.WriteLine($"from ({fromX},{fromY}) to ({toX},{toY}");
+                #region using all pixels
+                for (int y = fromY; y < toY; y+=2)
+                {
+                    for (int x = fromX; x < toX; x+=2)
+                    {
+                        for (int color = 0; color < 3; color++)
+                        {
+                            int index = (y * stride) + x * bytesPerPixel + color;
+                            try { totals[color] += data[index] * data[index]; }
+                            catch (OverflowException) {; }
+                        }
+                    }
+                }
+                #endregion
+
+                
+
+
+                long tot = (width * height)/2;
+                int avgB = (int)Math.Sqrt(totals[0] / tot);
+                int avgG = (int)Math.Sqrt(totals[1] / tot);
+                int avgR = (int)Math.Sqrt(totals[2] / tot);
+                res[i] = new CColor(avgR, avgG, avgB);
+            }
+#endif

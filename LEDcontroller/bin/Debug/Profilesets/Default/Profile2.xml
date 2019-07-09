@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LedProfile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:type="AmbilightLedProfile">
+  <Name>Ambilight</Name>
+  <UName>Default:Ambilight</UName>
+  <ProfileType>Ambilight</ProfileType>
+  <LedColor R="255" G="255" B="255" />
+  <Brightness>255</Brightness>
+  <NumLeds>51</NumLeds>
+  <Ups>30</Ups>
+  <Speed>0</Speed>
+  <Index>2</Index>
+  <Parent>Default</Parent>
+  <ScreenIndex>1</ScreenIndex>
+  <RatioProfile RatioWidth="16" RatioHeight="9" />
+</LedProfile>

@@ -1,0 +1,9 @@
+Bitmap Bpp: 32
+Bitmap width; 5360, height: 2160
+driver res {X=0,Y=0,Width=3440,Height=1440}
+Bitmap Bpp: 32
+Bitmap width; 5360, height: 2160
+driver res {X=0,Y=0,Width=3440,Height=1440}
+Bitmap Bpp: 32
+Bitmap width; 5360, height: 2160
+driver res {X=0,Y=0,Width=3440,Height=1440}

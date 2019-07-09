@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LedProfile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:type="RainbowLedProfile">
+  <Name>Rainbow</Name>
+  <UName>Default:Rainbow</UName>
+  <ProfileType>Rainbow</ProfileType>
+  <Brightness>109</Brightness>
+  <NumLeds>51</NumLeds>
+  <Ups>60</Ups>
+  <Speed>1</Speed>
+  <Index>1</Index>
+  <Parent>Default</Parent>
+  <ScreenIndex>0</ScreenIndex>
+</LedProfile>

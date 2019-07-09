@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LedProfile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:type="StaticLedProfile">
+  <Name>Normal</Name>
+  <UName>Default:Normal</UName>
+  <ProfileType>Static</ProfileType>
+  <LedColor R="252" G="190" B="0" />
+  <Brightness>58</Brightness>
+  <NumLeds>51</NumLeds>
+  <Ups>30</Ups>
+  <Speed>0</Speed>
+  <Index>0</Index>
+  <Parent>Default</Parent>
+  <ScreenIndex>0</ScreenIndex>
+</LedProfile>

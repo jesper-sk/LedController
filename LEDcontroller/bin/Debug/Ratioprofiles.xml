@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfRatioProfile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <RatioProfile RatioWidth="4" RatioHeight="3" />
+  <RatioProfile RatioWidth="3" RatioHeight="2" />
+  <RatioProfile RatioWidth="16" RatioHeight="10" />
+  <RatioProfile RatioWidth="16" RatioHeight="9" />
+  <RatioProfile RatioWidth="18" RatioHeight="9" />
+  <RatioProfile RatioWidth="21" RatioHeight="9" />
+  <RatioProfile RatioWidth="43" RatioHeight="18" />
+  <RatioProfile RatioWidth="32" RatioHeight="9" />
+</ArrayOfRatioProfile>
