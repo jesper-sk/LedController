@@ -37,21 +37,19 @@ namespace LedController
         }
         private LedProfile activeProfile;
 
-        private MainForm main;
+        private readonly MainForm main;
         public Visualizer CurrVisualizer { get; private set; } 
 
-        private System.Timers.Timer comCheckTimer;
+        private readonly System.Timers.Timer comCheckTimer;
         private System.Threading.Timer updateTimer;
 
-        private SerialPort arduPort;
+        private readonly SerialPort arduPort;
         private bool outputCheckerCancelled;
 
         private DateTime dt;
 
         private delegate void UpdateFpsLabel(int fps);
-        private UpdateFpsLabel myDelegate;
-
-        private LedMatrix matrix;
+        private readonly UpdateFpsLabel myDelegate;
 
         public ComHandler(MainForm mainForm)
         {
@@ -81,7 +79,7 @@ namespace LedController
         }
 
         #region COM Connect/Disconnect
-        public bool ConnectCom(string com, bool overrideCheck = false)
+        public bool ConnectCom(string com)
         {
             arduPort.PortName = com;
             try { arduPort.Open(); }

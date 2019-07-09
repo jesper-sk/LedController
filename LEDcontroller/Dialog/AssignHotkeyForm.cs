@@ -16,7 +16,7 @@ namespace LedController
         private bool ctrl;
         private bool alt;
         private bool shift;
-        private Keys keyCode;
+        private readonly Keys keyCode = Keys.A;
 
         public AssignHotkeyForm()
         {

@@ -64,13 +64,13 @@ namespace LedController
         {
             if (StaticBrightnessTrackbar.Visible)
             {
-                StaticBrightnessTrackbar.Value = selectedProfile.Brightness;
+                StaticBrightnessTrackbar.Value = SelectedProfile.Brightness;
             }
         }
 
         private void StaticBrightnessTrackbar_ValueChanged(object sender, EventArgs e)
         {
-            selectedProfile.Brightness = (byte)StaticBrightnessTrackbar.Value;
+            SelectedProfile.Brightness = (byte)StaticBrightnessTrackbar.Value;
             StaticBrightnessNUD.Value = StaticBrightnessTrackbar.Value;
         }
 
@@ -78,13 +78,13 @@ namespace LedController
         {
             if (StaticBrightnessNUD.Visible)
             {
-                StaticBrightnessNUD.Text = selectedProfile.Brightness.ToString();
+                StaticBrightnessNUD.Text = SelectedProfile.Brightness.ToString();
             }
         }
 
         private void StaticBrightnessNUD_ValueChanged(object sender, EventArgs e)
         {
-            selectedProfile.Brightness = (byte)StaticBrightnessNUD.Value;
+            SelectedProfile.Brightness = (byte)StaticBrightnessNUD.Value;
             StaticBrightnessTrackbar.Value = (int)StaticBrightnessNUD.Value;
         }
 
@@ -92,7 +92,7 @@ namespace LedController
         {
             if (staticProfileColorButton.Visible)
             {
-                staticProfileColorButton.BackColor = selectedProfile.LedColor;
+                staticProfileColorButton.BackColor = SelectedProfile.LedColor;
             }
         }
 
@@ -108,7 +108,7 @@ namespace LedController
             if (MyDialog.ShowDialog() == DialogResult.OK)
             {
                 staticProfileColorButton.BackColor = MyDialog.Color;
-                selectedProfile.LedColor = staticProfileColorButton.BackColor;
+                SelectedProfile.LedColor = staticProfileColorButton.BackColor;
             }
         }
 
@@ -137,14 +137,14 @@ namespace LedController
         {
             if (RainbowBrightnessTrackBar.Visible)
             {
-                RainbowBrightnessTrackBar.Value = selectedProfile.Brightness;
+                RainbowBrightnessTrackBar.Value = SelectedProfile.Brightness;
             }
         }
 
         private void RainbowBrightnessTrackbar_ValueChanged(object sender, EventArgs ea)
         {
             RainbowBrightnessNud.Value = RainbowBrightnessTrackBar.Value;
-            selectedProfile.Brightness = (byte)RainbowBrightnessTrackBar.Value;
+            SelectedProfile.Brightness = (byte)RainbowBrightnessTrackBar.Value;
         }
 
         //RainbowBrightnessNud
@@ -152,14 +152,14 @@ namespace LedController
         {
             if (RainbowBrightnessNud.Visible)
             {
-                RainbowBrightnessNud.Value = selectedProfile.Brightness;
+                RainbowBrightnessNud.Value = SelectedProfile.Brightness;
             }
         }
 
         private void RainbowBrightnessNud_ValueChanged(object sender, EventArgs ea)
         {
             RainbowBrightnessTrackBar.Value = (int)RainbowBrightnessNud.Value;
-            selectedProfile.Brightness = (byte)RainbowBrightnessNud.Value;
+            SelectedProfile.Brightness = (byte)RainbowBrightnessNud.Value;
         }
 
         //RainbowSpeedTrackbar
@@ -167,14 +167,14 @@ namespace LedController
         {
             if (RainbowSpeedTrackBar.Visible)
             {
-                RainbowSpeedTrackBar.Value = selectedProfile.Speed;
+                RainbowSpeedTrackBar.Value = SelectedProfile.Speed;
             }
         }
 
         private void RainbowSpeedTrackbar_ValueChanged(object sender, EventArgs ea)
         {
             RainbowSpeedNud.Value = RainbowSpeedTrackBar.Value;
-            selectedProfile.Speed = (int)RainbowSpeedNud.Value;
+            SelectedProfile.Speed = (int)RainbowSpeedNud.Value;
         }
 
         //RainbowSpeedNud
@@ -182,14 +182,14 @@ namespace LedController
         {
             if (RainbowSpeedNud.Visible)
             {
-                RainbowSpeedNud.Value = selectedProfile.Speed;
+                RainbowSpeedNud.Value = SelectedProfile.Speed;
             }
         }
 
         private void RainbowSpeedNud_ValueChanged(object sender, EventArgs ea)
         {
             RainbowSpeedTrackBar.Value = (int)RainbowSpeedNud.Value;
-            selectedProfile.Speed = RainbowSpeedTrackBar.Value;
+            SelectedProfile.Speed = RainbowSpeedTrackBar.Value;
         }
 
         #endregion
@@ -199,26 +199,26 @@ namespace LedController
         {
             if (AmbilightBrightnessTrackBar.Visible)
             {
-                AmbilightBrightnessTrackBar.Value = selectedProfile.Brightness;
+                AmbilightBrightnessTrackBar.Value = SelectedProfile.Brightness;
             }
         }
         void AmbilightBrightnessTrackBar_ValueChanged(object s, EventArgs e)
         {
             AmbilightBrightnessNumericUpDown.Value = AmbilightBrightnessTrackBar.Value;
-            selectedProfile.Brightness = (byte)AmbilightBrightnessTrackBar.Value;
+            SelectedProfile.Brightness = (byte)AmbilightBrightnessTrackBar.Value;
         }
 
         void AmbilightBrightnessNumericUpDown_VisibleChanged(object s, EventArgs e)
         {
             if (AmbilightBrightnessNumericUpDown.Visible)
             {
-                AmbilightBrightnessNumericUpDown.Value = selectedProfile.Brightness;
+                AmbilightBrightnessNumericUpDown.Value = SelectedProfile.Brightness;
             }
         }
         void AmbilightBrightnessNumericUpDown_ValueChanged(object s, EventArgs e)
         {
             AmbilightBrightnessTrackBar.Value = (int)AmbilightBrightnessNumericUpDown.Value;
-            selectedProfile.Brightness = (byte)AmbilightBrightnessNumericUpDown.Value;
+            SelectedProfile.Brightness = (byte)AmbilightBrightnessNumericUpDown.Value;
         }
 
         void AmbilightCaptureScreenComboBox_VisibleChanged(object s, EventArgs e)
@@ -232,7 +232,7 @@ namespace LedController
                     string msg = (scr.Primary) ? $"Screen {i} : {scr.Bounds.Width} x{scr.Bounds.Height} (Primary)" : $"Screen {i}: {scr.Bounds.Width} x{scr.Bounds.Height}";
                     AmbilightCaptureScreenComboBox.Items.Add(msg);
                 }
-                if (selectedProfile.ScreenIndex < Screen.AllScreens.Length) AmbilightCaptureScreenComboBox.SelectedIndex = selectedProfile.ScreenIndex;
+                if (SelectedProfile.ScreenIndex < Screen.AllScreens.Length) AmbilightCaptureScreenComboBox.SelectedIndex = SelectedProfile.ScreenIndex;
                 else AmbilightCaptureScreenComboBox.SelectedIndex = 0;
             }
         }
@@ -243,18 +243,18 @@ namespace LedController
 
         void AmbilightSetCaptureScreenButton_Click(object s, EventArgs e)
         {
-            selectedProfile.ScreenIndex = AmbilightCaptureScreenComboBox.SelectedIndex;
+            SelectedProfile.ScreenIndex = AmbilightCaptureScreenComboBox.SelectedIndex;
         }
 
         void AmbilightCaptureProfileComboBox_VisibleChanged(object s, EventArgs e)
         {
             if (RatioProfiles == null)
             {
-                LoadRatioProfiles(selectedProfile.RatioProfile);
+                LoadRatioProfiles(SelectedProfile.RatioProfile);
             }
             Screen curr;
-            if (selectedProfile.ScreenIndex >= Screen.AllScreens.Length) curr = Screen.AllScreens[0];
-            else curr = Screen.AllScreens[selectedProfile.ScreenIndex];
+            if (SelectedProfile.ScreenIndex >= Screen.AllScreens.Length) curr = Screen.AllScreens[0];
+            else curr = Screen.AllScreens[SelectedProfile.ScreenIndex];
             Rectangle bounds = curr.Bounds;
             double r = Math.Round((double)bounds.Width / (double)bounds.Height, 2);
             RatioProfile profile = new RatioProfile(r);
@@ -266,13 +266,13 @@ namespace LedController
                 string msg = (native) ? $"{RatioProfiles[i].ToString()} (Native)" : RatioProfiles[i].ToString();
                 AmbilightCaptureProfileComboBox.Items.Add(msg);
             }
-            AmbilightCaptureProfileComboBox.SelectedIndex = RatioProfiles.FindIndex((RatioProfile p) => { return p == selectedProfile.RatioProfile; });
+            AmbilightCaptureProfileComboBox.SelectedIndex = RatioProfiles.FindIndex((RatioProfile p) => { return p == SelectedProfile.RatioProfile; });
         }
         void UpdateAmbilightCaptureProfileComboBox()
         {
             if (RatioProfiles == null)
             {
-                LoadRatioProfiles(selectedProfile.RatioProfile);
+                LoadRatioProfiles(SelectedProfile.RatioProfile);
             }
             Screen curr = Screen.AllScreens[AmbilightCaptureScreenComboBox.SelectedIndex];
             Rectangle bounds = curr.Bounds;
@@ -298,7 +298,7 @@ namespace LedController
 
         void AmbilightSetCaptureProfileButton_Click(object s, EventArgs e)
         {
-            if (selectedProfile is AmbilightLedProfile prof)
+            if (SelectedProfile is AmbilightLedProfile prof)
             {
                 prof.UpdateRects(AmbilightCaptureScreenComboBox.SelectedIndex, RatioProfiles[AmbilightCaptureProfileComboBox.SelectedIndex]);
             }
@@ -307,7 +307,7 @@ namespace LedController
         #endregion
         void ProfileSettingsChanged()
         {
-            if (selectedProfile == activeProfile)
+            if (SelectedProfile == ActiveProfile)
             {
                 ActivateSelectedProfile();
             }

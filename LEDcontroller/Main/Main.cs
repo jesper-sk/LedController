@@ -18,7 +18,7 @@ namespace LedController
         ComHandler comHandler;
         Config config;
         List<LedProfile> profiles;
-        LedProfile activeProfile
+        LedProfile ActiveProfile
         {
             get
             {
@@ -34,7 +34,7 @@ namespace LedController
                 else throw new InvalidOperationException("comHandler is null");
             }
         }
-        LedProfile selectedProfile
+        LedProfile SelectedProfile
         {
             get
             {
@@ -60,7 +60,7 @@ namespace LedController
         LedMatrix ledMatrix;
         string[] profileSets;
         string selectedProfileSet;
-        string appName = "Led Controller";
+        const string appName = "Led Controller";
         bool isConnected = false;
         bool firstRun;
         int initState;
@@ -185,7 +185,7 @@ namespace LedController
                 Console.WriteLine("Saving Config file...");
                 SaveConfig();
                 Console.WriteLine("Saving Profiles...");
-                SaveProfilesInCurrProfileSet();
+                SaveProfilesInCurrentProfileSet();
                 Console.WriteLine("Saving Aspect Ratio profiles...");
                 SaveRatioProfiles();
             }
@@ -375,13 +375,13 @@ namespace LedController
         private void RefreshProfiles(bool jumpToNew = false)
         {
             profiles = LoadProfiles();
-            if (activeProfile != null && activeProfile.Parent == selectedProfileSet) activeProfile = profiles[activeProfile.Index];
+            if (ActiveProfile != null && ActiveProfile.Parent == selectedProfileSet) ActiveProfile = profiles[ActiveProfile.Index];
             profileListView.Items.Clear();
             foreach (LedProfile p in profiles)
             {
                 profileListView.Items.Add(new CListViewItem(p));
             }
-            if (activeProfile != null && !jumpToNew)
+            if (ActiveProfile != null && !jumpToNew)
             {
 
             }
@@ -427,7 +427,7 @@ namespace LedController
 
         private void ProfileSetBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (initState == 0) { SaveProfilesInCurrProfileSet(); }
+            if (initState == 0) { SaveProfilesInCurrentProfileSet(); }
             SelectProfileSet((string)profileSetComboBox.SelectedItem);
         }
 
@@ -463,7 +463,7 @@ namespace LedController
                     return;
                 }
                 profiles.Add(GetProfileAs((ProfileType)intProfileMode, profileName, selectedProfileSet));
-                SaveProfilesInCurrProfileSet();                
+                SaveProfilesInCurrentProfileSet();                
                 RefreshProfiles();
             }
         }
@@ -485,23 +485,23 @@ namespace LedController
         {
             if (profileListView.SelectedIndices.Count == 0)
             {
-                selectedProfile = null;
+                SelectedProfile = null;
             }
             else
             {
                 int profileIndex = profileListView.SelectedIndices[0];
-                selectedProfile = profiles[profileIndex];
+                SelectedProfile = profiles[profileIndex];
             }
         }
 
         private void SelectActiveProfile()
         {
-            if (activeProfile != null)
+            if (ActiveProfile != null)
             {
-                SelectProfileSet(activeProfile.UName.Split(':')[0]);
+                SelectProfileSet(ActiveProfile.UName.Split(':')[0]);
                 profileListView.SelectedIndices.Clear();
-                profileListView.SelectedIndices.Add(activeProfile.Index);
-                activeProfile = profiles[activeProfile.Index];
+                profileListView.SelectedIndices.Add(ActiveProfile.Index);
+                ActiveProfile = profiles[ActiveProfile.Index];
                 UpdateSelectedProfileFromListView();
             }
         }
@@ -511,7 +511,7 @@ namespace LedController
          */
         private void ActivateSelectedProfile()
         {
-            activeProfile = selectedProfile;
+            ActiveProfile = SelectedProfile;
         }
 
         private void SetActiveButton_Click(object sender, EventArgs e)
@@ -531,7 +531,7 @@ namespace LedController
         {
             Console.WriteLine("Deativating Leds");
             comHandler.Deactivate(true);
-            activeProfile = null;
+            ActiveProfile = null;
         }
 
         private void SelectActiveProfileButton_Click(object sender, EventArgs e)
@@ -602,7 +602,7 @@ namespace LedController
             return File.Exists(Directory.GetCurrentDirectory() + @"\Configuration.xml");
         }
 
-        private void SaveProfilesInCurrProfileSet()
+        private void SaveProfilesInCurrentProfileSet()
         {
             try
             {
@@ -751,7 +751,7 @@ namespace LedController
 
         private void SaveToXmlButton_Click(object sender, EventArgs e)
         {
-            SaveProfilesInCurrProfileSet();
+            SaveProfilesInCurrentProfileSet();
         }
         #endregion
 
@@ -815,10 +815,10 @@ namespace LedController
         private void UpdateConfig()
         {
             config.StartupOnLogin = OpenOnStartupCheckBox.Checked;
-            if (activeProfile != null)
+            if (ActiveProfile != null)
             {
-                config.ProfileSetOnStartup = activeProfile.UName.Split(':')[0];
-                config.ProfileIndexOnStartup = activeProfile.Index;
+                config.ProfileSetOnStartup = ActiveProfile.UName.Split(':')[0];
+                config.ProfileIndexOnStartup = ActiveProfile.Index;
             }
             config.ConnectOnStartup = ConnectOnOpenCheckBox.Checked;
             config.StartMinimized = startMinimizedCheckBox.Checked;
@@ -838,7 +838,7 @@ namespace LedController
                 {
                     try
                     {
-                        selectedProfile = LoadSingleProfile(config.ProfileSetOnStartup, config.ProfileIndexOnStartup);
+                        SelectedProfile = LoadSingleProfile(config.ProfileSetOnStartup, config.ProfileIndexOnStartup);
                         ActivateSelectedProfile();
                     }
                     catch (Exception e) when (!Env.Debugging)
@@ -935,7 +935,7 @@ namespace LedController
 
         private void AmbilightShowCaptureAreasButton_Click(object sender, EventArgs e)
         {
-            if (selectedProfile is AmbilightLedProfile prof)
+            if (SelectedProfile is AmbilightLedProfile prof)
             {
                 if (!capToggle)
                 {
