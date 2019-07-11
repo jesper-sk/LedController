@@ -206,6 +206,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="old.txt" />
+    <Content Include="Resources\tray_dark.ico" />
+    <Content Include="Resources\tray_light.ico" />
     <Content Include="tray icon.ico" />
   </ItemGroup>
   <ItemGroup>

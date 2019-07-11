@@ -12,7 +12,7 @@ using Microsoft.Win32;
 using System.Collections.Generic;
 using System.IO;
 using LedController;
-using ImRectangle = System.Drawing.Rectangle;
+using Rect = System.Drawing.Rectangle;
 
 namespace Driver
 {
@@ -456,7 +456,7 @@ namespace Driver
         }
 
 
-        public CColor[] GetAvgCColorFromScreen(ImRectangle[] rects, int precision = 12)
+        public CColor[] GetAvgCColorFromScreen(Rect[] rects, int precision = 12)
         {
             CColor[] res = new CColor[rects.Length];
 
@@ -478,7 +478,7 @@ namespace Driver
 
             return res;
 
-            unsafe void GetAverageColors(IntPtr buff, ImRectangle currRect, out int r, out int g, out int b)
+            unsafe void GetAverageColors(IntPtr buff, Rect currRect, out int r, out int g, out int b)
             {
                 byte* curr = (byte*)pointer.ToPointer(); //Gets the byte-pointer of the top-left position of the screens
 
@@ -525,6 +525,180 @@ namespace Driver
                     AddColors(scan3, newWidth, newHeight, ref totals, ref num, maxI, ni);
                 }
             }
+
+            unsafe void AddColors2d(byte* tl, byte* tr, byte* bl, byte* br, int h, int w, ref long[] totals, ref int tot, int maxI = -1, int i = 0, string ind = "")
+            {
+                int nw = w / 2;
+                int nh = h / 2;
+
+                //Console.WriteLine($"nw: {nw}, nh: {nh}");
+
+                if ((nw == 0 && nh == 0) || i == maxI)
+                {
+                    AddColors0d(tl, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
+                    AddColors0d(tr, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
+                    AddColors0d(bl, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
+                    AddColors0d(br, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
+                }
+                else if (nw == 0)
+                {
+                    int hEven = h % 2 == 0 ? 1 : 0;
+
+                    byte*[][] n = new byte*[4][];
+                    for (int x = 0; x < 4; x++) n[x] = new byte*[2];
+
+                    //topleft
+                    n[0][0] = tl;
+                    n[0][1] = n[0][0] + nh * bitmapWidth * bytesPerPixel;
+
+                    //topright
+                    n[1][0] = tr;
+                    n[1][1] = n[1][0] + nh * bitmapWidth * bytesPerPixel;
+
+                    //bottomleft
+                    n[2][1] = bl;
+                    n[2][0] = n[2][0] - nh * bitmapWidth * bytesPerPixel;
+
+                    //bottomright
+                    n[3][1] = br;
+                    n[3][0] = n[3][0] - nh * bitmapWidth * bytesPerPixel;
+
+                    for (int x = 0; x < 4; x++)
+                    {
+                        //Console.WriteLine($"{ind}{x}:");
+                        for (int y = 0; y < 2; y++)
+                        {
+                            //Console.WriteLine($"{ind}  {y}: {(*n[x][y]).ToString()}");
+                        }
+                    }
+
+                    for (int j = 0; j < 4; j++)
+                    {
+                        AddColors1d(n[j][0], n[j][1], nh, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
+                    }
+                }
+                else if (nh == 0)
+                {
+                    int wEven = w % 2 == 0 ? 1 : 0;
+
+                    byte*[][] n = new byte*[4][];
+                    for (int x = 0; x < 4; x++) n[x] = new byte*[2];
+
+                    //topleft
+                    n[0][0] = tl;
+                    n[0][1] = n[0][0] + nw * bytesPerPixel;
+
+                    //topright
+                    n[1][1] = tr;
+                    n[1][0] = n[1][1] - nw * bytesPerPixel;
+
+                    //bottomleft
+                    n[2][0] = bl;
+                    n[2][1] = n[2][0] + nw * bytesPerPixel;
+
+                    //topright
+                    n[3][1] = tr;
+                    n[3][0] = n[1][1] - nw * bytesPerPixel;
+
+                    for (int x = 0; x < 4; x++)
+                    {
+                        //Console.WriteLine($"{ind}{x}:");
+                        for (int y = 0; y < 2; y++)
+                        {
+                            //Console.WriteLine($"{ind}  {y}: {(*n[x][y]).ToString()}");
+                        }
+                    }
+
+                    for (int j = 0; j < 4; j++)
+                    {
+                        AddColors1d(n[j][0], n[j][1], nw, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
+                    }
+                }
+                else
+                {
+                    int wEven = w % 2 == 0 ? 1 : 0;
+                    int hEven = h % 2 == 0 ? 1 : 0;
+
+                    byte*[,] n = new byte*[4, 4];
+
+                    //topleft
+                    n[0, 0] = tl;
+                    n[0, 1] = n[0, 0] + nw * bytesPerPixel;
+                    n[0, 2] = n[0, 0] + nh * bitmapWidth * bytesPerPixel;
+                    n[0, 3] = n[0, 2] + nw * bytesPerPixel;
+
+                    //topright
+                    n[1, 1] = tr;
+                    n[1, 0] = n[1, 1] - nw * bytesPerPixel;
+                    n[1, 2] = n[1, 0] + nh * bitmapWidth * bytesPerPixel;
+                    n[1, 3] = n[1, 2] + nw * bytesPerPixel;
+
+                    //bottomleft
+                    n[2, 2] = bl;
+                    n[2, 3] = n[2, 2] + nw * bytesPerPixel;
+                    n[2, 1] = n[2, 3] - nh * bitmapWidth * bytesPerPixel;
+                    n[2, 0] = n[2, 1] - nw * bytesPerPixel;
+
+                    //bottomright
+                    n[3, 3] = br;
+                    n[3, 2] = n[3, 3] - nw * bytesPerPixel;
+                    n[3, 0] = n[3, 2] - nh * bitmapWidth * bytesPerPixel;
+                    n[3, 1] = n[3, 0] + nw * bytesPerPixel;
+
+                    for (int x = 0; x < 4; x++)
+                    {
+                        //Console.WriteLine($"{ind}{x}:");
+                        for (int y = 0; y < 4; y++)
+                        {
+                            //Console.WriteLine($"{ind}  {y}: {(*n[x, y]).ToString()}");
+                        }
+                    }
+
+                    for (int j = 0; j < 4; j++)
+                    {
+                        AddColors2d(n[j, 0], n[j, 1], n[j, 2], n[j, 3], nh, nw, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
+                    }
+                }
+            }
+
+            unsafe void AddColors1d(byte* f, byte* t, int l, ref long[] totals, ref int tot, int maxI, int i, string ind)
+            {
+                int nl = l / 2;
+                //Console.WriteLine($"{ind}nl: {nl}");
+
+                if (nl == 0)
+                {
+                    AddColors0d(f, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
+                    AddColors0d(t, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
+                }
+                else
+                {
+                    byte* ft = f + nl * bytesPerPixel;
+                    byte* tf = t - nl * bytesPerPixel;
+
+                    //Console.WriteLine($"{ind}0:");
+                    //Console.WriteLine($"{ind} 0: {*f}");
+                    //Console.WriteLine($"{ind} 1: {*ft}");
+                    //Console.WriteLine($"{ind}1:");
+                    //Console.WriteLine($"{ind} 0: {*tf}");
+                    //Console.WriteLine($"{ind} 1: {*t}");
+
+                    AddColors1d(f, ft, nl, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
+                    AddColors1d(tf, t, nl, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
+                }
+            }
+
+            unsafe void AddColors0d(byte* l, ref long[] totals, ref int tot, int maxI, int i, string ind)
+            {
+                byte* curr = l;
+                for (int color = 0; color < 3; color++)
+                {
+                    totals[color] += *curr;
+                    curr++;
+                }
+                tot++;
+            }
+
 #else
             GetChangesBuffer buffer = (GetChangesBuffer)Marshal.PtrToStructure(_getChangesBuffer, typeof(GetChangesBuffer));
             byte[] data = new byte[bytes];

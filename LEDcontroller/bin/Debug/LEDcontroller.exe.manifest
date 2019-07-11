@@ -43,14 +43,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="LedController.exe" size="138728">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="LedController.exe" size="151016">
       <assemblyIdentity name="LedController" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>RvfQyxWrQm+f8fwPFr3+18f8CUn5zhZEN/kUfiJlfOs=</dsig:DigestValue>
+        <dsig:DigestValue>MFn3PYYy/DhBQu1+58+MQMTkGU+19gmOo23WUmcmPls=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -70,6 +70,24 @@
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
       <dsig:DigestValue>xZSHMpSfjCXmciPixwTWC2OOs4CI2LZPd3Pn+5tgdAo=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Resources\tray_dark.ico" size="5430">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>nJHx10PsuIPgvb9ElcIv3Qhnd+vP6RijL6AVEhikjDA=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Resources\tray_light.ico" size="5430">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>oJVpkwoSVWbgUYASHlrGl7HQ+c/ejlmlC4mgqs9nfhY=</dsig:DigestValue>
     </hash>
   </file>
   <file name="tray icon.ico" size="1150">

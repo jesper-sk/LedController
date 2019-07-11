@@ -30,7 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem(new string[] {
             "",
             "",
             "",
@@ -388,9 +388,9 @@
             this.profileListView.FullRowSelect = true;
             this.profileListView.GridLines = true;
             this.profileListView.HideSelection = false;
-            listViewItem1.StateImageIndex = 0;
+            listViewItem4.StateImageIndex = 0;
             this.profileListView.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem1});
+            listViewItem4});
             this.profileListView.Location = new System.Drawing.Point(111, 136);
             this.profileListView.MultiSelect = false;
             this.profileListView.Name = "profileListView";
@@ -945,6 +945,7 @@
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.profileSetComboBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "MainForm";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
