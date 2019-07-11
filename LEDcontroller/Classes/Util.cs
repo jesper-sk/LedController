@@ -438,7 +438,7 @@ namespace LedController
             }
         }
 
-        public Rectangle[] GetCaptureRects(int screenIndex, RatioProfile prof)
+        public Rect[] GetCaptureRects(int screenIndex, RatioProfile prof)
         {
             Screen curr = Screen.AllScreens[screenIndex];
             Rectangle bounds = curr.Bounds;
@@ -475,28 +475,28 @@ namespace LedController
             int x = 0;
             int y = 0;
             int i = 0;
-            Rectangle[] res = new Rectangle[Length];
+            Rect[] res = new Rect[Length];
             do
             {
-                res[i] = new Rectangle((x * dx) + xOffset, (y * dy) + yOffset, dx, dy);
+                res[i] = new Rect((x * dx) + xOffset, (y * dy) + yOffset, dx, dy);
                 x++;
                 i++;
             } while (x < Width - 1);
             do
             {
-                res[i] = new Rectangle((x * dx) + xOffset, (y * dy) + yOffset, dx, dy);
+                res[i] = new Rect((x * dx) + xOffset, (y * dy) + yOffset, dx, dy);
                 y++;
                 i++;
             } while (y < Height - 1);
             do
             {
-                res[i] = new Rectangle((x * dx) + xOffset, (y * dy) + yOffset, dx, dy);
+                res[i] = new Rect((x * dx) + xOffset, (y * dy) + yOffset, dx, dy);
                 x--;
                 i++;
             } while (x > 0);
             do
             {
-                res[i] = new Rectangle((x * dx) + xOffset, (y * dy) + yOffset, dx, dy);
+                res[i] = new Rect((x * dx) + xOffset, (y * dy) + yOffset, dx, dy);
                 y--;
                 i++;
             } while (y > 0);
@@ -713,6 +713,22 @@ namespace LedController
         public override int GetHashCode()
         {
             return base.GetHashCode();
+        }
+    }
+
+    public struct Rect
+    {
+        public int Width;
+        public int Height;
+        public int X;
+        public int Y;
+
+        public Rect(int x, int y, int w, int h)
+        {
+            Width = w;
+            Height = h;
+            X = x;
+            Y = y;
         }
     }
 }

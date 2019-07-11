@@ -19,7 +19,7 @@ namespace LedController
         readonly DesktopMirror mirror = new DesktopMirror();
 
         [XmlIgnore]
-        public Rectangle[] Rects { get; private set; }
+        public Rect[] Rects { get; private set; }
 
         bool isChanging = false;
 

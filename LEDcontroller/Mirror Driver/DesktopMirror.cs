@@ -12,7 +12,7 @@ using Microsoft.Win32;
 using System.Collections.Generic;
 using System.IO;
 using LedController;
-using Rect = System.Drawing.Rectangle;
+
 
 namespace Driver
 {
