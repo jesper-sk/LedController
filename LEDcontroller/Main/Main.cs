@@ -103,8 +103,9 @@ namespace LedController
             config = !firstRun ? LoadConfig() : new Config();
 
             Console.WriteLine($"new config: {firstRun}");
-            //Test();
-
+            Console.WriteLine("RGB: 66, 254, 134");
+            Util.RgbToHsv(66, 254, 134, out double h, out double s, out double v);
+            Console.WriteLine($"HSV: {h}, {s}, {v}");
             //Eventhandlers
             profileListView.DoubleClick += new System.EventHandler(ProfileListView);
         }
@@ -943,7 +944,7 @@ namespace LedController
                     capToggle = true;
                     captureForms = new Form[ledMatrix.Length];
                     int i = 0;
-                    foreach (Rectangle r in prof.Rects)
+                    foreach (Rect r in prof.Rects)
                     {
                         Form f = new Form()
                         {

@@ -155,7 +155,7 @@ namespace LedController
         public override CColor[] Update()
         {
             CColor[] res = new CColor[NumLeds];
-            deltaStartHue = ((double)Map(Speed, 0, 100, 0, (int)Math.Floor(deltaHue * 10))) / 10;
+            deltaStartHue = ((double)Util.Map(Speed, 0, 100, 0, (int)Math.Floor(deltaHue * 10))) / 10;
             currHue = startHue;
             for (int i = 0; i < NumLeds; i++)
             {
@@ -164,10 +164,6 @@ namespace LedController
             }
             startHue = (startHue + deltaStartHue) % 360;
             return res;
-        }
-        int Map(int x, int inLow, int inHigh, int outLow, int outHigh)
-        {
-            return (x - inLow) * (outHigh - outLow) / (inHigh - inLow) + outLow;
         }
     }
 

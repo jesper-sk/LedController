@@ -9,6 +9,60 @@ using System.Xml.Serialization;
 
 namespace LedController
 {
+    public static class Util
+    {
+        public static int Map(int x, int inLow, int inHigh, int outLow, int outHigh)
+        {
+            return (x - inLow) * (outHigh - outLow) / (inHigh - inLow) + outLow;
+        }
+
+        public static void RgbToHsv(byte r, byte g, byte b, out double h, out double s, out double v)
+        {
+            double cMax;
+            double cMin;
+
+            int dom = 1;
+
+            double rNorm = cMax = cMin = r / 255.0;
+            double gNorm = g / 255.0;
+            if (gNorm > rNorm)
+            {
+                cMax = gNorm;
+                dom = 2;
+            }
+            else cMin = gNorm;
+            double bNorm = b / 255.0;
+            if (bNorm > cMax)
+            {
+                cMax = bNorm;
+                dom = 3;
+            }
+            else if (bNorm < cMin) cMin = bNorm;
+
+            double delta = cMax - cMin;
+            Console.WriteLine($"delta: {delta}");
+            Console.WriteLine($"dom: {dom}");
+            if (delta == 0) h = s = 0;
+            else
+            {
+                switch (dom)
+                {
+                    case 1: 
+                        h = 60 * ((gNorm - bNorm) / delta % 6);
+                        break;
+                    case 2:
+                        h = 60 * (((bNorm - rNorm) / delta) + 2);
+                        break;
+                    default: //dom is 3
+                        h = 60 * (((rNorm - gNorm) / delta) + 4);
+                        break;
+                }
+                while (h < 0) h += 360;
+                s = delta / cMax;
+            }
+            v = cMax;
+        }
+    }
     public class StripConfig
     {
         public int Width;
@@ -184,7 +238,6 @@ namespace LedController
                     // The color is not defined, we should throw an error.
 
                     default:
-                        //LFATAL("i Value error in Pixel conversion, Value is %d", i);
                         R = G = B = V; // Just pretend its black/white
                         break;
                 }
@@ -192,6 +245,52 @@ namespace LedController
             r = Clamp((int)(R * 255.0));
             g = Clamp((int)(G * 255.0));
             b = Clamp((int)(B * 255.0));
+        }
+
+        static void RgbToHsv(byte r, byte g, byte b, out double h, out double s, out double v)
+        {
+            double cMax;
+            double cMin;
+
+            int dom = 1;
+
+            double rNorm = cMax = cMin = r / 255.0;
+            double gNorm = g / 255.0;
+            if (gNorm > rNorm)
+            {
+                cMax = gNorm;
+                dom = 2;
+            }
+            else cMin = gNorm;
+            double bNorm = b / 255.0;
+            if (bNorm > cMax)
+            {
+                cMax = bNorm;
+                dom = 3;
+            }
+            else if (bNorm < cMin) cMin = bNorm;
+
+            double delta = cMax - cMin;
+
+            if (delta == 0) h = s = 0;
+            else
+            {
+                switch (dom)
+                {
+                    case 1:
+                        h = 60 * ((gNorm - bNorm) / delta % 6);
+                        break;
+                    case 2:
+                        h = 60 * ((bNorm - rNorm) / delta) + 2;
+                        break;
+                    default: //dom is 3
+                        h = 60 * ((rNorm - gNorm) / delta) + 4;
+                        break;
+                }
+
+                s = delta / cMax;
+            }
+            v = cMax;
         }
 
         /// <summary>
@@ -257,6 +356,187 @@ namespace LedController
             sb.Append($"G{G} ");
             sb.Append($"B{B}");
             return sb.ToString();
+        }
+    }
+
+    public class CCColor
+    {
+        private byte? r;
+        private byte? g;
+        private byte? b;
+        private double? h;
+        private double? s;
+        private double? v;
+
+        [XmlAttribute]
+        public byte R
+        {
+            get {
+                if (r != null) return r.GetValueOrDefault();
+                else
+                {
+                    //HsvToRgb(H, S, V,  out r, out g, out b);
+                    return r.GetValueOrDefault();
+                }
+            }
+            set
+            {
+                
+            }
+        }
+        [XmlAttribute]
+        public byte G;
+        [XmlAttribute]
+        public byte B;
+        [XmlIgnore]
+        public double H;
+        [XmlIgnore]
+        public double S;
+        [XmlIgnore]
+        public double V;
+
+        static void RgbToHsv(byte r, byte g, byte b, out double h, out double s, out double v)
+        {
+            double cMax;
+            double cMin;
+
+            int dom = 1;
+
+            double rNorm = cMax = cMin = r / 255.0;
+            double gNorm = g / 255.0;
+            if (gNorm > rNorm)
+            {
+                cMax = gNorm;
+                dom = 2;
+            }
+            else cMin = gNorm;
+            double bNorm = b / 255.0;
+            if (bNorm > cMax)
+            {
+                cMax = bNorm;
+                dom = 3;
+            }
+            else if (bNorm < cMin) cMin = bNorm;
+
+            double delta = cMax - cMin;
+            Console.WriteLine($"delta: {delta}");
+            Console.WriteLine($"dom: {dom}");
+            if (delta == 0) h = s = 0;
+            else
+            {
+                switch (dom)
+                {
+                    case 1:
+                        h = 60 * ((gNorm - bNorm) / delta % 6);
+                        break;
+                    case 2:
+                        h = 60 * (((bNorm - rNorm) / delta) + 2);
+                        break;
+                    default: //dom is 3
+                        h = 60 * (((rNorm - gNorm) / delta) + 4);
+                        break;
+                }
+                while (h < 0) h += 360;
+                s = delta / cMax;
+            }
+            v = cMax;
+        }
+
+        static void HsvToRgb(double h, double S, double V, out byte r, out byte g, out byte b)
+        {
+            double H = h;
+            while (H < 0) { H += 360; };
+            while (H >= 360) { H -= 360; };
+            double R, G, B;
+            if (V <= 0)
+            { R = G = B = 0; }
+            else if (S <= 0)
+            {
+                R = G = B = V;
+            }
+            else
+            {
+                double hf = H / 60.0;
+                int i = (int)Math.Floor(hf);
+                double f = hf - i;
+                double pv = V * (1 - S);
+                double qv = V * (1 - S * f);
+                double tv = V * (1 - S * (1 - f));
+                switch (i)
+                {
+
+                    // Red is the dominant color
+
+                    case 0:
+                        R = V;
+                        G = tv;
+                        B = pv;
+                        break;
+
+                    // Green is the dominant color
+
+                    case 1:
+                        R = qv;
+                        G = V;
+                        B = pv;
+                        break;
+                    case 2:
+                        R = pv;
+                        G = V;
+                        B = tv;
+                        break;
+
+                    // Blue is the dominant color
+
+                    case 3:
+                        R = pv;
+                        G = qv;
+                        B = V;
+                        break;
+                    case 4:
+                        R = tv;
+                        G = pv;
+                        B = V;
+                        break;
+
+                    // Red is the dominant color
+
+                    case 5:
+                        R = V;
+                        G = pv;
+                        B = qv;
+                        break;
+
+                    // Just in case we overshoot on our math by a little, we put these here. Since its a switch it won't slow us down at all to put these here.
+
+                    case 6:
+                        R = V;
+                        G = tv;
+                        B = pv;
+                        break;
+                    case -1:
+                        R = V;
+                        G = pv;
+                        B = qv;
+                        break;
+
+                    // The color is not defined, we should throw an error.
+
+                    default:
+                        R = G = B = V; // Just pretend its black/white
+                        break;
+                }
+            }
+            r = Clamp((byte)(R * 255.0));
+            g = Clamp((byte)(G * 255.0));
+            b = Clamp((byte)(B * 255.0));
+        }
+
+        static byte Clamp(byte i)
+        {
+            if (i < 0) return 0;
+            if (i > 255) return 255;
+            return i;
         }
     }
     public class DirectBitmap : IDisposable
@@ -401,7 +681,7 @@ namespace LedController
             BottomLeft = BottomRight + Width - 1;
             Length = BottomLeft + Height - 1;
 
-            Length = (2 * Width + 2 * Height) - 4;
+            Length = 2 * Width + 2 * Height - 4;
             offset = Length - Start;
 
             colors = new CColor[Length];
@@ -428,7 +708,7 @@ namespace LedController
             BottomLeft = BottomRight + Width - 1;
             Length = BottomLeft + Height - 1;
 
-            Length = (2 * Width + 2 * Height) - 4;
+            Length = 2 * Width + 2 * Height - 4;
             offset = Length - Start;
 
             colors = new CColor[Length];
@@ -628,35 +908,35 @@ namespace LedController
         {
             switch (Math.Round(ratio, 2))
             {
-                case (1.33):
+                case 1.33:
                     w = 4;
                     h = 3;
                     break;
-                case (1.50):
+                case 1.50:
                     w = 3;
                     h = 2;
                     break;
-                case (1.60):
+                case 1.60:
                     w = 16;
                     h = 10;
                     break;
-                case (1.78):
+                case 1.78:
                     w = 16;
                     h = 9;
                     break;
-                case (2.00):
+                case 2.00:
                     w = 18;
                     h = 9;
                     break;
-                case (2.33):
+                case 2.33:
                     w = 21;
                     h = 9;
                     break;
-                case (2.39):
+                case 2.39:
                     w = 43;
                     h = 18;
                     break;
-                case (3.56):
+                case 3.56:
                     w = 32;
                     h = 9;
                     break;
