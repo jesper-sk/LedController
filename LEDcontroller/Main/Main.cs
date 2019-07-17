@@ -66,6 +66,8 @@ namespace LedController
         int initState;
 
         bool capToggle = false;
+        bool visualizerActive = false;
+        Visualizer vis;
 
         [XmlArray("AspectRatioProfiles"), XmlArrayItem("profile")]
         List<RatioProfile> RatioProfiles;
@@ -101,11 +103,6 @@ namespace LedController
             //Load or create config object
             firstRun = !GetCanLoadConfig();
             config = !firstRun ? LoadConfig() : new Config();
-
-            Console.WriteLine($"new config: {firstRun}");
-            Console.WriteLine("RGB: 66, 254, 134");
-            Util.RgbToHsv(66, 254, 134, out double h, out double s, out double v);
-            Console.WriteLine($"HSV: {h}, {s}, {v}");
             //Eventhandlers
             profileListView.DoubleClick += new System.EventHandler(ProfileListView);
         }
@@ -913,14 +910,33 @@ namespace LedController
 
         private void CreateVisualizer()
         {
-            Visualizer v = new Visualizer(ledMatrix);
-            comHandler.AddVisualizer(v);
-            v.Show();
+            vis = new Visualizer(ledMatrix);
+            comHandler.AddVisualizer(vis);
+            vis.Show();
+            vis.FormClosed += new FormClosedEventHandler(VisualizerClosed);
+            visualizerActive = true;
+        }
+
+        private void VisualizerClosed(object o, FormClosedEventArgs ea)
+        {
+            visualizerActive = false;
+            VisualizeButton.Text = "Visualizer";
         }
 
         private void VisualizeButton_Click(object sender, EventArgs e)
         {
-            CreateVisualizer();
+            if (!visualizerActive)
+            {
+                CreateVisualizer();
+                VisualizeButton.Text = "Close vis.";
+            }
+            else
+            {
+                VisualizeButton.Text = "Visualizer";
+                vis.Close();
+                vis.FormClosed -= VisualizerClosed;
+                vis.Dispose();
+            }
         }
 
         private string FormatProfileName(string name)

@@ -252,9 +252,9 @@ namespace LedController
             buffer[6] = brightness;
             for (int i = 0; i < numLeds; i++)
             {
-                buffer[i * 3 + 7] = ledColors[i].R;
-                buffer[i * 3 + 7 + 1] = ledColors[i].G;
-                buffer[i * 3 + 7 + 2] = ledColors[i].B;
+                buffer[i * 3 + 7] = Convert.ToByte(ledColors[i].R);
+                buffer[i * 3 + 7 + 1] = Convert.ToByte(ledColors[i].G);
+                buffer[i * 3 + 7 + 2] = Convert.ToByte(ledColors[i].B);
             }
             //Console.WriteLine(ByteToString(buffer));
             if (CurrVisualizer != null)
@@ -286,9 +286,9 @@ namespace LedController
             buffer[6] = brightness;
             for (int i = 0; i < numLeds; i++)
             {
-                buffer[i * 3 + 7] = ledColors[i].R;
-                buffer[i * 3 + 7 + 1] = ledColors[i].G;
-                buffer[i * 3 + 7 + 2] = ledColors[i].B;
+                buffer[i * 3 + 7] = Convert.ToByte(ledColors[i].R);
+                buffer[i * 3 + 7 + 1] = Convert.ToByte(ledColors[i].G);
+                buffer[i * 3 + 7 + 2] = Convert.ToByte(ledColors[i].B);
             }
             //Console.WriteLine(ByteToString(buffer));
             if (CurrVisualizer != null)

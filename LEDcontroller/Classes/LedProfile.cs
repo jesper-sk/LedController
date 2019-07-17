@@ -86,7 +86,7 @@ namespace LedController
             Index = index;
             Parent = parentProfileSet;
             Brightness = 64;
-            LedColor = new CColor(Color.White);
+            LedColor = CColor.FromColor(Color.White);
             ProfileType = ProfileType.Static;
             Name = name;
             UName = $"{parentProfileSet}:{name}";
@@ -159,7 +159,7 @@ namespace LedController
             currHue = startHue;
             for (int i = 0; i < NumLeds; i++)
             {
-                res[i] = new CColor(currHue, 255, 255);
+                res[i] = CColor.FromHsv(currHue, 1, 1);
                 currHue = (currHue + deltaHue) % 360;
             }
             startHue = (startHue + deltaStartHue) % 360;
@@ -205,7 +205,7 @@ namespace LedController
             {
                 res[j] = new CColor(); //defaults to black
             }
-            res[i] = new CColor(Color.White);
+            res[i] = CColor.FromColor(Color.White);
             if (updates >= 1 / fps)
             {
                 i++;
@@ -283,7 +283,7 @@ namespace LedController
             CColor[] res = new CColor[NumLeds];
             for (int i = 0; i < NumLeds; i++)                           // Initiate result array to all black
             {
-                res[i] = new CColor(Color.Black);
+                res[i] = new CColor();
             }
             for (int i = 0; i < Slices.Count; i++)                      // Iterate over all Slices (and CColors)
             {
@@ -331,13 +331,13 @@ namespace LedController
             CColor[] Right = new CColor[matrix.Height];
             for (int i = 0; i < matrix.Width; i++)
             {
-                Top[i] = new CColor(Color.Red);
-                Bot[i] = new CColor(Color.Red);
+                Top[i] = CColor.FromColor(Color.Red);
+                Bot[i] = CColor.FromColor(Color.Red);
             }
             for (int i = 0; i < matrix.Height; i++)
             {
-                Left[i] = new CColor(Color.Blue);
-                Right[i] = new CColor(Color.Blue);
+                Left[i] = CColor.FromColor(Color.Blue);
+                Right[i] = CColor.FromColor(Color.Blue);
             }
             matrix.AssignFrom(matrix.TopLeft, Top);
             matrix.AssignFrom(matrix.TopRight, Right);

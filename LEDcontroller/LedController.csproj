@@ -107,6 +107,12 @@
       <DependentUpon>AssignHotkeyForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Classes\AmbilightLedProfile.cs" />
+    <Compile Include="Utilities\CColorBlendTester.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Utilities\CColorBlendTester.Designer.cs">
+      <DependentUpon>CColorBlendTester.cs</DependentUpon>
+    </Compile>
     <Compile Include="Mirror Driver\DesktopMirror.cs" />
     <Compile Include="Mirror Driver\Interop.cs" />
     <Compile Include="Dialog\Visualizer.cs">
@@ -142,6 +148,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Dialog\AssignHotkeyForm.resx">
       <DependentUpon>AssignHotkeyForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Utilities\CColorBlendTester.resx">
+      <DependentUpon>CColorBlendTester.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Main\Main.resx">
       <DependentUpon>Main.cs</DependentUpon>
@@ -210,8 +219,6 @@
     <Content Include="Resources\tray_light.ico" />
     <Content Include="tray icon.ico" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Utilities\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

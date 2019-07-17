@@ -29,7 +29,7 @@ namespace LedController
             Index = index;
             Parent = parentProfileSet;
             Brightness = 255;
-            LedColor = new CColor(Color.White);
+            LedColor = new CColor();
             ProfileType = ProfileType.Ambilight;
             Name = name;
             UName = $"{parentProfileSet}:{name}";
@@ -73,7 +73,7 @@ namespace LedController
                 CColor[] res = new CColor[matrix.MasterLength];
                 for(int i = 0; i < res.Length; i++)
                 {
-                    res[i] = new CColor(Color.Black);
+                    res[i] = new CColor();
                 }
                 return res;
             }

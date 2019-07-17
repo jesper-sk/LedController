@@ -121,7 +121,7 @@ namespace LedController
         {
             if (Step1GroupBox.Visible)
             {
-                step1Profile = new SliceOfPixelsLedProfile("setup", new List<Slice> { new Slice(0, (int)numLedsNumericUpDown.Value + 1) }, new List<CColor> { new CColor(Color.White) }, (byte)setupBrightnessTrackbar.Value);
+                step1Profile = new SliceOfPixelsLedProfile("setup", new List<Slice> { new Slice(0, (int)numLedsNumericUpDown.Value + 1) }, new List<CColor> { CColor.FromColor(Color.White) }, (byte)setupBrightnessTrackbar.Value);
                 currProfile = step1Profile;
                 if (connected) ComHandler.SetActive(currProfile);
             }

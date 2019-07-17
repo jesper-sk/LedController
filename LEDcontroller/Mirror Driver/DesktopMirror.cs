@@ -473,7 +473,7 @@ namespace Driver
             for (int i = 0; i < rects.Length; i++)
             {
                 GetAverageColors(pointer, rects[i], out int r, out int g, out int b);
-                res[i] = new CColor(r, g, b);
+                res[i] = CColor.FromRgb(r, g, b);
             }
 
             return res;

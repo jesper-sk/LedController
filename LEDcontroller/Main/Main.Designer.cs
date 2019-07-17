@@ -30,7 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem(new string[] {
             "",
             "",
             "",
@@ -388,9 +388,9 @@
             this.profileListView.FullRowSelect = true;
             this.profileListView.GridLines = true;
             this.profileListView.HideSelection = false;
-            listViewItem4.StateImageIndex = 0;
+            listViewItem2.StateImageIndex = 0;
             this.profileListView.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem4});
+            listViewItem2});
             this.profileListView.Location = new System.Drawing.Point(111, 136);
             this.profileListView.MultiSelect = false;
             this.profileListView.Name = "profileListView";

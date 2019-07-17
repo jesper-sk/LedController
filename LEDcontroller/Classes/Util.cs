@@ -83,25 +83,25 @@ namespace LedController
         }
 
     }
-    public class CColor
+    public class CColor_old
     {
         private Color color = Color.Black;
 
-        public CColor() { }
-        public CColor(Color c) { color = c; }
+        public CColor_old() { }
+        public CColor_old(Color c) { color = c; }
 
-        public CColor(int R, int G, int B)
+        public CColor_old(int R, int G, int B)
         {
             color = Color.FromArgb(R, G, B);
         }
 
-        public CColor(int H, byte S, byte V)
+        public CColor_old(int H, byte S, byte V)
         {
             HsvToRgb(H, S, V, out int R, out int G, out int B);
             color = Color.FromArgb(R, G, B);
         }
 
-        public CColor(double H, double S, double V)
+        public CColor_old(double H, double S, double V)
         {
             HsvToRgb(H, S, V, out int R, out int G, out int B);
             color = Color.FromArgb(R, G, B);
@@ -117,19 +117,19 @@ namespace LedController
             color = c;
         }
 
-        public CColor(double H, byte S, byte V)
+        public CColor_old(double H, byte S, byte V)
         {
             SetFromHsv(H, S, V);
         }
 
-        public static implicit operator Color(CColor x)
+        public static implicit operator Color(CColor_old x)
         {
             return x.ToColor();
         }
 
-        public static implicit operator CColor(Color c)
+        public static implicit operator CColor_old(Color c)
         {
-            return new CColor(c);
+            return new CColor_old(c);
         }
 
         public void SetFromHsv(int h, byte s, byte v)
@@ -359,43 +359,58 @@ namespace LedController
         }
     }
 
-    public class CCColor
+    public class CColor
     {
-        private byte? r;
-        private byte? g;
-        private byte? b;
-        private double? h;
-        private double? s;
-        private double? v;
-
         [XmlAttribute]
-        public byte R
+        public int R = 0;
+        [XmlAttribute]
+        public int G = 0;
+        [XmlAttribute]
+        public int B = 0;
+
+        /// <summary>
+        /// Returns a CColor-instance based on RGB-values
+        /// </summary>
+        /// <param name="r">R-value, [0, 255]</param>
+        /// <param name="g">G-value, [0, 255]</param>
+        /// <param name="b">B-value, [0, 255]</param>
+        /// <returns>A CColor-instance based on RGB-values</returns>
+        public static CColor FromRgb(int r, int g, int b)
         {
-            get {
-                if (r != null) return r.GetValueOrDefault();
-                else
-                {
-                    //HsvToRgb(H, S, V,  out r, out g, out b);
-                    return r.GetValueOrDefault();
-                }
-            }
-            set
+            CColor res = new CColor
             {
-                
-            }
+                R = r,
+                G = g,
+                B = b
+            };
+            return res;
         }
-        [XmlAttribute]
-        public byte G;
-        [XmlAttribute]
-        public byte B;
-        [XmlIgnore]
-        public double H;
-        [XmlIgnore]
-        public double S;
-        [XmlIgnore]
-        public double V;
 
-        static void RgbToHsv(byte r, byte g, byte b, out double h, out double s, out double v)
+        /// <summary>
+        /// Returns a CColor-instance based on HSV-values
+        /// </summary>
+        /// <param name="h">H-value, in degrees [0, 360]</param>
+        /// <param name="s">S-value, [0, 1]</param>
+        /// <param name="v">V-value, [0, 1]</param>
+        /// <returns>A CColor-instance based on HSV-values</returns>
+        public static CColor FromHsv(double h, double s, double v)
+        {
+            HsvToRgb(h, s, v, out int r, out int g, out int b);
+            CColor res = new CColor
+            {
+                R = r,
+                G = g,
+                B = b
+            };
+            return res;
+        }
+
+        public static CColor FromColor(Color c)
+        {
+            return FromRgb(c.R, c.G, c.B);
+        }
+
+        static void RgbToHsv(int r, int g, int b, out double h, out double s, out double v)
         {
             double cMax;
             double cMin;
@@ -442,33 +457,33 @@ namespace LedController
             v = cMax;
         }
 
-        static void HsvToRgb(double h, double S, double V, out byte r, out byte g, out byte b)
+        static void HsvToRgb(double h, double s, double v, out int r, out int g, out int b)
         {
             double H = h;
             while (H < 0) { H += 360; };
             while (H >= 360) { H -= 360; };
             double R, G, B;
-            if (V <= 0)
+            if (v <= 0)
             { R = G = B = 0; }
-            else if (S <= 0)
+            else if (s <= 0)
             {
-                R = G = B = V;
+                R = G = B = v;
             }
             else
             {
                 double hf = H / 60.0;
                 int i = (int)Math.Floor(hf);
                 double f = hf - i;
-                double pv = V * (1 - S);
-                double qv = V * (1 - S * f);
-                double tv = V * (1 - S * (1 - f));
+                double pv = v * (1 - s);
+                double qv = v * (1 - s * f);
+                double tv = v * (1 - s * (1 - f));
                 switch (i)
                 {
 
                     // Red is the dominant color
 
                     case 0:
-                        R = V;
+                        R = v;
                         G = tv;
                         B = pv;
                         break;
@@ -477,12 +492,12 @@ namespace LedController
 
                     case 1:
                         R = qv;
-                        G = V;
+                        G = v;
                         B = pv;
                         break;
                     case 2:
                         R = pv;
-                        G = V;
+                        G = v;
                         B = tv;
                         break;
 
@@ -491,18 +506,18 @@ namespace LedController
                     case 3:
                         R = pv;
                         G = qv;
-                        B = V;
+                        B = v;
                         break;
                     case 4:
                         R = tv;
                         G = pv;
-                        B = V;
+                        B = v;
                         break;
 
                     // Red is the dominant color
 
                     case 5:
-                        R = V;
+                        R = v;
                         G = pv;
                         B = qv;
                         break;
@@ -510,12 +525,12 @@ namespace LedController
                     // Just in case we overshoot on our math by a little, we put these here. Since its a switch it won't slow us down at all to put these here.
 
                     case 6:
-                        R = V;
+                        R = v;
                         G = tv;
                         B = pv;
                         break;
                     case -1:
-                        R = V;
+                        R = v;
                         G = pv;
                         B = qv;
                         break;
@@ -523,20 +538,74 @@ namespace LedController
                     // The color is not defined, we should throw an error.
 
                     default:
-                        R = G = B = V; // Just pretend its black/white
+                        R = G = B = v; // Just pretend its black/white
                         break;
                 }
             }
             r = Clamp((byte)(R * 255.0));
             g = Clamp((byte)(G * 255.0));
             b = Clamp((byte)(B * 255.0));
+
+            byte Clamp(byte i)
+            {
+                if (i < 0) return 0;
+                if (i > 255) return 255;
+                return i;
+            }
         }
 
-        static byte Clamp(byte i)
+        public void GetHsv(out double h, out double s, out double v)
         {
-            if (i < 0) return 0;
-            if (i > 255) return 255;
-            return i;
+            RgbToHsv(R, G, B, out h, out s, out v);
+        }
+        public void SetHsv(double h, double s, double v)
+        {
+            HsvToRgb(h, s, v, out R, out G, out B);
+        }
+
+        public Color ToColor()
+        {
+            return Color.FromArgb(R, G, B);
+        }
+
+        public static implicit operator CColor(Color c)
+        {
+            return FromColor(c);
+        }
+        public static implicit operator Color(CColor c)
+        {
+            return c.ToColor();
+        }
+
+        public static CColor operator +(CColor x, CColor y)
+        {
+            int nR = (x.R + y.R) / 2;
+            int nG = (x.G + y.G) / 2;
+            int nB = (x.B + y.B) / 2;
+            Console.WriteLine($"x: {x}");
+            Console.WriteLine($"y: {y}");
+            CColor res = FromRgb(nR, nG, nB);
+            Console.WriteLine($"r: {res}");
+            return res;
+        }
+
+        public static CColor Blend(CColor c1, CColor c2, double t)
+        {
+            return FromRgb(
+                BlendColorValue(c1.R, c2.R),
+                BlendColorValue(c1.G, c2.G),
+                BlendColorValue(c1.B, c2.B)
+                );
+
+            int BlendColorValue(int a, int b)
+            {
+                return (int)Math.Sqrt(((1 - t) * (a * a)) + (t * (b * b)));
+            }
+        }
+
+        public override string ToString()
+        {
+            return $"R={R},G={G},B={B}";
         }
     }
     public class DirectBitmap : IDisposable
@@ -785,9 +854,9 @@ namespace LedController
 
         public void CleanSlate()
         {
-            foreach (CColor c in colors)
+            for (int c = 0; c < colors.Length; c++)
             {
-                c.FromColor(Color.Black);
+                colors[c] = new CColor();
             }
         }
 

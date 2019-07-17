@@ -28,25 +28,42 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Visualizer));
+            this.statLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
+            // 
+            // statLabel
+            // 
+            this.statLabel.AutoSize = true;
+            this.statLabel.ForeColor = System.Drawing.SystemColors.HighlightText;
+            this.statLabel.Location = new System.Drawing.Point(23, 20);
+            this.statLabel.Name = "statLabel";
+            this.statLabel.Size = new System.Drawing.Size(28, 13);
+            this.statLabel.TabIndex = 0;
+            this.statLabel.Text = "Text\r\n";
             // 
             // Visualizer
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.BackColor = System.Drawing.SystemColors.Desktop;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.statLabel);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "Visualizer";
-            this.ShowIcon = false;
-            this.ShowInTaskbar = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
-            this.Text = "Form2";
+            this.Text = "Visualizer";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Visualizer_FormClosing);
             this.Load += new System.EventHandler(this.Visualizer_Load);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
+
+        private System.Windows.Forms.Label statLabel;
     }
 }
