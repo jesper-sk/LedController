@@ -102,3 +102,4 @@ C:\Users\Jesper\Documents\LedController\LEDcontroller\obj\Debug\LedController.ap
 C:\Users\Jesper\Documents\LedController\LEDcontroller\obj\Debug\LedController.exe
 C:\Users\Jesper\Documents\LedController\LEDcontroller\obj\Debug\LedController.pdb
 C:\Users\Jesper\Documents\LedController\LEDcontroller\obj\Debug\LedController.CCColorBlendTester.resources
+C:\Users\Jesper\Documents\LedController\LEDcontroller\obj\Debug\LedController.Log.resources

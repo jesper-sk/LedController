@@ -9,6 +9,86 @@ using System.Xml.Serialization;
 
 namespace LedController
 {
+    public static class Util
+    {
+        public static int Map(int x, int inLow, int inHigh, int outLow, int outHigh)
+        {
+            return (x - inLow) * (outHigh - outLow) / (inHigh - inLow) + outLow;
+        }
+
+        public static void RgbToHsv(byte r, byte g, byte b, out double h, out double s, out double v)
+        {
+            double cMax;
+            double cMin;
+
+            int dom = 1;
+
+            double rNorm = cMax = cMin = r / 255.0;
+            double gNorm = g / 255.0;
+            if (gNorm > rNorm)
+            {
+                cMax = gNorm;
+                dom = 2;
+            }
+            else cMin = gNorm;
+            double bNorm = b / 255.0;
+            if (bNorm > cMax)
+            {
+                cMax = bNorm;
+                dom = 3;
+            }
+            else if (bNorm < cMin) cMin = bNorm;
+
+            double delta = cMax - cMin;
+            Logger.Log($"delta: {delta}");
+            Logger.Log($"dom: {dom}");
+            if (delta == 0) h = s = 0;
+            else
+            {
+                switch (dom)
+                {
+                    case 1: 
+                        h = 60 * ((gNorm - bNorm) / delta % 6);
+                        break;
+                    case 2:
+                        h = 60 * (((bNorm - rNorm) / delta) + 2);
+                        break;
+                    default: //dom is 3
+                        h = 60 * (((rNorm - gNorm) / delta) + 4);
+                        break;
+                }
+                while (h < 0) h += 360;
+                s = delta / cMax;
+            }
+            v = cMax;
+        }
+
+        public static string ByteToString(byte[] inp)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append('[');
+            sb.Append(inp[0]);
+            for (int i = 1; i < inp.Length; i++)
+            {
+                byte b = inp[i];
+                sb.Append(", ");
+                sb.Append(b);
+            }
+            sb.Append(']');
+            return sb.ToString();
+        }
+
+        public static string FormatProfileName(string name)
+        {
+            if (name == null) return "None";
+            string[] spl = name.Split(':');
+            StringBuilder sb = new StringBuilder();
+            sb.Append(spl[0]);
+            sb.Append(" -> ");
+            sb.Append(spl[1]);
+            return sb.ToString();
+        }
+    }
     public class StripConfig
     {
         public int Width;
@@ -31,105 +111,129 @@ namespace LedController
     }
     public class CColor
     {
-        private Color color = Color.Black;
+        [XmlAttribute]
+        public int R = 0;
+        [XmlAttribute]
+        public int G = 0;
+        [XmlAttribute]
+        public int B = 0;
 
-        public CColor() { }
-        public CColor(Color c) { color = c; }
-
-        public CColor(int R, int G, int B)
+        /// <summary>
+        /// Returns a CColor-instance based on RGB-values
+        /// </summary>
+        /// <param name="r">R-value, [0, 255]</param>
+        /// <param name="g">G-value, [0, 255]</param>
+        /// <param name="b">B-value, [0, 255]</param>
+        /// <returns>A CColor-instance based on RGB-values</returns>
+        public static CColor FromRgb(int r, int g, int b)
         {
-            color = Color.FromArgb(R, G, B);
-        }
-
-        public CColor(int H, byte S, byte V)
-        {
-            HsvToRgb(H, S, V, out int R, out int G, out int B);
-            color = Color.FromArgb(R, G, B);
-        }
-
-        public CColor(double H, double S, double V)
-        {
-            HsvToRgb(H, S, V, out int R, out int G, out int B);
-            color = Color.FromArgb(R, G, B);
-        }
-
-        public Color ToColor()
-        {
-            return color;
-        }
-
-        public void FromColor(Color c)
-        {
-            color = c;
-        }
-
-        public CColor(double H, byte S, byte V)
-        {
-            SetFromHsv(H, S, V);
-        }
-
-        public static implicit operator Color(CColor x)
-        {
-            return x.ToColor();
-        }
-
-        public static implicit operator CColor(Color c)
-        {
-            return new CColor(c);
-        }
-
-        public void SetFromHsv(int h, byte s, byte v)
-        {
-            if (h > 360)
+            CColor res = new CColor
             {
-                throw new InvalidOperationException("Hue should be lower than or equal to 360!");
-            }
-            double S = s / 255;
-            double V = v / 255;
-            double H = h;
-            HsvToRgb(H, S, V, out int r, out int g, out int b);
-            color = Color.FromArgb(r, g, b);
+                R = r,
+                G = g,
+                B = b
+            };
+            return res;
         }
 
-        public void SetFromHsv(double h, byte s, byte v)
+        /// <summary>
+        /// Returns a CColor-instance based on HSV-values
+        /// </summary>
+        /// <param name="h">H-value, in degrees [0, 360]</param>
+        /// <param name="s">S-value, [0, 1]</param>
+        /// <param name="v">V-value, [0, 1]</param>
+        /// <returns>A CColor-instance based on HSV-values</returns>
+        public static CColor FromHsv(double h, double s, double v)
         {
-            if (h > 360)
+            HsvToRgb(h, s, v, out int r, out int g, out int b);
+            CColor res = new CColor
             {
-                throw new InvalidOperationException("Hue should be lower than or equal to 360!");
-            }
-            double S = s / 255;
-            double V = v / 255;
-            HsvToRgb(h, S, V, out int r, out int g, out int b);
-            color = Color.FromArgb(r, g, b);
+                R = r,
+                G = g,
+                B = b
+            };
+            return res;
         }
 
-        static void HsvToRgb(double h, double S, double V, out int r, out int g, out int b)
+        public static CColor FromColor(Color c)
+        {
+            return FromRgb(c.R, c.G, c.B);
+        }
+
+        static void RgbToHsv(int r, int g, int b, out double h, out double s, out double v)
+        {
+            double cMax;
+            double cMin;
+
+            int dom = 1;
+
+            double rNorm = cMax = cMin = r / 255.0;
+            double gNorm = g / 255.0;
+            if (gNorm > rNorm)
+            {
+                cMax = gNorm;
+                dom = 2;
+            }
+            else cMin = gNorm;
+            double bNorm = b / 255.0;
+            if (bNorm > cMax)
+            {
+                cMax = bNorm;
+                dom = 3;
+            }
+            else if (bNorm < cMin) cMin = bNorm;
+
+            double delta = cMax - cMin;
+            Logger.Log($"delta: {delta}");
+            Logger.Log($"dom: {dom}");
+            if (delta == 0) h = s = 0;
+            else
+            {
+                switch (dom)
+                {
+                    case 1:
+                        h = 60 * ((gNorm - bNorm) / delta % 6);
+                        break;
+                    case 2:
+                        h = 60 * (((bNorm - rNorm) / delta) + 2);
+                        break;
+                    default: //dom is 3
+                        h = 60 * (((rNorm - gNorm) / delta) + 4);
+                        break;
+                }
+                while (h < 0) h += 360;
+                s = delta / cMax;
+            }
+            v = cMax;
+        }
+
+        static void HsvToRgb(double h, double s, double v, out int r, out int g, out int b)
         {
             double H = h;
             while (H < 0) { H += 360; };
             while (H >= 360) { H -= 360; };
             double R, G, B;
-            if (V <= 0)
+            if (v <= 0)
             { R = G = B = 0; }
-            else if (S <= 0)
+            else if (s <= 0)
             {
-                R = G = B = V;
+                R = G = B = v;
             }
             else
             {
                 double hf = H / 60.0;
                 int i = (int)Math.Floor(hf);
                 double f = hf - i;
-                double pv = V * (1 - S);
-                double qv = V * (1 - S * f);
-                double tv = V * (1 - S * (1 - f));
+                double pv = v * (1 - s);
+                double qv = v * (1 - s * f);
+                double tv = v * (1 - s * (1 - f));
                 switch (i)
                 {
 
                     // Red is the dominant color
 
                     case 0:
-                        R = V;
+                        R = v;
                         G = tv;
                         B = pv;
                         break;
@@ -138,12 +242,12 @@ namespace LedController
 
                     case 1:
                         R = qv;
-                        G = V;
+                        G = v;
                         B = pv;
                         break;
                     case 2:
                         R = pv;
-                        G = V;
+                        G = v;
                         B = tv;
                         break;
 
@@ -152,18 +256,18 @@ namespace LedController
                     case 3:
                         R = pv;
                         G = qv;
-                        B = V;
+                        B = v;
                         break;
                     case 4:
                         R = tv;
                         G = pv;
-                        B = V;
+                        B = v;
                         break;
 
                     // Red is the dominant color
 
                     case 5:
-                        R = V;
+                        R = v;
                         G = pv;
                         B = qv;
                         break;
@@ -171,12 +275,12 @@ namespace LedController
                     // Just in case we overshoot on our math by a little, we put these here. Since its a switch it won't slow us down at all to put these here.
 
                     case 6:
-                        R = V;
+                        R = v;
                         G = tv;
                         B = pv;
                         break;
                     case -1:
-                        R = V;
+                        R = v;
                         G = pv;
                         B = qv;
                         break;
@@ -184,79 +288,74 @@ namespace LedController
                     // The color is not defined, we should throw an error.
 
                     default:
-                        //LFATAL("i Value error in Pixel conversion, Value is %d", i);
-                        R = G = B = V; // Just pretend its black/white
+                        R = G = B = v; // Just pretend its black/white
                         break;
                 }
             }
-            r = Clamp((int)(R * 255.0));
-            g = Clamp((int)(G * 255.0));
-            b = Clamp((int)(B * 255.0));
-        }
+            r = Clamp((byte)(R * 255.0));
+            g = Clamp((byte)(G * 255.0));
+            b = Clamp((byte)(B * 255.0));
 
-        /// <summary>
-        /// Clamp a value to 0-255
-        /// </summary>
-        static int Clamp(int i)
-        {
-            if (i < 0) return 0;
-            if (i > 255) return 255;
-            return i;
-        }
-
-        [XmlIgnore]
-        public float H
-        {
-            get { return color.GetHue(); }
-        }
-
-        [XmlIgnore]
-        public float S
-        {
-            get { return color.GetSaturation(); }
-        }
-
-        [XmlIgnore]
-        public float V
-        {
-            get { return color.GetBrightness(); }
-        }
-
-        [XmlAttribute]
-        public byte R
-        {
-            get { return color.R; }
-            set
+            byte Clamp(byte i)
             {
-                color = Color.FromArgb(value, G, B);
+                if (i < 0) return 0;
+                if (i > 255) return 255;
+                return i;
             }
         }
-        [XmlAttribute]
-        public byte G
+
+        public void GetHsv(out double h, out double s, out double v)
         {
-            get { return color.G; }
-            set
-            {
-                color = Color.FromArgb(R, value, B);
-            }
+            RgbToHsv(R, G, B, out h, out s, out v);
         }
-        [XmlAttribute]
-        public byte B
+        public void SetHsv(double h, double s, double v)
         {
-            get { return color.B; }
-            set
+            HsvToRgb(h, s, v, out R, out G, out B);
+        }
+
+        public Color ToColor()
+        {
+            return Color.FromArgb(R, G, B);
+        }
+
+        public static implicit operator CColor(Color c)
+        {
+            return FromColor(c);
+        }
+        public static implicit operator Color(CColor c)
+        {
+            return c.ToColor();
+        }
+
+        public static CColor operator +(CColor x, CColor y)
+        {
+            int nR = (x.R + y.R) / 2;
+            int nG = (x.G + y.G) / 2;
+            int nB = (x.B + y.B) / 2;
+            Logger.Log($"x: {x}");
+            Logger.Log($"y: {y}");
+            CColor res = FromRgb(nR, nG, nB);
+            Logger.Log($"r: {res}");
+            return res;
+        }
+
+        public static CColor Blend(CColor c1, CColor c2, double t)
+        {
+            return FromRgb(
+                BlendColorValue(c1.R, c2.R),
+                BlendColorValue(c1.G, c2.G),
+                BlendColorValue(c1.B, c2.B)
+                );
+
+            int BlendColorValue(int a, int b)
             {
-                color = Color.FromArgb(R, G, value);
+                return (int)Math.Sqrt(((1 - t) * (a * a)) + (t * (b * b)));
             }
         }
 
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
-            sb.Append($"R{R} ");
-            sb.Append($"G{G} ");
-            sb.Append($"B{B}");
-            return sb.ToString();
+            return $"R={R},G={G},B={B}";
         }
     }
     public class DirectBitmap : IDisposable
@@ -367,11 +466,6 @@ namespace LedController
         public readonly int BottomLeft;
         public readonly int BottomRight;
 
-        public readonly int ResolutionX;
-        public readonly int ResolutionY;
-
-        public readonly int ScreenIndex;
-
         public readonly int Width;
         public readonly int Height;
         public readonly int Start;
@@ -393,15 +487,13 @@ namespace LedController
 
             MasterLength = ml == 0 ? Length : ml;
 
-            ScreenIndex = 0;
-
             TopLeft = 0;
             TopRight = Width - 1;
             BottomRight = TopRight + Height - 1;
             BottomLeft = BottomRight + Width - 1;
             Length = BottomLeft + Height - 1;
 
-            Length = (2 * Width + 2 * Height) - 4;
+            Length = 2 * Width + 2 * Height - 4;
             offset = Length - Start;
 
             colors = new CColor[Length];
@@ -420,15 +512,13 @@ namespace LedController
 
             MasterLength = config.MasterLength == 0 ? Length : config.MasterLength;
 
-            ScreenIndex = 0;
-
             TopLeft = 0;
             TopRight = Width - 1;
             BottomRight = TopRight + Height - 1;
             BottomLeft = BottomRight + Width - 1;
             Length = BottomLeft + Height - 1;
 
-            Length = (2 * Width + 2 * Height) - 4;
+            Length = 2 * Width + 2 * Height - 4;
             offset = Length - Start;
 
             colors = new CColor[Length];
@@ -438,53 +528,65 @@ namespace LedController
             }
         }
 
-        public Rectangle[] GetCaptureRects(int screenIndex, double tr)
+        public Rect[] GetCaptureRects(int screenIndex, RatioProfile prof)
         {
             Screen curr = Screen.AllScreens[screenIndex];
             Rectangle bounds = curr.Bounds;
-            double sr = bounds.Width / (double)bounds.Height;
-            int xOffset = bounds.X;
-            int yOffset = bounds.Y;
-            int dx = bounds.Width / Width;
-            int dy = bounds.Height / Height;
-            if (tr < sr)
-            {
-                double factor = sr / tr;
+            int sw = bounds.Width;
+            int sh = bounds.Height;
 
-            }
-            else if (tr > sr)
-            {
+            //Logger.Log($"Screen: {sw}x{sh}");
 
-            }
-            else
-            {
+            double sr = sw / (double)sh;
+            double tr = prof.CalculateRatio();
 
-            }
-            int x = xOffset;
-            int y = yOffset;
+            //Logger.Log($"Screen Ratio {sr}, Target Ratio {tr}");
+
+            double f = sr / tr;
+
+            //Logger.Log($"Factor {f}");
+            //Logger.Log($"1/Factor: {1 / f}");
+
+            int tw = (int)(sw * Math.Min(1.0, 1 / f));
+            int th = (int)(sh * Math.Min(1.0, f));
+
+            //Logger.Log($"Target {tw}x{th}");
+
+            int dx = (int)Math.Round((double)tw / Width);
+            int dy = (int)Math.Round((double)th / Height);
+
+            //Logger.Log($"dx{dx}, dy{dy}");
+
+            int xOffset = bounds.X + ((sw - tw) / 2);
+            int yOffset = bounds.Y + ((sh - th) / 2);
+
+            //Logger.Log($"Offset ({xOffset},{yOffset})");
+
+            int x = 0;
+            int y = 0;
             int i = 0;
-            Rectangle[] res = new Rectangle[Length];
+            Rect[] res = new Rect[Length];
             do
             {
-                res[i] = new Rectangle(x * dx, y * dy, dx, dy);
+                res[i] = new Rect((x * dx) + xOffset, (y * dy) + yOffset, dx, dy);
                 x++;
                 i++;
             } while (x < Width - 1);
             do
             {
-                res[i] = new Rectangle(x * dx, y * dy, dx, dy);
+                res[i] = new Rect((x * dx) + xOffset, (y * dy) + yOffset, dx, dy);
                 y++;
                 i++;
             } while (y < Height - 1);
             do
             {
-                res[i] = new Rectangle(x * dx, y * dy, dx, dy);
+                res[i] = new Rect((x * dx) + xOffset, (y * dy) + yOffset, dx, dy);
                 x--;
                 i++;
             } while (x > 0);
             do
             {
-                res[i] = new Rectangle(x * dx, y * dy, dx, dy);
+                res[i] = new Rect((x * dx) + xOffset, (y * dy) + yOffset, dx, dy);
                 y--;
                 i++;
             } while (y > 0);
@@ -493,9 +595,9 @@ namespace LedController
 
         public void CleanSlate()
         {
-            foreach (CColor c in colors)
+            for (int c = 0; c < colors.Length; c++)
             {
-                c.FromColor(Color.Black);
+                colors[c] = new CColor();
             }
         }
 
@@ -609,42 +711,60 @@ namespace LedController
             return sb.ToString();
         }
     }
+    public static class Logger
+    {
+        public static Queue<string> msgs = new Queue<string>();
+        public static void Log(string txt)
+        {
+            if (Env.Debugging) Console.WriteLine(txt);
+            msgs.Enqueue($"[{DateTime.Now.ToString("HH:mm:ss")}] {txt}\n");
+        }
 
+        public static void Warn(string txt)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void Error(string txt)
+        {
+            throw new NotImplementedException();
+        }
+    }
     public static class AspectRatio
     {
         public static void EstimateAspectRatio(double ratio, out double w, out double h)
         {
             switch (Math.Round(ratio, 2))
             {
-                case (1.33):
+                case 1.33:
                     w = 4;
                     h = 3;
                     break;
-                case (1.50):
+                case 1.50:
                     w = 3;
                     h = 2;
                     break;
-                case (1.60):
+                case 1.60:
                     w = 16;
                     h = 10;
                     break;
-                case (1.78):
+                case 1.78:
                     w = 16;
                     h = 9;
                     break;
-                case (2.00):
+                case 2.00:
                     w = 18;
                     h = 9;
                     break;
-                case (2.33):
+                case 2.33:
                     w = 21;
                     h = 9;
                     break;
-                case (2.39):
+                case 2.39:
                     w = 43;
                     h = 18;
                     break;
-                case (3.56):
+                case 3.56:
                     w = 32;
                     h = 9;
                     break;
@@ -655,44 +775,71 @@ namespace LedController
             }
         }
     }
-
     [Serializable]
-    public class RatioProfile : IEquatable<RatioProfile>
+    public class RatioProfile : IEquatable<object>
     {
         [XmlAttribute]
-        public double Ratio { get; set; }
+        public double RatioWidth { get; set; }
+
         [XmlAttribute]
-        public string Name { get; set; }
+        public double RatioHeight { get; set; }
+
         public RatioProfile() { }
         public RatioProfile(double ratio)
         {
-            Ratio = ratio;
             AspectRatio.EstimateAspectRatio(ratio, out double w, out double h);
-            Name = $"{w}:{h}";
+            RatioWidth = w;
+            RatioHeight = h;
+        }
+
+        public double CalculateRatio()
+        {
+            return RatioWidth / RatioHeight;
         }
         public override string ToString()
         {
-            return Name;
+            return $"{RatioWidth}:{RatioHeight}";
         }
 
-        public bool Equals(RatioProfile other)
+        public override bool Equals(object other)
         {
-            return Ratio == other.Ratio;
+            if (other is RatioProfile r) return RatioWidth == r.RatioWidth && RatioHeight == r.RatioHeight;
+            return false;
         }
 
         public static bool operator ==(RatioProfile a, RatioProfile b)
         {
-            return a.Equals(b);
+            return a?.Equals(b) ?? b?.Equals(null) ?? true;
         }
 
         public static bool operator !=(RatioProfile a, RatioProfile b)
         {
-            return !a.Equals(b);
+            return !a?.Equals(b) ?? !b?.Equals(null) ?? false;
         }
 
         public override int GetHashCode()
         {
             return base.GetHashCode();
+        }
+    }
+    public struct Rect
+    {
+        public int Width;
+        public int Height;
+        public int X;
+        public int Y;
+
+        public Rect(int x, int y, int w, int h)
+        {
+            Width = w;
+            Height = h;
+            X = x;
+            Y = y;
+        }
+
+        public override string ToString()
+        {
+            return $"X={X},Y={Y},W={Width},H={Height}";
         }
     }
 }

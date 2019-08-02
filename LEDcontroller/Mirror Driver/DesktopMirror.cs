@@ -1,4 +1,4 @@
-﻿#define UNSAFE
+﻿//#define MEDIAN
 
 using System;
 using System.ComponentModel;
@@ -12,7 +12,8 @@ using Microsoft.Win32;
 using System.Collections.Generic;
 using System.IO;
 using LedController;
-
+using static System.Math;
+using System.Text;
 
 namespace Driver
 {
@@ -118,10 +119,10 @@ namespace Driver
 
         public MirrorState State { get; private set; }
 
-        //private const string driverDeviceNumber = "DEVICE0";
+        private const string driverDeviceNumber = "DEVICE0";
         private const string driverMiniportName = "dfmirage";
         private const string driverName = "Mirage Driver";
-        //private const string driverRegistryPath = @"SYSTEM\CurrentControlSet\Hardware Profiles\Current\System\CurrentControlSet\Services";
+        private const string driverRegistryPath = @"SYSTEM\CurrentControlSet\Hardware Profiles\Current\System\CurrentControlSet\Services";
 
         private int primaryScreenOffsetX;
         private int primaryScreenOffsetY;
@@ -136,11 +137,17 @@ namespace Driver
             }
 
             var device = new DisplayDevice();
-            var deviceMode = new DeviceMode { dmDriverExtra = 0 };
+            var deviceMode = new DeviceMode { dmDriverExtra = 0 };              /* Assigned properties:
+                                                                                    - dmDriverExtra - 0
+                                                                                    - dmSize - size of deviceMode
+                                                                                    - dmBitsPerPel - primary screen bpp
+                                                                                    - dmDeviceName - empty string
+                                                                                    - dmFiels - idk lol
+                                                                                */
 
             device.CallBack = Marshal.SizeOf(device);
             deviceMode.dmSize = (short)Marshal.SizeOf(deviceMode);
-            deviceMode.dmBitsPerPel = Screen.PrimaryScreen.BitsPerPixel;
+            deviceMode.dmBitsPerPel = Screen.PrimaryScreen.BitsPerPixel;        // Get bits per pixel of primaryscreen
 
             if (deviceMode.dmBitsPerPel == 24)
                 deviceMode.dmBitsPerPel = 32;
@@ -171,7 +178,7 @@ namespace Driver
             bool deviceFound;
             uint deviceIndex = 0;
 
-            while (deviceFound = EnumDisplayDevices(null, deviceIndex, ref device, 0))
+            while (deviceFound = EnumDisplayDevices(null, deviceIndex, ref device, 0))      // User user32.dll::EnumDisplayDevices to enumerate all devices until the right one occurs
             {
                 if (device.DeviceString == driverName)
                     break;
@@ -320,7 +327,7 @@ namespace Driver
             if (State != MirrorState.Connected)
                 return;
 
-            unmapSharedBuffers();
+            UnmapSharedBuffers();
             State = MirrorState.Loaded;
         }
 
@@ -394,7 +401,7 @@ namespace Driver
             return false;
         }
 
-        private void unmapSharedBuffers()
+        private void UnmapSharedBuffers()
         {
             int res = ExtEscape(_globalDC, UnMap, Marshal.SizeOf(typeof(GetChangesBuffer)), _getChangesBuffer, 0, IntPtr.Zero);
             if (res < 0)
@@ -456,7 +463,7 @@ namespace Driver
         }
 
 
-        public CColor[] GetAvgCColorFromScreen(Rect[] rects, int precision = 12)
+        public CColor[] GetAvgCColorFromScreen(Rect[] rects, bool print, int delta = 4)
         {
             CColor[] res = new CColor[rects.Length];
 
@@ -464,47 +471,114 @@ namespace Driver
                 throw new InvalidOperationException("In order to get current screen you must at least be connected to the driver");
 
             int bytesPerPixel = bitmapBitsPerPixel / 8;
-            int bytes = bitmapWidth * bytesPerPixel * bitmapHeight;
+            int totalBytes = bitmapWidth * bytesPerPixel * bitmapHeight;
+            int alpha = bytesPerPixel - 3;
 
-#if UNSAFE
             GetChangesBuffer buffer = (GetChangesBuffer)Marshal.PtrToStructure(_getChangesBuffer, typeof(GetChangesBuffer));
             IntPtr pointer = buffer.UserBuffer;
 
-            for (int i = 0; i < rects.Length; i++)
+            StringBuilder log = new StringBuilder();
+
+            //Logger.Log($"Bitmap Width {bitmapWidth}, Height {bitmapHeight}");
+            //Logger.Log($"No. bytes: {totalBytes}");
+
+            unsafe
             {
-                GetAverageColors(pointer, rects[i], out int r, out int g, out int b);
-                res[i] = CColor.FromRgb(r, g, b);
+                byte* origin = (byte*)pointer.ToPointer();
+
+                for(int i = 0; i < rects.Length; i++)
+                {
+                    Rect currRect = rects[i];
+                    byte* curr =
+                        origin +
+                        (currRect.X + primaryScreenOffsetX) * bytesPerPixel +
+                        (currRect.Y + primaryScreenOffsetY) * bitmapWidth * bytesPerPixel;
+
+                    //Logger.Log($"\nRect {i}, {currRect.ToString()}");
+                    //Logger.Log($"Coordinates offset: X={currRect.X + primaryScreenOffsetX},Y={currRect.Y + primaryScreenOffsetY}");
+                    //GetCoordinates(origin, curr, out int xs, out int ys, out int cs);
+                    //Logger.Log($"byte ({xs},{ys},{cs}), no. {curr - origin}");
+
+#if MEDIAN
+#else
+                    int tot = 0;
+                    long[] totals = { 0, 0, 0 };
+
+                    int x, y;
+                    x = y = 0;
+
+                    while(y < currRect.Height)
+                    {
+                        while(x < currRect.Width)
+                        {
+                            for(int c = 0; c < 3; c++)
+                            {
+                                totals[c] += *curr;
+                                curr++;
+                            }
+                            curr += alpha;
+                            curr += (delta - 1) * bytesPerPixel;
+                            tot++;
+                            x += delta;
+                        }
+                        if (print) log.AppendLine("");
+                        curr += bitmapWidth * bytesPerPixel * delta;
+                        x = 0;
+                        y += delta;
+                    }
+
+                    int b = (int)Round((double)totals[0] / tot);
+                    int g = (int)Round((double)totals[1] / tot);
+                    int r = (int)Round((double)totals[2] / tot);
+
+                    res[i] = CColor.FromRgb(r, g, b);
+#endif
+                }
             }
+
+
+            if (print) File.WriteAllText("ding.txt", log.ToString());
 
             return res;
 
-            unsafe void GetAverageColors(IntPtr buff, Rect currRect, out int r, out int g, out int b)
+            unsafe void oGetAverageColors(IntPtr buff, Rect currRect, out int r, out int g, out int b)
             {
-                byte* curr = (byte*)pointer.ToPointer(); //Gets the byte-pointer of the top-left position of the screens
+                byte* origin = (byte*)buff.ToPointer(); //Gets the byte-pointer of the top-left position of the screens
 
-                curr += (currRect.X + primaryScreenOffsetX) * bytesPerPixel;
-                curr += ((currRect.Y + primaryScreenOffsetY) * bitmapWidth) * bytesPerPixel;
+                byte* recStart = 
+                    origin +
+                    (currRect.X + primaryScreenOffsetX) * bytesPerPixel +
+                    ((currRect.Y + primaryScreenOffsetY) * bitmapWidth) * bytesPerPixel;
 
                 int tot = 0;
                 long[] totals = { 0, 0, 0 };
 
-                byte* tr = curr + (currRect.Width - 1) * bytesPerPixel;
-                byte* bl = curr + (currRect.Height - 1) * (currRect.Width - 1) * bytesPerPixel;
+                byte* tr = recStart + (currRect.Width - 1) * bytesPerPixel;
+                byte* bl = recStart + (currRect.Height - 1) * (currRect.Width - 1) * bytesPerPixel;
                 byte* br = bl + (currRect.Width - 1) * bytesPerPixel;
 
-                AddColors(curr, currRect.Width, currRect.Height, ref totals, ref tot, 4);
+                AddColors2d(origin, recStart, tr, bl, br, currRect.Height, currRect.Width, ref totals, ref tot, 1);
 
-                b = (int)Math.Round((double)totals[0] / tot);
-                g = (int)Math.Round((double)totals[1] / tot);
-                r = (int)Math.Round((double)totals[2] / tot);
+                b = (int)Round((double)totals[0] / tot);
+                g = (int)Round((double)totals[1] / tot);
+                r = (int)Round((double)totals[2] / tot);
             }
 
-            unsafe void AddColors(byte* scan0, int width, int height, ref long[] totals, ref int num, int maxI = -1, int i = 0)
+            unsafe void GetCoordinates(byte* origin, byte* point, out int x, out int y, out int c)
+            {
+                long d = point - origin;
+                y = Convert.ToInt32(DivRem(d, (long)bitmapWidth * bytesPerPixel, out d));
+                x = Convert.ToInt32(DivRem(d, (long)bytesPerPixel, out d));
+                c = Convert.ToInt32(d);
+            }
+
+#region Failed Trials
+            unsafe void AddColors(byte* origin, byte* scan0, int width, int height, ref long[] totals, ref int num, int maxI = -1, int i = 0)
             {
                 if (i == maxI || (width == 0 && height == 0))
                 {
                     byte* curr = &*scan0;
-                    for(int color = 0; color < 3; color++)
+                    for (int color = 0; color < 3; color++)
                     {
                         totals[color] += *curr;
                         curr++;
@@ -519,26 +593,26 @@ namespace Driver
                     byte* scan2 = scan0 + (newHeight + 1) * bitmapWidth * bytesPerPixel;
                     byte* scan3 = scan2 + (newWidth + 1) * bytesPerPixel;
                     int ni = i + 1;
-                    AddColors(scan0, newWidth, newHeight, ref totals, ref num, maxI, ni);
-                    AddColors(scan1, newWidth, newHeight, ref totals, ref num, maxI, ni);
-                    AddColors(scan2, newWidth, newHeight, ref totals, ref num, maxI, ni);
-                    AddColors(scan3, newWidth, newHeight, ref totals, ref num, maxI, ni);
+                    AddColors(origin, scan0, newWidth, newHeight, ref totals, ref num, maxI, ni);
+                    AddColors(origin, scan1, newWidth, newHeight, ref totals, ref num, maxI, ni);
+                    AddColors(origin, scan2, newWidth, newHeight, ref totals, ref num, maxI, ni);
+                    AddColors(origin, scan3, newWidth, newHeight, ref totals, ref num, maxI, ni);
                 }
             }
 
-            unsafe void AddColors2d(byte* tl, byte* tr, byte* bl, byte* br, int h, int w, ref long[] totals, ref int tot, int maxI = -1, int i = 0, string ind = "")
+            unsafe void AddColors2d(byte* origin, byte* tl, byte* tr, byte* bl, byte* br, int h, int w, ref long[] totals, ref int tot, int maxI = -1, int i = 0, string ind = "")
             {
                 int nw = w / 2;
                 int nh = h / 2;
 
-                //Console.WriteLine($"nw: {nw}, nh: {nh}");
+                //Logger.Log($"nw: {nw}, nh: {nh}");
 
                 if ((nw == 0 && nh == 0) || i == maxI)
                 {
-                    AddColors0d(tl, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                    AddColors0d(tr, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                    AddColors0d(bl, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                    AddColors0d(br, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
+                    AddColors0d(origin, tl, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
+                    AddColors0d(origin, tr, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
+                    AddColors0d(origin, bl, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
+                    AddColors0d(origin, br, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
                 }
                 else if (nw == 0)
                 {
@@ -565,16 +639,16 @@ namespace Driver
 
                     for (int x = 0; x < 4; x++)
                     {
-                        //Console.WriteLine($"{ind}{x}:");
+                        //Logger.Log($"{ind}{x}:");
                         for (int y = 0; y < 2; y++)
                         {
-                            //Console.WriteLine($"{ind}  {y}: {(*n[x][y]).ToString()}");
+                            //Logger.Log($"{ind}  {y}: {(*n[x][y]).ToString()}");
                         }
                     }
 
                     for (int j = 0; j < 4; j++)
                     {
-                        AddColors1d(n[j][0], n[j][1], nh, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
+                        AddColors1d(origin, n[j][0], n[j][1], nh, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
                     }
                 }
                 else if (nh == 0)
@@ -602,16 +676,16 @@ namespace Driver
 
                     for (int x = 0; x < 4; x++)
                     {
-                        //Console.WriteLine($"{ind}{x}:");
+                        //Logger.Log($"{ind}{x}:");
                         for (int y = 0; y < 2; y++)
                         {
-                            //Console.WriteLine($"{ind}  {y}: {(*n[x][y]).ToString()}");
+                            //Logger.Log($"{ind}  {y}: {(*n[x][y]).ToString()}");
                         }
                     }
 
                     for (int j = 0; j < 4; j++)
                     {
-                        AddColors1d(n[j][0], n[j][1], nw, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
+                        AddColors1d(origin, n[j][0], n[j][1], nw, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
                     }
                 }
                 else
@@ -647,277 +721,69 @@ namespace Driver
 
                     for (int x = 0; x < 4; x++)
                     {
-                        //Console.WriteLine($"{ind}{x}:");
+                        //Logger.Log($"{ind}{x}:");
                         for (int y = 0; y < 4; y++)
                         {
-                            //Console.WriteLine($"{ind}  {y}: {(*n[x, y]).ToString()}");
+                            //Logger.Log($"{ind}  {y}: {(*n[x, y]).ToString()}");
                         }
                     }
 
                     for (int j = 0; j < 4; j++)
                     {
-                        AddColors2d(n[j, 0], n[j, 1], n[j, 2], n[j, 3], nh, nw, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
+                        AddColors2d(origin, n[j, 0], n[j, 1], n[j, 2], n[j, 3], nh, nw, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
                     }
                 }
             }
 
-            unsafe void AddColors1d(byte* f, byte* t, int l, ref long[] totals, ref int tot, int maxI, int i, string ind)
+            unsafe void AddColors1d(byte* origin, byte* f, byte* t, int l, ref long[] totals, ref int tot, int maxI, int i, string ind)
             {
                 int nl = l / 2;
-                //Console.WriteLine($"{ind}nl: {nl}");
+                //Logger.Log($"{ind}nl: {nl}");
 
                 if (nl == 0)
                 {
-                    AddColors0d(f, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                    AddColors0d(t, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
+                    AddColors0d(origin, f, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
+                    AddColors0d(origin, t, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
                 }
                 else
                 {
                     byte* ft = f + nl * bytesPerPixel;
                     byte* tf = t - nl * bytesPerPixel;
 
-                    //Console.WriteLine($"{ind}0:");
-                    //Console.WriteLine($"{ind} 0: {*f}");
-                    //Console.WriteLine($"{ind} 1: {*ft}");
-                    //Console.WriteLine($"{ind}1:");
-                    //Console.WriteLine($"{ind} 0: {*tf}");
-                    //Console.WriteLine($"{ind} 1: {*t}");
+                    //Logger.Log($"{ind}0:");
+                    //Logger.Log($"{ind} 0: {*f}");
+                    //Logger.Log($"{ind} 1: {*ft}");
+                    //Logger.Log($"{ind}1:");
+                    //Logger.Log($"{ind} 0: {*tf}");
+                    //Logger.Log($"{ind} 1: {*t}");
 
-                    AddColors1d(f, ft, nl, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                    AddColors1d(tf, t, nl, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
+                    AddColors1d(origin, f, ft, nl, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
+                    AddColors1d(origin, tf, t, nl, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
                 }
             }
 
-            unsafe void AddColors0d(byte* l, ref long[] totals, ref int tot, int maxI, int i, string ind)
+            unsafe void AddColors0d(byte* origin, byte* l, ref long[] totals, ref int tot, int maxI, int i, string ind)
             {
                 byte* curr = l;
                 for (int color = 0; color < 3; color++)
                 {
+                    try
+                    {
+                        totals[color] += *curr;
+                    }
+                    catch
+                    {
+                        GetCoordinates(origin, curr, out int xa, out int ya, out int ca);
+                        Logger.Log($"AVE at abs({xa},{ya},{ca}), no. {curr - origin}");
+                        Console.ReadKey();
+                    }
                     totals[color] += *curr;
                     curr++;
                 }
                 tot++;
             }
+#endregion
 
-#else
-            GetChangesBuffer buffer = (GetChangesBuffer)Marshal.PtrToStructure(_getChangesBuffer, typeof(GetChangesBuffer));
-            byte[] data = new byte[bytes];
-
-            try
-            {
-                Marshal.Copy(buffer.UserBuffer, data, 0, bytes);
-            }
-            catch (AccessViolationException)
-            {
-                logger.Add("AccessViolationException thrown");
-            }
-
-            for (int i = 0; i < rects.Length; i++)
-            {
-                ImRectangle currRect = rects[i];
-
-                long[] totals = new long[] { 0, 0, 0 };
-                int widthInPixels = currRect.Width;
-                int heightInLines = currRect.Height;
-                int fromY = currRect.Y;
-                int toY = fromY + heightInLines;
-                int fromX = currRect.X;
-                int toX = fromX + widthInPixels;
-                int stride = _bitmapWidth * 4;
-
-                for (int y = fromY; y < toY; y++)
-                {
-                    for (int x = fromX; x < toX; x++)
-                    {
-                        for (int color = 0; color < 3; color++)
-                        {
-                            int index = (y + offsetY) * stride + (x + offsetX) * bytesPerPixel + color;
-                            try { totals[color] += data[index]; }
-                            catch (OverflowException) {; }
-                        }
-                    }
-                }
-
-                long tot = widthInPixels * heightInLines;
-                int avgB = (int)(totals[0] / tot);
-                int avgG = (int)(totals[1] / tot);
-                int avgR = (int)(totals[2] / tot);
-                res[i] = new CColor(avgR, avgG, avgB);
-            }
-
-                        unsafe void AddColorsSquare(byte* tl, byte* tr, byte* bl, byte* br, int h, int w, ref long[] totals, ref int tot, int maxI = -1, int i = 0, string ind = "")
-            {
-                int nw = w / 2;
-                int nh = h / 2;
-
-                //Console.WriteLine($"nw: {nw}, nh: {nh}");
-
-                if ((nw == 0 && nh == 0) || i == maxI)
-                {
-                    AddColors0d(tl, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                    AddColors0d(tr, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                    AddColors0d(bl, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                    AddColors0d(br, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                }
-                else if (nw == 0)
-                {
-                    int hEven = h % 2 == 0 ? 1 : 0;
-
-                    byte*[][] n = new byte*[4][];
-                    for (int x = 0; x < 4; x++) n[x] = new byte*[2];
-
-                    //topleft
-                    n[0][0] = tl;
-                    n[0][1] = n[0][0] + nh * bitmapWidth * bytesPerPixel;
-
-                    //topright
-                    n[1][0] = tr;
-                    n[1][1] = n[1][0] + nh * bitmapWidth * bytesPerPixel;
-
-                    //bottomleft
-                    n[2][1] = bl;
-                    n[2][0] = n[2][0] - nh * bitmapWidth * bytesPerPixel;
-
-                    //bottomright
-                    n[3][1] = br;
-                    n[3][0] = n[3][0] - nh * bitmapWidth * bytesPerPixel;
-
-                    for (int x = 0; x < 4; x++)
-                    {
-                        //Console.WriteLine($"{ind}{x}:");
-                        for (int y = 0; y < 2; y++)
-                        {
-                            //Console.WriteLine($"{ind}  {y}: {(*n[x][y]).ToString()}");
-                        }
-                    }
-
-                    for (int j = 0; j < 4; j++)
-                    {
-                        AddColors1d(n[j][0], n[j][1], nh, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                    }
-                }
-                else if (nh == 0)
-                {
-                    int wEven = w % 2 == 0 ? 1 : 0;
-
-                    byte*[][] n = new byte*[4][];
-                    for (int x = 0; x < 4; x++) n[x] = new byte*[2];
-
-                    //topleft
-                    n[0][0] = tl;
-                    n[0][1] = n[0][0] + nw * bytesPerPixel;
-
-                    //topright
-                    n[1][1] = tr;
-                    n[1][0] = n[1][1] - nw * bytesPerPixel;
-
-                    //bottomleft
-                    n[2][0] = bl;
-                    n[2][1] = n[2][0] + nw * bytesPerPixel;
-
-                    //topright
-                    n[3][1] = tr;
-                    n[3][0] = n[1][1] - nw * bytesPerPixel;
-
-                    for (int x = 0; x < 4; x++)
-                    {
-                        //Console.WriteLine($"{ind}{x}:");
-                        for (int y = 0; y < 2; y++)
-                        {
-                            //Console.WriteLine($"{ind}  {y}: {(*n[x][y]).ToString()}");
-                        }
-                    }
-
-                    for (int j = 0; j < 4; j++)
-                    {
-                        AddColors1d(n[j][0], n[j][1], nw, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                    }
-                }
-                else
-                {
-                    int wEven = w % 2 == 0 ? 1 : 0;
-                    int hEven = h % 2 == 0 ? 1 : 0;
-
-                    byte*[,] n = new byte*[4, 4];
-
-                    //topleft
-                    n[0, 0] = tl;
-                    n[0, 1] = n[0, 0] + nw * bytesPerPixel;
-                    n[0, 2] = n[0, 0] + nh * bitmapWidth * bytesPerPixel;
-                    n[0, 3] = n[0, 2] + nw * bytesPerPixel;
-
-                    //topright
-                    n[1, 1] = tr;
-                    n[1, 0] = n[1, 1] - nw * bytesPerPixel;
-                    n[1, 2] = n[1, 0] + nh * bitmapWidth * bytesPerPixel;
-                    n[1, 3] = n[1, 2] + nw * bytesPerPixel;
-
-                    //bottomleft
-                    n[2, 2] = bl;
-                    n[2, 3] = n[2, 2] + nw * bytesPerPixel;
-                    n[2, 1] = n[2, 3] - nh * bitmapWidth * bytesPerPixel;
-                    n[2, 0] = n[2, 1] - nw * bytesPerPixel;
-
-                    //bottomright
-                    n[3, 3] = br;
-                    n[3, 2] = n[3, 3] - nw * bytesPerPixel;
-                    n[3, 0] = n[3, 2] - nh * bitmapWidth * bytesPerPixel;
-                    n[3, 1] = n[3, 0] + nw * bytesPerPixel;
-
-                    for (int x = 0; x < 4; x++)
-                    {
-                        //Console.WriteLine($"{ind}{x}:");
-                        for (int y = 0; y < 4; y++)
-                        {
-                            //Console.WriteLine($"{ind}  {y}: {(*n[x, y]).ToString()}");
-                        }
-                    }
-
-                    for (int j = 0; j < 4; j++)
-                    {
-                        AddColorsSquare(n[j, 0], n[j, 1], n[j, 2], n[j, 3], nh, nw, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                    }
-                }
-            }
-
-            unsafe void AddColors1d(byte* f, byte* t, int l, ref long[] totals, ref int tot, int maxI, int i, string ind)
-            {
-                int nl = l / 2;
-                //Console.WriteLine($"{ind}nl: {nl}");
-
-                if (nl == 0)
-                {
-                    AddColors0d(f, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                    AddColors0d(t, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                }
-                else
-                {
-                    byte* ft = f + nl * bytesPerPixel;
-                    byte* tf = t - nl * bytesPerPixel;
-
-                    //Console.WriteLine($"{ind}0:");
-                    //Console.WriteLine($"{ind} 0: {*f}");
-                    //Console.WriteLine($"{ind} 1: {*ft}");
-                    //Console.WriteLine($"{ind}1:");
-                    //Console.WriteLine($"{ind} 0: {*tf}");
-                    //Console.WriteLine($"{ind} 1: {*t}");
-
-                    AddColors1d(f, ft, nl, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                    AddColors1d(tf, t, nl, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                }
-            }
-
-            unsafe void AddColors0d(byte* l, ref long[] totals, ref int tot, int maxI, int i, string ind)
-            {
-                byte* curr = l;
-                for (int color = 0; color < 3; color++)
-                {
-                    totals[color] += *curr;
-                    curr++;
-                }
-                tot++;
-            }
-#endif
         }
 
         private void GetPrimaryScreenOffsets(out int x, out int y)
@@ -930,7 +796,7 @@ namespace Driver
             }
             x *= -1;
             y *= -1;
-            Console.WriteLine($"{x}, {y}");
+            Logger.Log($"Primary Screen offsets: {x}, {y}");
         }
 
         /// <summary>

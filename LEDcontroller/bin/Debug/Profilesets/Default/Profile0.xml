@@ -3,8 +3,8 @@
   <Name>Normal</Name>
   <UName>Default:Normal</UName>
   <ProfileType>Static</ProfileType>
-  <LedColor R="252" G="190" B="0" />
-  <Brightness>58</Brightness>
+  <LedColor R="255" G="128" B="0" />
+  <Brightness>39</Brightness>
   <NumLeds>51</NumLeds>
   <Ups>30</Ups>
   <Speed>0</Speed>

@@ -1,0 +1,3 @@
+Location one options switches: ((not) used in program)
+Computer\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Hardware Profiles\Current\System\CurrentControlSet\SERVICES\dfmirage\DEVICE0
+
