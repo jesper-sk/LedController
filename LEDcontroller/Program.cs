@@ -11,8 +11,8 @@ namespace LedController
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-        [MTAThread]
-        //[STAThread]
+        //[MTAThread]
+        [STAThread]
         static void Main()
         {
             Application.EnableVisualStyles();

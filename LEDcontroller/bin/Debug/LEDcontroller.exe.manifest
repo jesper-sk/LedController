@@ -43,14 +43,26 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="LedController.exe" size="169448">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Bass.Net.dll" size="679936">
+      <assemblyIdentity name="Bass.Net" version="2.4.14.0" publicKeyToken="B7566C273E6EF480" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>am2PlLQXPoB577axCOKD8EbLHvdjpRTMQfExqR8slSc=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="LedController.exe" size="186856">
       <assemblyIdentity name="LedController" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>RS5mu/JiC4QuFYYLcchz5yOFF5GI3YEcqMOsXQHjsXE=</dsig:DigestValue>
+        <dsig:DigestValue>BZom4mDQ4vBoJrKbXDCy+hss8aXOsFQyu7AiZGKuGiQ=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

@@ -69,9 +69,12 @@
     <ApplicationIcon>tray_light.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationManifest>Mirror Driver\app.manifest</ApplicationManifest>
+    <ApplicationManifest>MirrorDriver\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Bass.Net">
+      <HintPath>..\..\..\..\..\Program Files (x86)\Bass.Net\v4.5\Bass.Net.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -88,55 +91,57 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AddNewProfileForm.cs">
+    <Compile Include="Dialogs\AddNewProfileForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AddNewProfileForm.Designer.cs">
+    <Compile Include="Dialogs\AddNewProfileForm.Designer.cs">
       <DependentUpon>AddNewProfileForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="AddNewProfileSetForm.cs">
+    <Compile Include="Dialogs\AddNewProfileSetForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AddNewProfileSetForm.Designer.cs">
+    <Compile Include="Dialogs\AddNewProfileSetForm.Designer.cs">
       <DependentUpon>AddNewProfileSetForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="AssignHotkeyForm.cs">
+    <Compile Include="Dialogs\AssignHotkeyForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AssignHotkeyForm.Designer.cs">
+    <Compile Include="Dialogs\AssignHotkeyForm.Designer.cs">
       <DependentUpon>AssignHotkeyForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="AmbilightLedProfile.cs" />
-    <Compile Include="CColorBlendTester.cs">
+    <Compile Include="LedProfiles\AmbilightLedProfile.cs" />
+    <Compile Include="Dialogs\CColorBlendTester.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CColorBlendTester.Designer.cs">
+    <Compile Include="Dialogs\CColorBlendTester.Designer.cs">
       <DependentUpon>CColorBlendTester.cs</DependentUpon>
     </Compile>
-    <Compile Include="Form1.cs">
+    <Compile Include="MirrorDriver\DesktopMirror.cs" />
+    <Compile Include="MirrorDriver\Interop.cs" />
+    <Compile Include="BassDriver\BassDriver.cs" />
+    <Compile Include="BassDriver\SelectWasapiDeviceForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="BassDriver\SelectWasapiDeviceForm.Designer.cs">
+      <DependentUpon>SelectWasapiDeviceForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Mirror Driver\DesktopMirror.cs" />
-    <Compile Include="Mirror Driver\Interop.cs" />
-    <Compile Include="Visualizer.cs">
+    <Compile Include="LedProfiles\MusicLedProfile.cs" />
+    <Compile Include="Dialogs\Visualizer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Visualizer.Designer.cs">
+    <Compile Include="Dialogs\Visualizer.Designer.cs">
       <DependentUpon>Visualizer.cs</DependentUpon>
     </Compile>
     <Compile Include="Util.cs" />
     <Compile Include="Hotkey.cs" />
     <Compile Include="LedConfig.cs" />
-    <Compile Include="SetupLedForm.cs">
+    <Compile Include="Dialogs\SetupLedForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SetupLedForm.Designer.cs">
+    <Compile Include="Dialogs\SetupLedForm.Designer.cs">
       <DependentUpon>SetupLedForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="LedProfile.cs" />
+    <Compile Include="LedProfiles\LedProfile.cs" />
     <Compile Include="ProfileGroupBoxEventHandlers.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -149,23 +154,23 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="AddNewProfileForm.resx">
+    <EmbeddedResource Include="Dialogs\AddNewProfileForm.resx">
       <DependentUpon>AddNewProfileForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="AssignHotkeyForm.resx">
+    <EmbeddedResource Include="Dialogs\AssignHotkeyForm.resx">
       <DependentUpon>AssignHotkeyForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="CColorBlendTester.resx">
+    <EmbeddedResource Include="Dialogs\CColorBlendTester.resx">
       <DependentUpon>CColorBlendTester.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Main.resx">
       <DependentUpon>Main.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="AddNewProfileSetForm.resx">
+    <EmbeddedResource Include="Dialogs\AddNewProfileSetForm.resx">
       <DependentUpon>AddNewProfileSetForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BassDriver\SelectWasapiDeviceForm.resx">
+      <DependentUpon>SelectWasapiDeviceForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -177,14 +182,14 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="SetupLedForm.resx">
+    <EmbeddedResource Include="Dialogs\SetupLedForm.resx">
       <DependentUpon>SetupLedForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Visualizer.resx">
+    <EmbeddedResource Include="Dialogs\Visualizer.resx">
       <DependentUpon>Visualizer.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="LedController_TemporaryKey.pfx" />
-    <None Include="Mirror Driver\app.manifest" />
+    <None Include="MirrorDriver\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -233,5 +238,6 @@
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

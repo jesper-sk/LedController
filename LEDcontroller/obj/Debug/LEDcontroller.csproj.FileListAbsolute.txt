@@ -102,4 +102,7 @@ C:\Users\Jesper\Documents\LedController\LEDcontroller\obj\Debug\LedController.ap
 C:\Users\Jesper\Documents\LedController\LEDcontroller\obj\Debug\LedController.exe
 C:\Users\Jesper\Documents\LedController\LEDcontroller\obj\Debug\LedController.pdb
 C:\Users\Jesper\Documents\LedController\LEDcontroller\obj\Debug\LedController.CCColorBlendTester.resources
-C:\Users\Jesper\Documents\LedController\LEDcontroller\obj\Debug\LedController.Log.resources
+C:\Users\Jesper\Documents\LedController\LEDcontroller\bin\Debug\Bass.Net.dll
+C:\Users\Jesper\Documents\LedController\LEDcontroller\bin\Debug\Bass.Net.xml
+C:\Users\Jesper\Documents\LedController\LEDcontroller\obj\Debug\LedController.csproj.CopyComplete
+C:\Users\Jesper\Documents\LedController\LEDcontroller\obj\Debug\LedController.Bass.SelectWasapiDeviceForm.resources

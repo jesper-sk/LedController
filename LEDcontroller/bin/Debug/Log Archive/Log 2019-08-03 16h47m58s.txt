@@ -1,0 +1,11 @@
+[16:47:06] Hello world!
+[16:47:06] Activating profile null
+[16:47:06] 	Closing previous profile... (null)
+[16:47:06] 	Initiating new profile...
+[16:47:06] New profile activated.
+[16:47:06] Loading config file...
+[16:47:06] Activating profile Default:Normal
+[16:47:06] 	Closing previous profile... (null)
+[16:47:06] 	Initiating new profile...
+[16:47:06] New profile activated.
+[16:47:07] Arduino Connection Failure: The operation has timed out.

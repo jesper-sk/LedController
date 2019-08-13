@@ -1,0 +1,6 @@
+[22:09:34] Hello world!
+[22:09:34] Activating profile null
+[22:09:34] 	Closing previous profile... (null)
+[22:09:34] 	Initiating new profile...
+[22:09:34] New profile activated.
+[22:09:34] Loading config file...

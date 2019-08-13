@@ -6,14 +6,21 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using System.IO;
 
 namespace LedController
 {
     public static class Util
     {
-        public static int Map(int x, int inLow, int inHigh, int outLow, int outHigh)
+        public static double Map(double x, double inLow, double inHigh, double outLow, double outHigh)
         {
             return (x - inLow) * (outHigh - outLow) / (inHigh - inLow) + outLow;
+        }
+
+        public static unsafe void HighLow32(int val, out short high, out short low)
+        {
+            low = ((short*)&val)[0];
+            high = ((short*)&val)[1];
         }
 
         public static void RgbToHsv(byte r, byte g, byte b, out double h, out double s, out double v)
@@ -69,6 +76,21 @@ namespace LedController
             sb.Append('[');
             sb.Append(inp[0]);
             for (int i = 1; i < inp.Length; i++)
+            {
+                byte b = inp[i];
+                sb.Append(", ");
+                sb.Append(b);
+            }
+            sb.Append(']');
+            return sb.ToString();
+        }
+
+        public static string ByteToString(List<byte> inp)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append('[');
+            sb.Append(inp[0]);
+            for (int i = 1; i < inp.Count; i++)
             {
                 byte b = inp[i];
                 sb.Append(", ");
@@ -459,7 +481,7 @@ namespace LedController
             return from + ":" + to;
         }
     }
-    public class LedMatrix
+    public class ColorMatrix
     {
         public readonly int TopLeft;
         public readonly int TopRight;
@@ -476,9 +498,7 @@ namespace LedController
         private readonly int offset;
         private CColor[] colors;
 
-        public Rectangle[] CapRects;
-
-        public LedMatrix(int w, int h, int s, bool cw, int ml = 0)
+        public ColorMatrix(int w, int h, int s, bool cw, int ml = 0)
         {
             Width = w;
             Height = h;
@@ -503,7 +523,7 @@ namespace LedController
             }
         }
 
-        public LedMatrix(StripConfig config)
+        public ColorMatrix(StripConfig config)
         {
             Width = config.Width;
             Height = config.Height;
@@ -526,6 +546,12 @@ namespace LedController
             {
                 colors[i] = new CColor();
             }
+        }
+
+        public CColor this[int i]
+        {
+            get { return colors[i]; }
+            set { colors[i] = value; }
         }
 
         public Rect[] GetCaptureRects(int screenIndex, RatioProfile prof)
@@ -593,7 +619,7 @@ namespace LedController
             return res;
         }
 
-        public void CleanSlate()
+        public void Clear()
         {
             for (int c = 0; c < colors.Length; c++)
             {
@@ -713,11 +739,13 @@ namespace LedController
     }
     public static class Logger
     {
-        public static Queue<string> msgs = new Queue<string>();
+        public static Queue<string> Q = new Queue<string>();
+        private static StringBuilder log = new StringBuilder();
         public static void Log(string txt)
         {
             if (Env.Debugging) Console.WriteLine(txt);
-            msgs.Enqueue($"[{DateTime.Now.ToString("HH:mm:ss")}] {txt}\n");
+            log.AppendLine($"[{DateTime.Now.ToString("HH:mm:ss")}] {txt}");
+            Q.Enqueue($"[{DateTime.Now.ToString("HH:mm:ss")}] {txt}\n");
         }
 
         public static void Warn(string txt)
@@ -728,6 +756,18 @@ namespace LedController
         public static void Error(string txt)
         {
             throw new NotImplementedException();
+        }
+
+        public static void Save()
+        {
+            File.WriteAllText(@".\Execution Log.txt", log.ToString()); 
+        }
+
+        public static void Archive()
+        {
+            if (!Directory.Exists(@".\Log Archive")) Directory.CreateDirectory(@".\Log Archive");
+            Console.WriteLine(DateTime.Now.ToString(@"yyyy.MM.dd.HH\hmm\mss\s K"));
+            File.WriteAllText($@".\Log Archive\Log {DateTime.Now.ToString(@"yyyy-MM-dd HH\hmm\mss\s")}.txt", log.ToString());
         }
     }
     public static class AspectRatio

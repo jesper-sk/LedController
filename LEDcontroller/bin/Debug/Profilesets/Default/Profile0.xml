@@ -5,7 +5,6 @@
   <ProfileType>Static</ProfileType>
   <LedColor R="255" G="128" B="0" />
   <Brightness>39</Brightness>
-  <NumLeds>51</NumLeds>
   <Ups>30</Ups>
   <Speed>0</Speed>
   <Index>0</Index>

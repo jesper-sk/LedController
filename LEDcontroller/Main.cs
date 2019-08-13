@@ -1,17 +1,18 @@
 ﻿#define DEBUG
 
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using System.Threading;
-using Microsoft.Win32;
-
+using LedController.LedProfiles;
+using LedController.Bass;
 
 namespace LedController
 {
@@ -59,7 +60,7 @@ namespace LedController
         }
         LedProfile selectedProfile;
         GroupBox activeGroupBox;
-        LedMatrix LedMatrix
+        ColorMatrix LedMatrix
         {
             get
             {
@@ -70,7 +71,7 @@ namespace LedController
                 if (comHandler != null) comHandler.Matrix = value;
             }
         }
-        Thread logThread;
+
         string[] profileSets;
         string selectedProfileSet;
         const string appName = "Led Controller";
@@ -79,14 +80,15 @@ namespace LedController
         int initState;
 
         bool capToggle = false;
-        bool visualizerActive = false;
-        Visualizer vis;
 
-        delegate void UpdateLog(string txt);
-        UpdateLog updateLog;
+        bool visualizerActive = false;
+        Visualizer visualizer;
 
         [XmlArray("AspectRatioProfiles"), XmlArrayItem("profile")]
         List<RatioProfile> RatioProfiles;
+
+        bool analyzingAudio = false;
+        BassDriver d;
 
         Form[] captureForms;
 
@@ -112,7 +114,7 @@ namespace LedController
             InitializeComponent();
 
             comHandler = new ComHandler(this);
-            updateLog = new UpdateLog((string txt) => LogRichTextBox.AppendText(txt));
+            UpdateLogTimer.Enabled = true;
 
             //The working directory should never change as we save our xml there
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
@@ -127,8 +129,6 @@ namespace LedController
         private void OnLoad()
         {
             initState = 2;
-            logThread = new Thread(new ThreadStart(CheckLog));
-            logThread.Start();
             if (firstRun)
             {
                 OnVisible();
@@ -156,7 +156,8 @@ namespace LedController
                 NullGroupBox,
                 StaticGroupBox,
                 RainbowGroupBox,
-                AmbilightGroupBox
+                AmbilightGroupBox,
+                MusicGroupBox
             };
 
             //Give all Profile GroupBoxes the same Location and make them invisible
@@ -168,6 +169,7 @@ namespace LedController
             }
             activeGroupBox = NullGroupBox;
             activeGroupBox.Visible = true;
+            LogUpdateIntervalComboBox.SelectedIndex = (int)Math.Log10(UpdateLogTimer.Interval);
 
             if (firstRun)
             {
@@ -197,7 +199,6 @@ namespace LedController
                 NullGroupBox.Location.Y + NullGroupBox.Size.Height + 30
                 );*/
             TabControl.Size = new Size(907, 419);
-            Logger.Log("hi");
 
             ClientSize = new Size(TabControl.Size.Width + 8, TabControl.Size.Height + 32);
         }
@@ -212,10 +213,10 @@ namespace LedController
                 SaveConfig();
                 Logger.Log("Saving Profiles...");
                 SaveProfilesInCurrentProfileSet();
-                Logger.Log("Saving Aspect Ratio profiles...");
+                Logger.Log("\tSaving Aspect Ratio profiles...");
                 SaveRatioProfiles();
             }
-            Logger.Log("Disconnecting Arduino...");
+            Logger.Log("\tDisconnecting Arduino...");
             if (isConnected)
             {
                 comHandler.Deactivate();
@@ -245,7 +246,7 @@ namespace LedController
                     }
                 case ProfileType.Music:
                     {
-                        throw new NotImplementedException();
+                        return curr as MusicLedProfile;
                     }
 
                 default:
@@ -273,7 +274,7 @@ namespace LedController
                     }
                 case ProfileType.Music:
                     {
-                        throw new NotImplementedException();
+                        return new MusicLedProfile(name, parent, profiles.Count, LedMatrix);
                     }
 
                 default:
@@ -291,6 +292,7 @@ namespace LedController
                 case ProfileType.Static: return StaticGroupBox;
                 case ProfileType.Rainbow: return RainbowGroupBox;
                 case ProfileType.Ambilight: return AmbilightGroupBox;
+                case ProfileType.Music: return MusicGroupBox;
 
                 default: return NullGroupBox;
             }
@@ -537,7 +539,6 @@ namespace LedController
          */
         private void ActivateSelectedProfile()
         {
-            Logger.Log("activating");
             ActiveProfile = SelectedProfile;
         }
 
@@ -610,6 +611,7 @@ namespace LedController
         {
             try
             {
+                Logger.Log("Loading config file...");
                 string dir = Directory.GetCurrentDirectory();
                 XmlSerializer configSerializer = new XmlSerializer(typeof(Config));
                 StreamReader r = new StreamReader(dir + @"\Configuration.xml");
@@ -633,6 +635,7 @@ namespace LedController
         {
             try
             {
+                Logger.Log("Saving profiles in current profileset...");
                 string dir = Directory.GetCurrentDirectory() + @"\Profilesets";
                 string profileSetDir = dir + @"\" + selectedProfileSet;
                 if (!Directory.Exists(profileSetDir))
@@ -643,7 +646,7 @@ namespace LedController
                 foreach(LedProfile p  in profiles)
                 {
                     TextWriter w = new StreamWriter($@"{profileSetDir}\Profile{p.Index}.xml");
-                    Logger.Log($"    Saving profile {p.Name}");
+                    Logger.Log($"\tSaving profile {p.Name}");
                     profileSerializer.Serialize(w, p);
                     w.Dispose();
                 }}
@@ -848,7 +851,7 @@ namespace LedController
                 config.ProfileIndexOnStartup = ActiveProfile.Index;
             }
             config.ConnectOnStartup = ConnectOnOpenCheckBox.Checked;
-            config.StartMinimized = startMinimizedCheckBox.Checked;
+            config.StartMinimized = StartMinimizedCheckBox.Checked;
             config.Strip = LedMatrix.ToStripConfig();
         }
 
@@ -856,8 +859,8 @@ namespace LedController
         {
             OpenOnStartupCheckBox.Checked = config.StartupOnLogin;
             ConnectOnOpenCheckBox.Checked = config.ConnectOnStartup;
-            startMinimizedCheckBox.Checked = config.StartMinimized;
-            LedMatrix = new LedMatrix(config.Strip);
+            StartMinimizedCheckBox.Checked = config.StartMinimized;
+            LedMatrix = new ColorMatrix(config.Strip);
             if (config.ConnectOnStartup)
             {
                 TryConnect(config.Com);
@@ -927,8 +930,19 @@ namespace LedController
         #endregion
 
         #region Visualizer
-        public void DrawColors(CColor[] c)
+        public void VisualizeColors(CColor[] c)
         {
+            if (visualizerActive)
+            {
+                int x, y, i;
+                x = y = i = 0;
+                //Action<int, int, CColor> a = new Action<int, int, CColor>((xCoord, yCoord, cColor) => { visualizer.FillRect(xCoord, yCoord, cColor); });
+
+                do { visualizer.FillRect(c[i++], (++x * Visualizer.SqrSize), (y * Visualizer.SqrSize)); } while (x < LedMatrix.Width - 1);
+                do { visualizer.FillRect(c[i++], (x * Visualizer.SqrSize), (++y * Visualizer.SqrSize)); } while (y < LedMatrix.Height - 1);
+                do { visualizer.FillRect(c[i++], (--x * Visualizer.SqrSize), (y * Visualizer.SqrSize)); } while (x > 0);
+                do { visualizer.FillRect(c[i++], (x * Visualizer.SqrSize), (--y * Visualizer.SqrSize)); } while (y > 0);
+            }
             if (TabControl.SelectedIndex == 1)
             {
                 int width = VisualizerPanel.Width;
@@ -939,24 +953,49 @@ namespace LedController
                 int xs = (width - (sqr * LedMatrix.Width)) / 2;
                 int ys = (height - (sqr * LedMatrix.Height)) / 2;
 
-                Graphics e = VisualizerPanel.CreateGraphics();
-
                 int x, y, i;
                 x = y = i = 0;
 
-                do { FillRect(c[i++], xs + (++x * sqr), ys + (y * sqr)); } while (x < LedMatrix.Width - 1);
-                do { FillRect(c[i++], xs + (x * sqr), ys + (++y * sqr)); } while (y < LedMatrix.Height - 1);
-                do { FillRect(c[i++], xs + (--x * sqr), ys + (y * sqr)); } while (x > 0);
-                do { FillRect(c[i++], xs + (x * sqr), ys + (--y * sqr)); } while (y > 0);
-
-                void FillRect(CColor ccolor, int xstart, int ystart)
+                using (Graphics e = VisualizerPanel.CreateGraphics())
                 {
-                    SolidBrush b = new SolidBrush(ccolor.ToColor());
-                    e.FillRectangle(b, new Rectangle(xstart, ystart, sqr, sqr));
-                    b.Dispose();
-                }
+                    do { FillRect(c[i++], xs + (++x * sqr), ys + (y * sqr)); } while (x < LedMatrix.Width - 1);
+                    do { FillRect(c[i++], xs + (x * sqr), ys + (++y * sqr)); } while (y < LedMatrix.Height - 1);
+                    do { FillRect(c[i++], xs + (--x * sqr), ys + (y * sqr)); } while (x > 0);
+                    do { FillRect(c[i++], xs + (x * sqr), ys + (--y * sqr)); } while (y > 0);
 
-                e.Dispose();
+                    void FillRect(CColor ccolor, int xstart, int ystart)
+                    {
+                        using (SolidBrush b = new SolidBrush(ccolor.ToColor()))
+                            e.FillRectangle(b, new Rectangle(xstart, ystart, sqr, sqr));
+                    }
+                }
+            }
+        }
+
+        private void OpenVisualizerFormButton_Click(object sender, EventArgs e)
+        {
+            if(visualizerActive)
+            {
+                visualizer.Close();
+                visualizer.Dispose();
+                visualizer = null;
+                visualizerActive = false;
+                OpenVisualizerFormButton.Text = "Open in new window";
+            }
+            else
+            {
+                visualizer = new Visualizer(LedMatrix.Width, LedMatrix.Height);
+                visualizer.Show();
+                visualizer.FormClosing += (o, ea) =>
+                {
+                    visualizerActive = false;
+                    Logger.Log("Visualizer closed in form");
+                    visualizer.Dispose();
+                    OpenVisualizerFormButton.Text = "Open in new window";
+                    visualizer = null;
+                };
+                visualizerActive = true;
+                OpenVisualizerFormButton.Text = "Close visualizer";
             }
         }
         #endregion
@@ -1006,17 +1045,142 @@ namespace LedController
         }
         #endregion
 
-        #region Logger
-        void CheckLog()
+        #region Music
+        private void ShowSelectWasapiDevice()
         {
-            while (true)
+            if (SelectedProfile is MusicLedProfile p)
             {
-                int num = Logger.msgs.Count;
-                for(int i = 0; i < num; i++) LogRichTextBox.Invoke(updateLog, Logger.msgs.Dequeue());
-                Thread.Sleep(100);
+                var dial = new SelectWasapiDeviceForm();
+                dial.ShowDialog();
+                if(dial.DialogResult == DialogResult.OK)
+                {
+                    int deviceIndex = dial.GetAbsoluteSelectedIndex(out string name);
+                    p.DeviceIndex = deviceIndex;
+                    p.DeviceName = name;
+                    MusicDeviceLabel.Text = name;
+                }
+            }
+        }
+
+        private void MusicSelectDeviceButton_Click(object sender, EventArgs e)
+        {
+            ShowSelectWasapiDevice();
+        }
+
+        private void StartAudioVisButton_Click(object sender, EventArgs e)
+        {
+            if (analyzingAudio)
+            {
+                audioUpdateTimer.Enabled = false;
+                d.Disable();
+                d.Dispose();
+                analyzingAudio = false;
+                StartAudioVisButton.Text = "Start";
+            }
+            else
+            {
+                d = new BassDriver(32, 200);
+                d.Enable();
+                audioUpdateTimer.Enabled = true;
+                analyzingAudio = true;
+                StartAudioVisButton.Text = "Stop";
+            }
+        }
+        private void AudioUpdateTimer_Tick(object sender, EventArgs e)
+        {
+            DrawAnalyzer(d.GetBands(out short l, out short r), l, r);
+        }
+
+        private void DrawAnalyzer(List<byte> bands, short l, short r)
+        {
+            int w = (int)((AudioVisualizerPanel.Width - (d.NumBands - 1)) / (double)d.NumBands);
+            int xs = (int)((double)(AudioVisualizerPanel.Width - (d.NumBands * w + (d.NumBands - 1) * 1)) / 2);
+            int y = AudioVisualizerPanel.Height - 12;
+            int x = xs;
+            using (Graphics e = AudioVisualizerPanel.CreateGraphics())
+            {
+                //e.Clear(Color.Transparent);
+                for(int b = 0; b < d.NumBands; b++)
+                {
+                    double perc = (double)bands[b] / 255;
+                    int h = (int)(perc * (AudioVisualizerPanel.Width - y));
+                    //int h = bands[b];
+                    //Console.WriteLine(h);
+                    using (SolidBrush brush = new SolidBrush(SystemColors.Control))
+                    {
+                        e.FillRectangle(brush, new Rectangle(x, 0, w, AudioVisualizerPanel.Height - 12));
+                    }
+                    using (SolidBrush brush = new SolidBrush(Color.Red))
+                    {
+                        e.FillRectangle(brush, new Rectangle(x, y - h, w, h));
+                        //Console.WriteLine($"X={x}Y={y}W={w}H{h}");
+                    }
+                    x += w + 1;
+                }
             }
         }
         #endregion
+
+        #region Logger
+        void CheckLog()
+        { 
+            int num = Logger.Q.Count;
+            for (int i = 0; i < num; i++) LogRichTextBox.AppendText(Logger.Q.Dequeue());
+        }
+
+        private void UpdateLogTimer_Tick(object sender, EventArgs e)
+        {
+            CheckLog();
+        }
+
+        private async void ArchiveLogButton_Click(object sender, EventArgs e)
+        {
+            Logger.Archive();
+            ArchiveLogButton.Text = "Archived!";
+            await Task.Run(() =>
+            {
+                Thread.Sleep(2000);
+                Action a = () => { ArchiveLogButton.Text = "Archive"; };
+                CopyLogToClipboardButton.Invoke(a);
+            });
+        }
+
+        private async void CopyLogToClipboardButton_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText(LogRichTextBox.Text);
+            CopyLogToClipboardButton.Text = "Copied!";
+            await Task.Run(() =>
+            {
+                Thread.Sleep(2000);
+                Action a = () => { CopyLogToClipboardButton.Text = "Copy to clipboard"; };
+                CopyLogToClipboardButton.Invoke(a);
+            });
+        }
+
+        private void LogUpdateIntervalComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdateLogTimer.Interval = (int)Math.Pow(10, LogUpdateIntervalComboBox.SelectedIndex);
+        }
+        #endregion
+
+        private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Button1_Click(object sender, EventArgs e)
+        {
+            BassDriver d = new BassDriver(32);
+            d.Enable();
+            for(int i = 0; i < 100; i++)
+            {
+                var p = d.GetBands(out short levelL, out short levelR);
+                Logger.Log(Util.ByteToString(p));
+                Thread.Sleep(1000);
+            }
+            d.Disable();
+            d.Dispose();
+        }
     }
 
     public class CListViewItem : ListViewItem

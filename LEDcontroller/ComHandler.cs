@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Timers;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using LedController.LedProfiles;
 using System.Windows.Threading;
 
 namespace LedController
@@ -22,7 +23,7 @@ namespace LedController
         public bool IsConnected { get; private set; }
         public bool IsSending { get; private set; }
         public string Com { get; private set; }
-        public LedMatrix Matrix;
+        public ColorMatrix Matrix;
         public LedProfile ActiveProfile
         {
             get
@@ -31,9 +32,13 @@ namespace LedController
             }
             private set
             {
+                Logger.Log($"Activating profile {value?.UName ?? "null"}");
+                Logger.Log($"\tClosing previous profile... ({activeProfile?.UName ?? "null"})");
                 if (activeProfile != null) activeProfile.Close();
                 activeProfile = value;
-                if (activeProfile != null) activeProfile.Init();
+                Logger.Log("\tInitiating new profile...");
+                if (activeProfile != null) activeProfile.Init(Matrix);
+                Logger.Log($"New profile activated.");
             }
         }
         private LedProfile activeProfile;
@@ -77,7 +82,7 @@ namespace LedController
             outputCheckerCancelled = false;
 
             UpdateFpsDelegate = new UpdateFpsLabel(main.UpdateFpsLabel);
-            UpdateVisDelegate = new UpdateVisualizer(main.DrawColors);
+            UpdateVisDelegate = new UpdateVisualizer(main.VisualizeColors);
 
             comCheckTimer.Elapsed += new ElapsedEventHandler(ComCheckTimer_Tick);
         }
@@ -260,11 +265,6 @@ namespace LedController
                 buffer[i * 3 + 7 + 1] = Convert.ToByte(ledColors[i].G);
                 buffer[i * 3 + 7 + 2] = Convert.ToByte(ledColors[i].B);
             }
-            //Logger.Log(ByteToString(buffer));
-            if (CurrVisualizer != null)
-            {
-                CurrVisualizer.Update(ledColors);
-            }
             int count = buffer.Length;
             try { arduPort.Write(buffer, 0, count); }
             catch (Exception e) { Logger.Log($"Writing bytes to port failed: {e.Message}"); }
@@ -273,9 +273,8 @@ namespace LedController
         private void SendBytes(object state)
         {
             //Logger.Log($"\nSending bytes from thread \n{formatThreadInfo()}");
-            DateTime start = DateTime.Now;
-            CColor[] relColors = ActiveProfile.Update();
-            Matrix.AssignFrom(Matrix.TopLeft, relColors);
+            //DateTime start = DateTime.Now;
+            ActiveProfile.Update(Matrix);
             CColor[] ledColors = Matrix.ReturnAbsoluteColors();
             byte brightness = ActiveProfile.Brightness;
             ushort numLeds = (ushort)ledColors.Length;
@@ -297,10 +296,6 @@ namespace LedController
                 buffer[i * 3 + 7 + 2] = Convert.ToByte(ledColors[i].B);
             }
             //Logger.Log(ByteToString(buffer));
-            if (CurrVisualizer != null)
-            {
-                CurrVisualizer.Update(ledColors);
-            }
             int count = buffer.Length;
             try { arduPort.Write(buffer, 0, count); }
             catch { /*Logger.Log("Writing bytes to port failed: {0}", e.Message);*/ }
@@ -308,7 +303,7 @@ namespace LedController
             int fps = (int)(1 / span.TotalSeconds);
             try
             {
-                main.Invoke(UpdateVisDelegate, new object[] { relColors });
+                main.Invoke(UpdateVisDelegate, new object[] { Matrix.ReturnRelativeColors() });
                 main.Invoke(UpdateFpsDelegate, new object[] { fps });
             }
             catch (ObjectDisposedException) {; }

@@ -4,6 +4,7 @@ using System.IO;
 using System.Xml.Serialization;
 using System.Drawing;
 using System.Collections.Generic;
+using LedController.LedProfiles;
 
 namespace LedController
 {
