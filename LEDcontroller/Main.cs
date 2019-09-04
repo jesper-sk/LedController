@@ -1,5 +1,9 @@
 ﻿#define DEBUG
 
+//#define NEW
+
+using LedController.Bass;
+using LedController.LedProfiles;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -11,16 +15,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using LedController.LedProfiles;
-using LedController.Bass;
 
 namespace LedController
 {
     public partial class MainForm : Form
     {
+        #region Definitions
         ComHandler comHandler;
         Config config;
-        List<LedProfile> profiles;
         LedProfile ActiveProfile
         {
             get
@@ -29,9 +31,12 @@ namespace LedController
             }
             set
             {
+                foreach (ToolStripItem i in ActiveProfileToolStripMenuItem.DropDownItems) if (i is ToolStripMenuItem mi) mi.CheckState = CheckState.Unchecked;
+                try { (ActiveProfileToolStripMenuItem.DropDownItems[value?.ProfileIndex + 2 ?? 0] as ToolStripMenuItem).CheckState = CheckState.Checked; }
+                catch {; }
                 if (comHandler != null)
                 {
-                    activeProfileLabel.Text = Util.FormatProfileName(value?.UName);
+                    activeProfileLabel.Text = FormatProfileName(value);
                     comHandler.SetActive(value);
                 }
                 else throw new InvalidOperationException("comHandler is null");
@@ -72,9 +77,9 @@ namespace LedController
             }
         }
 
-        string[] profileSets;
-        string selectedProfileSet;
         const string appName = "Led Controller";
+        const string profileDirectory = "LedProfiles";
+
         bool isConnected = false;
         bool firstRun;
         int initState;
@@ -88,9 +93,13 @@ namespace LedController
         List<RatioProfile> RatioProfiles;
 
         bool analyzingAudio = false;
-        BassDriver d;
 
         Form[] captureForms;
+
+
+        List<string> profileSetNames;
+        List<List<LedProfile>> profiles;
+    #endregion
 
         #region Constructor & Load
         public MainForm()
@@ -147,8 +156,8 @@ namespace LedController
 
         private void OnVisible()
         {
+            Console.WriteLine("Beep");
             InitializeGroupBoxEventHandlers();
-            profiles = new List<LedProfile>();
 
             //Define all Profile GroupBoxes
             List<GroupBox> profileGroupBox = new List<GroupBox>()
@@ -176,19 +185,31 @@ namespace LedController
                 SetupLedMatrix();
             }
 
+            Logger.Log("Refreshing comports...");
             RefreshComPorts();
-            RefreshProfileSets();
+            Logger.Log("Loading profiles...");
+            LoadAllProfiles();
+            Logger.Log("Refreshing profilesets...");
+            RefreshProfileSetComboBox();
+            Logger.Log($"Selecting profileset {config.ProfileSetOnStartup}");
             SelectProfileSet(config.ProfileSetOnStartup);
-            if (!firstRun) profileListView.SelectedIndices.Add(config.ProfileIndexOnStartup);
+            Logger.Log("Filling controls...");
+            RefreshProfileControls();
+            Console.WriteLine("Selecting right profile...");
+            if (!firstRun && config.ProfileIndexOnStartup < profileListView.Items.Count) profileListView.SelectedIndices.Add(config.ProfileIndexOnStartup);
+            Console.WriteLine("Updating view from selected profle...");
             UpdateSelectedProfileFromListView();
+            Console.WriteLine("Activating selected profile...");
             if (comHandler.IsConnected) ActivateSelectedProfile();
 
-            if (profiles.Count > 0)
+            if (profiles[profileSetComboBox.SelectedIndex].Count > 0)
             {
                 profileListView.SelectedIndices.Add(config.ProfileIndexOnStartup);
             }
 
             StripInfoLabel.Text = $"Number of LEDs: {LedMatrix.MasterLength}\nLength: {LedMatrix.Width}\nHeight: {LedMatrix.Height}\nOverlap: {LedMatrix.MasterLength - LedMatrix.Length}\nRotating {(LedMatrix.IsCw ? "Clockwise" : "Counterclockwise")}\n\nTopleft index: {LedMatrix.TopLeft}\nTopright index: {LedMatrix.TopRight}\nBottomright index: {LedMatrix.BottomRight}\nBottomleft index: {LedMatrix.BottomLeft}\nStrip start index {LedMatrix.Start}";
+
+            SaveProfileSetNames();
 
             initState = 0; //We're now fully initiated
 
@@ -201,12 +222,15 @@ namespace LedController
             TabControl.Size = new Size(907, 419);
 
             ClientSize = new Size(TabControl.Size.Width + 8, TabControl.Size.Height + 32);
+            Console.WriteLine("boop");
         }
 
         private void OnClose()
         {
             if (initState == 0)
             {
+                Logger.Log("Freeing BassDriver...");
+                BassDriver.Free();
                 Logger.Log("Updating config file...");
                 UpdateConfig();
                 Logger.Log("Saving Config file...");
@@ -224,7 +248,7 @@ namespace LedController
             }
             Logger.Log("Bye!");
         }
-        #endregion
+#endregion
 
         /*  <!!!Add new LedProfiles over here!!!>  */
         #region LedProfile Definitions
@@ -256,25 +280,39 @@ namespace LedController
             }
         }
 
-        private LedProfile GetProfileAs(ProfileType id, string name, string parent)
+        private XmlSerializer GetCompatibleSerializer(ProfileType type)
+        {
+            XmlSerializer ser;
+            switch (type)
+            {
+                case ProfileType.Static: ser = new XmlSerializer(typeof(StaticLedProfile)); break;
+                case ProfileType.Rainbow: ser = new XmlSerializer(typeof(RainbowLedProfile)); break;
+                case ProfileType.Ambilight: ser = new XmlSerializer(typeof(AmbilightLedProfile)); break;
+                case ProfileType.Music: ser = new XmlSerializer(typeof(MusicLedProfile)); break;
+                default: ser = new XmlSerializer(typeof(LedProfile)); break;
+            }
+            return ser;
+        }
+
+        private LedProfile GetProfileAs(ProfileType id, string name, int psind)
         {
             switch (id)
             {
                 case ProfileType.Static:
                     {
-                        return new StaticLedProfile(name, parent, profiles.Count, LedMatrix);
+                        return new StaticLedProfile(name, profiles[profileSetComboBox.SelectedIndex].Count, psind, LedMatrix);
                     }
                 case ProfileType.Rainbow:
                     {
-                        return new RainbowLedProfile(name, parent, profiles.Count, LedMatrix);
+                        return new RainbowLedProfile(name, profiles[profileSetComboBox.SelectedIndex].Count, psind, LedMatrix);
                     }
                 case ProfileType.Ambilight:
                     {
-                        return new AmbilightLedProfile(name, parent, profiles.Count, LedMatrix);
+                        return new AmbilightLedProfile(name, profiles[profileSetComboBox.SelectedIndex].Count, psind, LedMatrix);
                     }
                 case ProfileType.Music:
                     {
-                        return new MusicLedProfile(name, parent, profiles.Count, LedMatrix);
+                        return new MusicLedProfile(name, profiles[profileSetComboBox.SelectedIndex].Count, psind, LedMatrix);
                     }
 
                 default:
@@ -297,7 +335,7 @@ namespace LedController
                 default: return NullGroupBox;
             }
         }
-        #endregion
+#endregion
         /*  </!!!Add new LedProfiles over here!!!>  */
 
         #region Connect/Disconnect
@@ -360,7 +398,7 @@ namespace LedController
         {
             isConnected = checkBox1.Checked || comHandler.IsConnected;
         }
-        #endregion
+#endregion
 
         #region Refresh Controls
         private void RefreshComPorts()
@@ -386,38 +424,90 @@ namespace LedController
             }
         }
 
-        private void RefreshProfileSets(bool jumpToNew = false) //if jumptonew is true, we expect a max of 1 new profileset 
+        private void RefreshComButton_Click(object sender, EventArgs e)
         {
-            profileSets = LoadProfileSets();
+            RefreshComPorts();
+        }
+
+        private void RefreshProfileControls()
+        {
+            RefreshProfileListView();
+            RefreshActiveProfileToolStripMenuItem();
+        }
+
+        private void RefreshProfileSetComboBox()
+        {
+            int sind = profileSetComboBox.SelectedIndex;
             profileSetComboBox.Items.Clear();
-            foreach (string k in profileSets)
+            for (int i = 0; i < profiles.Count; i++)
             {
-                profileSetComboBox.Items.Add(k);
-                if (jumpToNew)
+                profileSetComboBox.Items.Add(profileSetNames[i]);
+            }
+            for (; sind >= profileSetComboBox.Items.Count; sind--) ;
+            profileSetComboBox.SelectedIndex = sind;
+        }
+
+        private void RefreshProfileListView()
+        {
+            profileListView.Items.Clear();
+
+            foreach (LedProfile p in profiles[profileSetComboBox.SelectedIndex])
+            {
+                profileListView.Items.Add(new CListViewItem(p));
+            }
+
+            if (profileListView.Items.Count > 0) profileListView.SelectedIndices.Add(0);
+        }
+
+        private void RefreshActiveProfileToolStripMenuItem()
+        {
+            ActiveProfileToolStripMenuItem.DropDownItems.Clear();
+            ActiveProfileToolStripMenuItem.DropDownItems.Add(new ToolStripMenuItem()
+            {
+                Text = "[None]",
+                Checked = true,
+                CheckState = CheckState.Unchecked
+            });
+            ActiveProfileToolStripMenuItem.DropDownItems.Add(new ToolStripSeparator());
+
+            foreach (LedProfile p in profiles[profileSetComboBox.SelectedIndex])
+            {
+                if(p != null)
                 {
-                    profileSetComboBox.SelectedItem = k;
+                    ToolStripMenuItem item = new ToolStripMenuItem()
+                    {
+                        Text = p.Name,
+                        Checked = true,
+                        CheckState = CheckState.Unchecked,
+                    };
+                    ActiveProfileToolStripMenuItem.DropDownItems.Insert(p.ProfileIndex + 2, item);
+                }
+            }
+
+            //Check right entry for toolstripmenuitem
+            if (ActiveProfile == null) (ActiveProfileToolStripMenuItem.DropDownItems[0] as ToolStripMenuItem).CheckState = CheckState.Checked;
+            else
+            {
+                if (ActiveProfile.ProfileSetIndex == profileSetComboBox.SelectedIndex)
+                {
+                    (ActiveProfileToolStripMenuItem.DropDownItems[ActiveProfile.ProfileIndex] as ToolStripMenuItem).CheckState = CheckState.Checked;
+                }
+                else
+                {
+                    ActiveProfileToolStripMenuItem.DropDownItems.Add(new ToolStripSeparator());
+                    ActiveProfileToolStripMenuItem.DropDownItems.Add(new ToolStripMenuItem()
+                    {
+                        Text = Util.FormatProfileName(FormatProfileName(ActiveProfile)),
+                        Checked = true,
+                        CheckState = CheckState.Checked
+                    });
                 }
             }
         }
 
-        private void RefreshProfiles(bool jumpToNew = false)
+        private void MainNotifyIcon_MouseMove(object sender, MouseEventArgs e)
         {
-            profiles = LoadProfiles();
-            if (ActiveProfile != null && ActiveProfile.Parent == selectedProfileSet) ActiveProfile = profiles[ActiveProfile.Index];
-            profileListView.Items.Clear();
-            foreach (LedProfile p in profiles)
-            {
-                profileListView.Items.Add(new CListViewItem(p));
-            }
-            if (ActiveProfile != null && !jumpToNew)
-            {
-
-            }
-        }
-
-        private void RefreshComButton_Click(object sender, EventArgs e)
-        {
-            RefreshComPorts();
+            RefreshActiveProfileToolStripMenuItem();
         }
         #endregion
 
@@ -429,7 +519,7 @@ namespace LedController
             {
                 string name = anpsmf.profileSetNameBox.Text;
                 SaveNewProfileSet(name);
-                RefreshProfileSets(true);
+                RefreshProfileSetComboBox();
             }
         }
 
@@ -439,8 +529,17 @@ namespace LedController
             {
                 profileSetComboBox.SelectedItem = ps;
             }
-            selectedProfileSet = ps;
-            RefreshProfiles();
+
+            RefreshProfileControls();
+        }
+
+        private void SelectProfileSet(int index)
+        {
+            if (profileSetComboBox.SelectedIndex != index)
+            {
+                profileSetComboBox.SelectedIndex = index;
+                RefreshProfileListView();
+            }
         }
 
         private void RemoveSelectedProfileset()
@@ -455,7 +554,7 @@ namespace LedController
 
         private void ProfileSetBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (initState == 0) { SaveProfilesInCurrentProfileSet(); }
+            if (initState == 0) SaveSingleProfile(SelectedProfile);
             SelectProfileSet((string)profileSetComboBox.SelectedItem);
         }
 
@@ -463,9 +562,15 @@ namespace LedController
         {
             RemoveSelectedProfileset();
         }
-        #endregion
+#endregion
 
         #region Profile Control/Activation
+        private string FormatProfileName(LedProfile prof)
+        {
+            if (prof == null) return "none";
+            return $"{profileSetNames[prof.ProfileSetIndex]} -> {prof.Name}";
+        }
+
         /*
          * Adding a new profile
          */
@@ -477,7 +582,7 @@ namespace LedController
                 int intProfileMode = ADNF.comboBox1.SelectedIndex;
                 string profileName = ADNF.textBox1.Text;
                 bool nameExists = false;
-                foreach (LedProfile p in profiles)
+                foreach (LedProfile p in profiles[profileSetComboBox.SelectedIndex])
                 {
                     if (p.Name == profileName)
                     {
@@ -490,12 +595,13 @@ namespace LedController
                     NewProfileButton_Click(null, null);
                     return;
                 }
-                profiles.Add(GetProfileAs((ProfileType)intProfileMode, profileName, selectedProfileSet));
-                SaveProfilesInCurrentProfileSet();                
-                RefreshProfiles();
+                LedProfile prof = GetProfileAs((ProfileType)intProfileMode, profileName, profileSetComboBox.SelectedIndex);
+                profiles[profileSetComboBox.SelectedIndex].Add(prof);
+                SaveSingleProfile(prof);
+                RefreshProfileControls();
             }
         }
-        
+
         private void NewProfileButton_Click(object sender, EventArgs e)
         {
             AddProfile();
@@ -518,7 +624,7 @@ namespace LedController
             else
             {
                 int profileIndex = profileListView.SelectedIndices[0];
-                SelectedProfile = profiles[profileIndex];
+                SelectedProfile = profiles[profileSetComboBox.SelectedIndex][profileIndex];
             }
         }
 
@@ -526,10 +632,9 @@ namespace LedController
         {
             if (ActiveProfile != null)
             {
-                SelectProfileSet(ActiveProfile.UName.Split(':')[0]);
+                SelectProfileSet(ActiveProfile.ProfileSetIndex);
                 profileListView.SelectedIndices.Clear();
-                profileListView.SelectedIndices.Add(ActiveProfile.Index);
-                ActiveProfile = profiles[ActiveProfile.Index];
+                profileListView.SelectedIndices.Add(ActiveProfile.ProfileIndex);
                 UpdateSelectedProfileFromListView();
             }
         }
@@ -540,6 +645,7 @@ namespace LedController
         private void ActivateSelectedProfile()
         {
             ActiveProfile = SelectedProfile;
+            ActiveProfileToolStripMenuItem.Enabled = true;
         }
 
         private void SetActiveButton_Click(object sender, EventArgs e)
@@ -552,14 +658,42 @@ namespace LedController
             if (isConnected) ActivateSelectedProfile();
         }
 
+        private void ActiveProfileToolStripMenuItem_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs a)
+        {
+            ToolStripMenuItem item = a.ClickedItem as ToolStripMenuItem;
+            int index = ActiveProfileToolStripMenuItem.DropDownItems.IndexOf(item);
+            if (index == 0) DeactivateLeds();
+            else if (index < profileListView.Items.Count + 4)
+            {
+                profileListView.SelectedItems.Clear();
+                profileListView.SelectedIndices.Add(index - 2);
+                UpdateSelectedProfileFromListView();
+                ActivateSelectedProfile();
+                if (ActiveProfileToolStripMenuItem.DropDownItems.Count - 4 > profileListView.Items.Count)
+                {
+                    ActiveProfileToolStripMenuItem.DropDownItems.RemoveAt(profileListView.Items.Count + 2);
+                    ActiveProfileToolStripMenuItem.DropDownItems.RemoveAt(profileListView.Items.Count + 3);
+                }
+                /*foreach(ToolStripMenuItem i in ActiveProfileToolStripMenuItem.DropDownItems)
+                {
+                    i.CheckState = CheckState.Unchecked;
+                };
+                item.CheckState = CheckState.Checked;*/
+            }
+        }
         /*
          * Deactivating LEDs
          */
         private void DeactivateLEDsButton_Click(object sender, EventArgs e)
         {
+            DeactivateLeds();
+        }
+
+        private void DeactivateLeds()
+        {
             Logger.Log("Deativating Leds");
             comHandler.Deactivate(true);
-            ActiveProfile = null;
+            foreach (ToolStripItem item in ActiveProfileToolStripMenuItem.DropDownItems) { if (item is ToolStripMenuItem mitem) mitem.CheckState = CheckState.Unchecked; }
         }
 
         private void SelectActiveProfileButton_Click(object sender, EventArgs e)
@@ -571,7 +705,7 @@ namespace LedController
         {
             FpsLabel.Text = (fps == 0) ? "-- Fps" : $"{fps} Fps";
         }
-        #endregion
+#endregion
 
         #region Hotkey Assignments
         private void AssignHotkey()
@@ -588,7 +722,7 @@ namespace LedController
             MessageBox.Show("Not yet implemented! (it sucks)");
             //AssignHotkey();
         }
-        #endregion
+#endregion
 
         #region XML Serialization
         private void SaveConfig()
@@ -637,15 +771,15 @@ namespace LedController
             {
                 Logger.Log("Saving profiles in current profileset...");
                 string dir = Directory.GetCurrentDirectory() + @"\Profilesets";
-                string profileSetDir = dir + @"\" + selectedProfileSet;
+                string profileSetDir = dir + @"\" + (string)profileSetComboBox.SelectedItem;
                 if (!Directory.Exists(profileSetDir))
                 {
                     Directory.CreateDirectory(profileSetDir);
                 }
                 XmlSerializer profileSerializer = new XmlSerializer(typeof(LedProfile));
-                foreach(LedProfile p  in profiles)
+                foreach(LedProfile p  in profiles[profileSetComboBox.SelectedIndex])
                 {
-                    TextWriter w = new StreamWriter($@"{profileSetDir}\Profile{p.Index}.xml");
+                    TextWriter w = new StreamWriter($@"{profileSetDir}\Profile{p.ProfileIndex}.xml");
                     Logger.Log($"\tSaving profile {p.Name}");
                     profileSerializer.Serialize(w, p);
                     w.Dispose();
@@ -670,59 +804,101 @@ namespace LedController
             }
         }
 
-        private List<LedProfile> LoadProfiles()
+        private void LoadAllProfiles()
         {
-            try
+            if (!Directory.Exists(@".\Profilesets")) { Directory.CreateDirectory(@".\Profilesets"); }
+            string[] pss = Directory.GetDirectories(@".\Profilesets");
+            if (pss.Length == 0)
             {
-                string dir = Directory.GetCurrentDirectory() + @"\Profilesets";
-                string[] files = Directory.GetFiles(dir + @"\" + selectedProfileSet);
-                XmlSerializer profSerializer = new XmlSerializer(typeof(LedProfile));
-                LedProfile[] arrRes = new LedProfile[files.Length];
-                Parallel.ForEach(files, (d) =>
-                {
-                    StreamReader r = new StreamReader(d);
-                    LedProfile curr = profSerializer.Deserialize(r) as LedProfile;
-                    r.Dispose();
-                    curr.SetMatrix(LedMatrix);
-                    arrRes[curr.Index] = GetProfileType(curr.ProfileType, curr);
-                });
-                List<LedProfile> res = (arrRes.Length == 0) ? new List<LedProfile>(1) : new List<LedProfile>(arrRes);
-                return res;
+                Directory.CreateDirectory(@".\Profilesets\Default");
+                pss = new string[]{ @".\Profilesets\Default" };
             }
-            catch (Exception e) when (!Env.Debugging)
+            profileSetNames = new List<string>(pss.Length);
+            profiles = new List<List<LedProfile>>(pss.Length);
+            for(int i = 0; i < pss.Length; i++)
             {
-                MessageBox.Show("Loading Profiles failed:\n" + e.Message);
-                return profiles;
+                string psdir = pss[i];
+                string[] spl = psdir.Split('\\');
+                string psn = spl[spl.Length - 1];
+                profileSetNames.Add(psn);
+
+                string[] files = Directory.GetFiles(psdir);
+                LedProfile[] profs = new LedProfile[files.Length];
+
+                XmlSerializer ser = new XmlSerializer(typeof(LedProfile));
+                for(int j = 0; j < files.Length; j++)
+                {
+                    using(StreamReader r = new StreamReader(files[j]))
+                    {
+                        LedProfile curr = ser.Deserialize(r) as LedProfile;
+                        profs[curr.ProfileIndex] = curr;
+                    }
+                }
+
+                List<LedProfile> ps = new List<LedProfile>(profs);
+                profiles.Add(ps);
             }
         }
 
-        private string[] LoadProfileSets()
+        private void newLoadAllProfiles()
         {
-            try
+            if (!Directory.Exists($@".\profs")) Directory.CreateDirectory($@".\profs");
+
+            if (File.Exists($@".\profs\_psn.xml"))
             {
-                string dir = Directory.GetCurrentDirectory() + @"\Profilesets";
-                if (!Directory.Exists(dir))
+                XmlSerializer ser = new XmlSerializer(typeof(List<string>));
+                using (StreamReader r = new StreamReader($@".\profs\_psn.xml"))
                 {
-                    Directory.CreateDirectory(dir);
+                    profileSetNames = ser.Deserialize(r) as List<string>;
                 }
-                string[] res = Directory.GetDirectories(dir);
-                if (res.Length == 0) //There are no profilesets yet, so let's make our first one!
-                {
-                    Directory.CreateDirectory(dir + @"\Default");
-                    return new string[1] { "Default" };
-                }
-                for (int i = 0; i < res.Length; i++)
-                {
-                    string d = res[i];
-                    string[] dsplit = d.Split('\\');
-                    res[i] = (dsplit[dsplit.Length - 1]);
-                }
-                return res;
             }
-            catch(Exception e) when (!Env.Debugging)
+            else profileSetNames = new List<string>() { "Default" };
+
+            int numPs = profileSetNames.Count;
+            XmlSerializer typeser = new XmlSerializer(typeof(List<ProfileType>));
+            for (int i = 0; i < numPs; i++)
             {
-                MessageBox.Show("Loading Profilesets failed:\n" + e.Message);
-                return profileSets;
+                List<ProfileType> types;
+                using (StreamReader r = new StreamReader($@".\profs\ps{i}\_pt.xml")) types = typeser.Deserialize(r) as List<ProfileType>;
+                int numP = types.Count;
+                List<LedProfile> ps = new List<LedProfile>(numP);
+                for(int j = 0; j < numP; j++)
+                {
+                    XmlSerializer profser = GetCompatibleSerializer(types[j]);
+                    using (StreamReader r = new StreamReader($@".\profs\ps{i}\p{j}.xml")) ps.Add(profser.Deserialize(r) as LedProfile);
+                }
+                profiles.Add(ps);
+            }
+        }
+
+        private void SaveSingleProfile(LedProfile prof)
+        {
+            XmlSerializer ser = new XmlSerializer(typeof(LedProfile));
+            using (TextWriter w = new StreamWriter($@".\Profilesets\{profileSetNames[prof.ProfileSetIndex]}\Profile{prof.ProfileIndex}.xml"))
+            {
+                Logger.Log($"Saving profile {prof.Name}");
+                ser.Serialize(w, prof);
+            }
+        }
+
+        private void SaveAllProfiles()
+        {
+            foreach(List<LedProfile> ps in profiles)
+            {
+                foreach(LedProfile p in ps)
+                {
+                    SaveSingleProfile(p);
+                }
+            }
+        }
+
+        private void SaveProfileSetNames()
+        {
+            XmlSerializer ser = new XmlSerializer(typeof(List<string>));
+            using(TextWriter w = new StreamWriter($@".\Profilesets\psnames.xml"))
+            {
+                Logger.Log($"Saving Profileset names...");
+                ser.Serialize(w, profileSetNames);
             }
         }
 
@@ -734,7 +910,18 @@ namespace LedController
             StreamReader r = new StreamReader(files[index]);
             LedProfile res = profSerializer.Deserialize(r) as LedProfile;
             r.Dispose();
-            res.SetMatrix(LedMatrix);
+            return res;
+        }
+
+        private LedProfile LoadSingleProfile(int psind, int index)
+        {
+            string[] dirs = Directory.GetDirectories(@".\Profilesets");
+            string dir = Directory.GetCurrentDirectory() + $@"\ProfileSets\{dirs[psind]}";
+            string[] files = Directory.GetFiles(dir);
+            XmlSerializer profSerializer = new XmlSerializer(typeof(LedProfile));
+            StreamReader r = new StreamReader(files[index]);
+            LedProfile res = profSerializer.Deserialize(r) as LedProfile;
+            r.Dispose();
             return res;
         }
 
@@ -783,7 +970,7 @@ namespace LedController
         {
             SaveProfilesInCurrentProfileSet();
         }
-        #endregion
+#endregion
 
         #region LED-strip Initiation
         private void SetupLedMatrix()
@@ -810,7 +997,7 @@ namespace LedController
         { 
 
         }
-        #endregion
+#endregion
 
         #region Start/Shutdown Eventhandlers
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -839,7 +1026,7 @@ namespace LedController
                 Logger.Log("Open app at startup disabled.");
             }
         }
-        #endregion
+#endregion
 
         #region Config
         private void UpdateConfig()
@@ -847,8 +1034,8 @@ namespace LedController
             config.StartupOnLogin = OpenOnStartupCheckBox.Checked;
             if (ActiveProfile != null)
             {
-                config.ProfileSetOnStartup = ActiveProfile.UName.Split(':')[0];
-                config.ProfileIndexOnStartup = ActiveProfile.Index;
+                config.ProfileSetOnStartup = ActiveProfile.ProfileSetIndex;
+                config.ProfileIndexOnStartup = ActiveProfile.ProfileIndex;
             }
             config.ConnectOnStartup = ConnectOnOpenCheckBox.Checked;
             config.StartMinimized = StartMinimizedCheckBox.Checked;
@@ -869,6 +1056,10 @@ namespace LedController
 
         private void LoadAndActivateProfileFromConfig()
         {
+            /*
+            SelectedProfile = new TestAmbilightLedProfile("TestAmbilight", "root", 0, LedMatrix);
+            ActivateSelectedProfile();
+            */
             if (config.ProfileSetOnStartup != null && comHandler.IsConnected)
             {
                 try
@@ -883,17 +1074,13 @@ namespace LedController
 
             }
         }
-        #endregion
+#endregion
 
         #region Form Show & Hide
-        private void showToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ShowHideToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            WindowState = FormWindowState.Normal;
-        }
-
-        private void hideToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            WindowState = FormWindowState.Minimized;
+            if (WindowState == FormWindowState.Minimized) WindowState = FormWindowState.Normal;
+            else WindowState = FormWindowState.Minimized;
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -907,6 +1094,7 @@ namespace LedController
             {
                 case FormWindowState.Normal:
                     {
+                        ShowHideToolStripMenuItem.Text = "Hide";
                         if (initState == 2)
                         {
                             OnVisible();
@@ -917,17 +1105,24 @@ namespace LedController
                     }
                 case FormWindowState.Minimized:
                     {
+                        ShowHideToolStripMenuItem.Text = "Show";
                         ShowInTaskbar = false;
                         break;
                     }
                 case FormWindowState.Maximized:
                     {
+                        ShowHideToolStripMenuItem.Text = "Hide";
                         ShowInTaskbar = true;
                         break;
                     }
             }
         }
-        #endregion
+
+        private void MainNotifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            ShowHideToolStripMenuItem_Click(sender, e);
+        }
+#endregion
 
         #region Visualizer
         public void VisualizeColors(CColor[] c)
@@ -998,7 +1193,7 @@ namespace LedController
                 OpenVisualizerFormButton.Text = "Close visualizer";
             }
         }
-        #endregion
+#endregion
 
         #region Ambilight
         private void AmbilightShowCaptureAreasButton_Click(object sender, EventArgs e)
@@ -1043,7 +1238,7 @@ namespace LedController
                 throw new InvalidOperationException("Expected selectedProfile of type AmbilightLedProfile");
             }
         }
-        #endregion
+#endregion
 
         #region Music
         private void ShowSelectWasapiDevice()
@@ -1072,15 +1267,14 @@ namespace LedController
             if (analyzingAudio)
             {
                 audioUpdateTimer.Enabled = false;
-                d.Disable();
-                d.Dispose();
+                BassDriver.Disable();
+                BassDriver.Free();
                 analyzingAudio = false;
                 StartAudioVisButton.Text = "Start";
             }
             else
             {
-                d = new BassDriver(32, 200);
-                d.Enable();
+                BassDriver.Enable(32);
                 audioUpdateTimer.Enabled = true;
                 analyzingAudio = true;
                 StartAudioVisButton.Text = "Stop";
@@ -1088,29 +1282,35 @@ namespace LedController
         }
         private void AudioUpdateTimer_Tick(object sender, EventArgs e)
         {
-            DrawAnalyzer(d.GetBands(out short l, out short r), l, r);
+            DrawAnalyzer(BassDriver.GetBands(numBandsTrackBar.Value, out short l, out short r), l, r);
         }
 
+        private bool NumBandsChanged = false;
         private void DrawAnalyzer(List<byte> bands, short l, short r)
         {
-            int w = (int)((AudioVisualizerPanel.Width - (d.NumBands - 1)) / (double)d.NumBands);
-            int xs = (int)((double)(AudioVisualizerPanel.Width - (d.NumBands * w + (d.NumBands - 1) * 1)) / 2);
-            int y = AudioVisualizerPanel.Height - 12;
+            int n = bands.Count;
+            int w = (int)((AudioVisualizerPanel.Width - (n - 1)) / (double)n);
+            int xs = (int)((double)(AudioVisualizerPanel.Width - (n * w + (n - 1) * 1)) / 2);
+            int y = AudioVisualizerPanel.Height - 3;
             int x = xs;
             using (Graphics e = AudioVisualizerPanel.CreateGraphics())
             {
-                //e.Clear(Color.Transparent);
-                for(int b = 0; b < d.NumBands; b++)
+                if (NumBandsChanged)
                 {
-                    double perc = (double)bands[b] / 255;
+                    e.Clear(SystemColors.ControlLightLight);
+                    NumBandsChanged = false;
+                }
+                for(int b = 0; b < n; b++)
+                {
+                    double perc = (double)bands[b] / byte.MaxValue;
                     int h = (int)(perc * (AudioVisualizerPanel.Width - y));
                     //int h = bands[b];
                     //Console.WriteLine(h);
                     using (SolidBrush brush = new SolidBrush(SystemColors.Control))
                     {
-                        e.FillRectangle(brush, new Rectangle(x, 0, w, AudioVisualizerPanel.Height - 12));
+                        e.FillRectangle(brush, new Rectangle(x, 0, w, y));
                     }
-                    using (SolidBrush brush = new SolidBrush(Color.Red))
+                    using (SolidBrush brush = new SolidBrush(Color.FromArgb(173, 43, 46)))
                     {
                         e.FillRectangle(brush, new Rectangle(x, y - h, w, h));
                         //Console.WriteLine($"X={x}Y={y}W={w}H{h}");
@@ -1118,14 +1318,53 @@ namespace LedController
                     x += w + 1;
                 }
             }
+            int lh = (AudioLevelPanel.Height - 1) / 2;
+            int lys = (AudioLevelPanel.Height - ((lh * 2) + 1)) / 2;
+
+            double percl = (double)l / short.MaxValue;
+            double percr = (double)r / short.MaxValue;
+            int hl = (int)(percl * AudioLevelPanel.Width);
+            int hr = (int)(percr * AudioLevelPanel.Width);
+            using (Graphics e = AudioLevelPanel.CreateGraphics())
+            {
+                using (SolidBrush brush = new SolidBrush(SystemColors.Control))
+                {
+                    e.FillRectangle(brush, new Rectangle(0, lys, AudioLevelPanel.Width, lh));
+                    e.FillRectangle(brush, new Rectangle(0, lys + 1 + lh, AudioLevelPanel.Width, lh));
+                }
+                using (SolidBrush brush = new SolidBrush(Color.FromArgb(173, 43, 46)))
+                {
+                    e.FillRectangle(brush, new Rectangle(0, lys, hl, lh));
+                    e.FillRectangle(brush, new Rectangle(0, lys + 1 + lh, hr, lh));
+                }
+            }
         }
-        #endregion
+
+        private void NumBandsTrackBar_Scroll(object sender, EventArgs e)
+        {
+            AudioNumBandsLabel.Text = numBandsTrackBar.Value.ToString();
+            NumBandsChanged = true;
+        }
+#endregion
 
         #region Logger
-        void CheckLog()
+        public void ShowBalloon(string title, string text, ToolTipIcon icon, int customTimeout = 5000)
+        {
+            MainNotifyIcon.ShowBalloonTip(customTimeout, title, text, icon);
+        }
+
+        async void CheckLog()
         { 
             int num = Logger.Q.Count;
             for (int i = 0; i < num; i++) LogRichTextBox.AppendText(Logger.Q.Dequeue());
+
+            int bnum = Logger.BalloonQueue.Count;
+            for (int i = 0; i < bnum; i++)
+            {
+                var info = Logger.BalloonQueue.Dequeue();
+                ShowBalloon(info.Item1, info.Item2, info.Item4, info.Item3);
+                await Task.Run(() => { Thread.Sleep(info.Item3); });
+            }
         }
 
         private void UpdateLogTimer_Tick(object sender, EventArgs e)
@@ -1162,25 +1401,6 @@ namespace LedController
             UpdateLogTimer.Interval = (int)Math.Pow(10, LogUpdateIntervalComboBox.SelectedIndex);
         }
         #endregion
-
-        private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void Button1_Click(object sender, EventArgs e)
-        {
-            BassDriver d = new BassDriver(32);
-            d.Enable();
-            for(int i = 0; i < 100; i++)
-            {
-                var p = d.GetBands(out short levelL, out short levelR);
-                Logger.Log(Util.ByteToString(p));
-                Thread.Sleep(1000);
-            }
-            d.Disable();
-            d.Dispose();
-        }
     }
 
     public class CListViewItem : ListViewItem
@@ -1200,8 +1420,8 @@ namespace LedController
 
         public CListViewItem(LedProfile lp, Hotkey hk = null)
         {
-            Text = lp.ToString();
-            SubItems.Add(lp.ProfileType.ToString());
+            Text = lp?.ToString() ?? "!!NULL!!";
+            SubItems.Add(lp?.ProfileType.ToString() ?? "!!NULL!!");
             SubItems.Add(hk?.ToString() ?? "not assigned");
             shortcut = hk;
             Shortcut = hk;
@@ -1210,7 +1430,7 @@ namespace LedController
 
     public enum ProfileType
     {
-        Static, Rainbow, Ambilight, Music, Other
+        Static, Rainbow, Ambilight, Music, None, Other
     }
 
     
@@ -1220,20 +1440,20 @@ namespace LedController
         public bool ConnectOnStartup;
         public bool StartupOnLogin;
         public bool StartMinimized;
-        public string ProfileSetOnStartup;
+        public int ProfileSetOnStartup;
         public int ProfileIndexOnStartup;
-        public StripConfig Strip;
+        public StripInfo Strip;
         //add more things here if needed
 
         public Config()
         {
             Com = null;
             ConnectOnStartup = false;
-            ProfileSetOnStartup = "Default";
+            ProfileSetOnStartup = 0;
             ProfileIndexOnStartup = 0;
             StartupOnLogin = false;
             StartMinimized = false;
-            Strip = new StripConfig(1, 1, 0, true);
+            Strip = new StripInfo(1, 1, 0, true);
         }
 
         public override string ToString()
@@ -1242,7 +1462,7 @@ namespace LedController
             sb.Append($"Com: {Com}");
             sb.Append($"\nConnect on startup: {ConnectOnStartup}");
             sb.Append($"\nStartup on login: {StartupOnLogin}");
-            sb.Append($"\nProfile on startup: {ProfileSetOnStartup ?? "None"} nr. {(ProfileSetOnStartup != null ? ProfileIndexOnStartup.ToString() : "")} ");
+            sb.Append($"\nProfile on startup: {ProfileSetOnStartup} nr. {ProfileIndexOnStartup} ");
             return sb.ToString();
         }
     }

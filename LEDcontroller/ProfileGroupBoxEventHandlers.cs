@@ -291,7 +291,7 @@ namespace LedController
             }
             if (SelectedProfile is AmbilightLedProfile prof)
             {
-                prof.UpdateRects(AmbilightCaptureScreenComboBox.SelectedIndex, RatioProfiles[AmbilightCaptureProfileComboBox.SelectedIndex]);
+                prof.UpdateRects(AmbilightCaptureScreenComboBox.SelectedIndex, RatioProfiles[AmbilightCaptureProfileComboBox.SelectedIndex], LedMatrix);
             }
             else throw new NotImplementedException("Invalid LedProfile, expected type AmbilightLedProfile");
         }
@@ -301,9 +301,17 @@ namespace LedController
             {
                 int scrInd = 0;
                 if (prof.ScreenIndex < Screen.AllScreens.Length) scrInd = prof.ScreenIndex;
-                prof.UpdateRects(scrInd, RatioProfiles[AmbilightCaptureProfileComboBox.SelectedIndex]);
+                prof.UpdateRects(scrInd, RatioProfiles[AmbilightCaptureProfileComboBox.SelectedIndex], LedMatrix);
             }
             else throw new NotImplementedException("Invalid LedProfile, expected type AmbilightLedProfile");
+        }
+        void AmbilightPrecisionTrackBar_ValueChanged(object s, EventArgs e)
+        {
+            if (SelectedProfile is AmbilightLedProfile prof)
+            {
+                prof.Precision = (double)AmbilightPrecisionTrackBar.Value / 11;
+                Logger.Log($"Precision = {prof.Precision}");
+            }
         }
         #endregion
         void ProfileSettingsChanged()

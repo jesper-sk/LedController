@@ -1,4 +1,4 @@
-﻿//#define MEDIAN
+﻿#define PRECISION
 
 using System;
 using System.ComponentModel;
@@ -463,7 +463,7 @@ namespace Driver
         }
 
 
-        public CColor[] GetAvgCColorFromScreen(Rect[] rects, bool print, int delta = 4)
+        public CColor[] GetAvgCColorFromScreen(Rect[] rects, bool print, double precision)
         {
             CColor[] res = new CColor[rects.Length];
 
@@ -489,7 +489,7 @@ namespace Driver
                 for(int i = 0; i < rects.Length; i++)
                 {
                     Rect currRect = rects[i];
-                    byte* curr =
+                    byte* start =
                         origin +
                         (currRect.X + primaryScreenOffsetX) * bytesPerPixel +
                         (currRect.Y + primaryScreenOffsetY) * bitmapWidth * bytesPerPixel;
@@ -499,7 +499,60 @@ namespace Driver
                     //GetCoordinates(origin, curr, out int xs, out int ys, out int cs);
                     //Logger.Log($"byte ({xs},{ys},{cs}), no. {curr - origin}");
 
-#if MEDIAN
+#if PRECISION
+                    int tot = 0;
+                    long[] totals = { 0, 0, 0 };
+
+                    int numX = (int)(currRect.Width * precision);
+                    int numY = (int)(currRect.Height * precision);
+
+                    int diffX = currRect.Width - numX;
+                    int diffY = currRect.Height - numY;
+
+                    int gapX = ((diffX > 0) ? (numX - 1) / diffX : 0);
+                    int gapY = ((diffY > 0) ? (numY - 1) / diffY : 0);
+
+                    int wid = numX + (numX - 1) * gapX;
+                    int hei = numY + (numY - 1) * gapY;
+
+                    int startX = (currRect.Width - wid) / 2;
+                    int startY = (currRect.Height - hei) / 2;
+
+                    int finX = startX + wid;
+                    int finY = startY + hei;
+
+                    int deltaX = gapX + 1;
+                    int deltaY = gapY + 1;
+
+                    //Logger.Log($"startX:{startX}, startY:{startY}, {deltaX}, {deltaY}");
+
+                    for(int y = startY; y < finY; y += deltaY)
+                    {
+                        for (int x = startX; x < finX; x += deltaX)
+                        {
+                            for(int c = 0; c < 3; c++)
+                            {
+                                byte* curr = start + (y * bitmapWidth * bytesPerPixel) + (x * bytesPerPixel) + c;
+                                try
+                                {
+                                    totals[c] += *curr;
+                                }
+                                catch(AccessViolationException)
+                                {
+                                    GetCoordinates(start, curr, out int xp, out int yp, out int cp);
+                                    Logger.Log($"AVE: for ({x},{y},{c}), pointer ({xp},{yp},{cp})");
+                                }
+                            }
+                            tot++;
+                        }
+                    }
+
+                    int b = (int)Round((double)totals[0] / tot);
+                    int g = (int)Round((double)totals[1] / tot);
+                    int r = (int)Round((double)totals[2] / tot);
+
+                    res[i] = CColor.FromRgb(r, g, b);
+
 #else
                     int tot = 0;
                     long[] totals = { 0, 0, 0 };
@@ -513,18 +566,14 @@ namespace Driver
                         {
                             for(int c = 0; c < 3; c++)
                             {
+                                byte* curr = start + (y * bitmapWidth * bytesPerPixel) + (x * bytesPerPixel) + c;
                                 totals[c] += *curr;
-                                curr++;
                             }
-                            curr += alpha;
-                            curr += (delta - 1) * bytesPerPixel;
                             tot++;
-                            x += delta;
+                            x++;
                         }
-                        if (print) log.AppendLine("");
-                        curr += bitmapWidth * bytesPerPixel * delta;
                         x = 0;
-                        y += delta;
+                        y++;
                     }
 
                     int b = (int)Round((double)totals[0] / tot);

@@ -47,8 +47,8 @@ namespace LedController
             else if (bNorm < cMin) cMin = bNorm;
 
             double delta = cMax - cMin;
-            Logger.Log($"delta: {delta}");
-            Logger.Log($"dom: {dom}");
+            //Logger.Log($"delta: {delta}");
+            //Logger.Log($"dom: {dom}");
             if (delta == 0) h = s = 0;
             else
             {
@@ -110,26 +110,6 @@ namespace LedController
             sb.Append(spl[1]);
             return sb.ToString();
         }
-    }
-    public class StripConfig
-    {
-        public int Width;
-        public int Height;
-        public int MasterLength;
-        public int Start;
-        public bool IsClockwise;
-
-        public StripConfig() { }
-
-        public StripConfig(int w, int h, int s, bool cw, int ml = 0)
-        {
-            Width = w;
-            Height = h;
-            Start = s;
-            IsClockwise = cw;
-            MasterLength = ml;
-        }
-
     }
     public class CColor
     {
@@ -494,8 +474,8 @@ namespace LedController
         public readonly int Length;
         public readonly int MasterLength;
         public readonly bool IsCw;
+        public readonly int Offset;
 
-        private readonly int offset;
         private CColor[] colors;
 
         public ColorMatrix(int w, int h, int s, bool cw, int ml = 0)
@@ -514,16 +494,14 @@ namespace LedController
             Length = BottomLeft + Height - 1;
 
             Length = 2 * Width + 2 * Height - 4;
-            offset = Length - Start;
+            Offset = Length - Start;
 
-            colors = new CColor[Length];
-            for (int i = 0; i < Length; i++)
-            {
-                colors[i] = new CColor();
-            }
+            Init();
         }
 
-        public ColorMatrix(StripConfig config)
+        public ColorMatrix() {; }
+
+        public ColorMatrix(StripInfo config)
         {
             Width = config.Width;
             Height = config.Height;
@@ -539,19 +517,24 @@ namespace LedController
             Length = BottomLeft + Height - 1;
 
             Length = 2 * Width + 2 * Height - 4;
-            offset = Length - Start;
+            Offset = Length - Start;
 
-            colors = new CColor[Length];
-            for (int i = 0; i < Length; i++)
-            {
-                colors[i] = new CColor();
-            }
+            Init();
         }
 
         public CColor this[int i]
         {
             get { return colors[i]; }
             set { colors[i] = value; }
+        }
+
+        public void Init()
+        {
+            colors = new CColor[Length];
+            for (int i = 0; i < Length; i++)
+            {
+                colors[i] = new CColor();
+            }
         }
 
         public Rect[] GetCaptureRects(int screenIndex, RatioProfile prof)
@@ -627,15 +610,15 @@ namespace LedController
             }
         }
 
-        public StripConfig ToStripConfig()
+        public StripInfo ToStripConfig()
         {
-            return new StripConfig(Width, Height, Start, IsCw, MasterLength);
+            return new StripInfo(Width, Height, Start, IsCw, MasterLength);
         }
 
         public void AssignFrom(int index, List<CColor> c)
         {
             int i = 0;
-            int j = index;
+            int j = Filter(index);
             while (i < c.Count)
             {
                 colors[j] = c[i];
@@ -647,7 +630,7 @@ namespace LedController
         public void AssignFrom(int index, CColor[] c)
         {
             int i = 0;
-            int j = index;
+            int j = Filter(index);
             while (i < c.Length)
             {
                 colors[j] = c[i];
@@ -659,7 +642,7 @@ namespace LedController
         public void AssignUpto(int index, List<CColor> c)
         {
             int i = c.Count - 1;
-            int j = (index + Length - c.Count + 1) % Length;
+            int j = (Filter(index) + Length - c.Count + 1) % Length;
             while (i >= 0)
             {
                 colors[j] = c[i];
@@ -671,7 +654,7 @@ namespace LedController
         public void AssignUpto(int index, CColor[] c)
         {
             int i = c.Length - 1;
-            int j = (index + Length - c.Length + 1) % Length;
+            int j = (Filter(index) + Length - c.Length + 1) % Length;
             while (i >= 0)
             {
                 colors[j] = c[i];
@@ -688,6 +671,11 @@ namespace LedController
         public CColor[] ReturnRelativeColors()
         {
             return colors;
+        }
+
+        private int Filter(int p)
+        {
+            return (Length + p) % Length;
         }
 
         private CColor[] ColorsCw()
@@ -712,7 +700,7 @@ namespace LedController
 
         private int CwAbsolute(int r)
         {
-            return (offset + r) % Length;
+            return (Offset + r) % Length;
         }
 
         private int CcwAbsolute(int r)
@@ -740,12 +728,19 @@ namespace LedController
     public static class Logger
     {
         public static Queue<string> Q = new Queue<string>();
+        public static Queue<Tuple<string, string, int, ToolTipIcon>> BalloonQueue = new Queue<Tuple<string, string, int, ToolTipIcon>>();
+
         private static StringBuilder log = new StringBuilder();
         public static void Log(string txt)
         {
             if (Env.Debugging) Console.WriteLine(txt);
             log.AppendLine($"[{DateTime.Now.ToString("HH:mm:ss")}] {txt}");
             Q.Enqueue($"[{DateTime.Now.ToString("HH:mm:ss")}] {txt}\n");
+        }
+
+        public static void Balloon(string title, string text, ToolTipIcon icon, int customTimeout = 5000)
+        {
+            BalloonQueue.Enqueue(new Tuple<string, string, int, ToolTipIcon>(title, text, customTimeout, icon));
         }
 
         public static void Warn(string txt)

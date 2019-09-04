@@ -132,6 +132,7 @@
     <Compile Include="Dialogs\Visualizer.Designer.cs">
       <DependentUpon>Visualizer.cs</DependentUpon>
     </Compile>
+    <Compile Include="nComHandler.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="Hotkey.cs" />
     <Compile Include="LedConfig.cs" />
@@ -190,6 +191,7 @@
     </EmbeddedResource>
     <None Include="LedController_TemporaryKey.pfx" />
     <None Include="MirrorDriver\app.manifest" />
+    <None Include="Properties\DataSources\MainForm.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

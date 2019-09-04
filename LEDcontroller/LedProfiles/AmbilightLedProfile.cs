@@ -16,21 +16,18 @@ namespace LedController.LedProfiles
     public class AmbilightLedProfile : LedProfile
     {
 
-        readonly DesktopMirror mirror = new DesktopMirror();
+        protected readonly DesktopMirror mirror = new DesktopMirror();
 
         [XmlIgnore]
-        public Rect[] Rects { get; private set; }
+        public Rect[] Rects { get; protected set; }
+        [XmlIgnore]
+        public double Precision = 1;
 
         bool isChanging = false;
 
-        public AmbilightLedProfile(string name, string parentProfileSet, int index, ColorMatrix m)
+        public AmbilightLedProfile(string name, int index, int psindex, ColorMatrix m) : base(name, index, psindex, ProfileType.Ambilight)
         {
-            Index = index;
-            Parent = parentProfileSet;
             Brightness = 255;
-            ProfileType = ProfileType.Ambilight;
-            Name = name;
-            UName = $"{parentProfileSet}:{name}";
             Ups = 30;
 
             for(int i = 0; i < Screen.AllScreens.Length; i++)
@@ -50,7 +47,7 @@ namespace LedController.LedProfiles
 
         public override void Init(ColorMatrix m)
         {
-            Rects = matrix.GetCaptureRects(ScreenIndex, RatioProfile);
+            Rects = m.GetCaptureRects(ScreenIndex, RatioProfile);
 
             if (mirror.Load())
             {
@@ -58,16 +55,51 @@ namespace LedController.LedProfiles
                 else MessageBox.Show("Could't connect to dfMirage driver", "Driver connection error");
             }
             else MessageBox.Show("Couldn't load the dfMirage driver", "Driver loading error");
+
+            Rect currRect = Rects[0];
+            Logger.Log($"\nFor {currRect.ToString()}, precision {Precision}:");
+
+            int numX = (int)(currRect.Width * Precision);
+            int numY = (int)(currRect.Height * Precision);
+
+            int diffX = currRect.Width - numX;
+            int diffY = currRect.Height - numY;
+
+            int gapX = diffX / (numX - 1);
+            int gapY = diffY / (numY - 1);
+
+            int wid = numX + (numX - 1) * gapX;
+            int hei = numY + (numY - 1) * gapY;
+
+            int startX = (currRect.Width - wid) / 2;
+            int startY = (currRect.Height - hei) / 2;
+
+            int finX = startX + wid;
+            int finY = startY + hei;
+
+            int deltaX = gapX + 1;
+            int deltaY = gapY + 1;
+
+            int tot = 0;
+            for (int y = startY; y < finY; y += deltaY)
+            {
+                for (int x = startX; x < finX; x += deltaX)
+                {
+                    tot++;
+                }
+            }
+
+            Logger.Log($"\nEvaluating {numX} in x and {numY} in y direction\nwith gaps {gapX}(x) and {gapY}(y)\ntotal width {wid} and height {hei}\nstarting ({startX},{startY})\nfinishing ({finX},{finY})\ntotal evals: {tot}x3\n");      
         }
 
         public override void Update(ColorMatrix m)
         {
             if (!isChanging)
             {
-                try
-                {
-                    m.AssignFrom(m.TopLeft, mirror.GetAvgCColorFromScreen(Rects, false));
-                }
+                /*try
+                {*/
+                    m.AssignFrom(m.TopLeft, mirror.GetAvgCColorFromScreen(Rects, false, 1));
+                /*}
                 catch
                 {
                     mirror.Stop();
@@ -75,15 +107,9 @@ namespace LedController.LedProfiles
                     mirror.Unload();
                     mirror.Dispose();
                     throw;
-                }
+                }*/
             }
-            else
-            {
-                for(int i = 0; i < m.MasterLength; i++)
-                {
-                    m[i] = new CColor();
-                }
-            }
+            else for (int i = 0; i < m.MasterLength; i++){ m[i] = new CColor(); }
         }
 
         public override void Close()
@@ -94,7 +120,7 @@ namespace LedController.LedProfiles
             mirror.Dispose();
         }
 
-        public void UpdateRects(int index, RatioProfile ratio)
+        public void UpdateRects(int index, RatioProfile ratio, ColorMatrix matrix)
         {
             isChanging = true;
             ScreenIndex = index;
@@ -102,6 +128,39 @@ namespace LedController.LedProfiles
             Rects = matrix.GetCaptureRects(ScreenIndex, RatioProfile);
             //Logger.Log(Rects.Length);
             isChanging = false;
+        }
+    }
+
+    public class TestAmbilightLedProfile : AmbilightLedProfile
+    {
+        public TestAmbilightLedProfile()
+        {
+            Brightness = 255;
+            Ups = 30;
+
+            for (int i = 0; i < Screen.AllScreens.Length; i++)
+            {
+                if (Screen.AllScreens[i].Primary)
+                {
+                    ScreenIndex = i;
+                    break;
+                }
+            }
+
+            Rectangle bounds = Screen.PrimaryScreen.Bounds;
+            RatioProfile = new RatioProfile(bounds.Width / (double)bounds.Height);
+        }
+
+        public override void Init(ColorMatrix m)
+        {
+            Rects = new Rect[]{ new Rect(0, 0, 10, 10)};
+
+            if (mirror.Load())
+            {
+                if (mirror.Connect()) mirror.Start();
+                else MessageBox.Show("Could't connect to dfMirage driver", "Driver connection error");
+            }
+            else MessageBox.Show("Couldn't load the dfMirage driver", "Driver loading error");
         }
     }
 }

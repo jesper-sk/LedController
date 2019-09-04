@@ -23,7 +23,7 @@ namespace LedController
         public bool IsConnected { get; private set; }
         public bool IsSending { get; private set; }
         public string Com { get; private set; }
-        public ColorMatrix Matrix;
+        public ColorMatrix Matrix { get; set; }
         public LedProfile ActiveProfile
         {
             get
@@ -32,12 +32,13 @@ namespace LedController
             }
             private set
             {
-                Logger.Log($"Activating profile {value?.UName ?? "null"}");
-                Logger.Log($"\tClosing previous profile... ({activeProfile?.UName ?? "null"})");
+                Logger.Log($"Activating profile {value?.Name ?? "null"}");
+                Logger.Log($"\tClosing previous profile... ({activeProfile?.Name ?? "null"})");
                 if (activeProfile != null) activeProfile.Close();
                 activeProfile = value;
                 Logger.Log("\tInitiating new profile...");
                 if (activeProfile != null) activeProfile.Init(Matrix);
+                else SetLedsBlack();
                 Logger.Log($"New profile activated.");
             }
         }
@@ -92,7 +93,7 @@ namespace LedController
         {
             arduPort.PortName = com;
             try { arduPort.Open(); }
-            catch(Exception e) { MessageBox.Show("Opening COM-port failed: " +  e.Message); return false; }
+            catch(Exception e) { Logger.Balloon("LedController Connection Error", "Opening COM-port failed: " +  e.Message, ToolTipIcon.Error); return false; }
             //outputChecker.Start();
             IsConnected = true;
             Com = arduPort.PortName;
@@ -186,6 +187,11 @@ namespace LedController
         #endregion
 
         #region Activate/Deactivate LEDProfiles
+        public void SetActiveProfile(LedProfile act)
+        {
+
+        }
+
         public void SetActive(LedProfile activeProfile)
         {
             if (activeProfile == null)
@@ -212,12 +218,28 @@ namespace LedController
 
         public LedProfile Deactivate(bool reset = false)
         {
-            if (updateTimer != null) updateTimer.Dispose();
-            SetLedsBlack();
+            if (updateTimer != null)
+            {
+                updateTimer.Dispose();
+                if (ActiveProfile != null) Thread.Sleep((int)((1.0 / ActiveProfile.Ups) * 1000));
+            }
             LedProfile temp = ActiveProfile;
             if (reset) ActiveProfile = null;
             IsSending = false;
             return temp;
+        }
+
+        public bool Reenable()
+        {
+            if (ActiveProfile != null)
+            {
+                dt = DateTime.Now;
+                int interval = Convert.ToInt32((1 / (double)ActiveProfile.Ups) * 1000);
+                updateTimer = new System.Threading.Timer(new TimerCallback(SendBytes), null, 0, interval);
+                IsSending = true;
+                return true;
+            }
+            else return false;
         }
         #endregion
 
@@ -236,8 +258,8 @@ namespace LedController
         {
             if (IsConnected)
             {
-                CColor[] black = new CColor[60];
-                for (int i = 0; i < 60; i++)
+                CColor[] black = new CColor[Matrix.MasterLength];
+                for (int i = 0; i < Matrix.MasterLength; i++)
                 {
                     black[i] = new CColor(); //defaults to black
                 }
@@ -300,6 +322,7 @@ namespace LedController
             try { arduPort.Write(buffer, 0, count); }
             catch { /*Logger.Log("Writing bytes to port failed: {0}", e.Message);*/ }
             TimeSpan span = DateTime.Now - dt;
+            dt = DateTime.Now;
             int fps = (int)(1 / span.TotalSeconds);
             try
             {
@@ -307,7 +330,6 @@ namespace LedController
                 main.Invoke(UpdateFpsDelegate, new object[] { fps });
             }
             catch (ObjectDisposedException) {; }
-            dt = DateTime.Now;
         }
 
         private string getThreadInfo()

@@ -27,54 +27,57 @@ namespace LedController.LedProfiles
          *  - Assignments of all relevant properties
          *  - Add the XmlInclude(typeof(ConcreteProfile)) attribute to the abstract profile class
          */
-        public string Name { get; set; }
-        public string UName { get; set; }
+        public int ProfileIndex { get; set; }
+        public int ProfileSetIndex { get; set; }
         public ProfileType ProfileType { get; set; }
-        public CColor LedColor { get; set; }
+        public int Ups { get; set; }
         public byte Brightness { get; set; }
-        public int Ups { get; set; } 
+        public string Name { get; set; }
+
+        //TODO: transfer below properties to right LedProfile type
+
+        //StaticLedProfile
+        public CColor LedColor { get; set; }
+
+        //RainbowLedProfile
         public int Speed { get; set; }
-        public int Index { get; set; }
-        public string Parent { get; set; }
+
+        //AmbilightLedProfile
         public int ScreenIndex { get; set; }
         public RatioProfile RatioProfile { get; set; }
 
-        protected ColorMatrix matrix;
-
-        protected Color[] leds;
-
-        public bool Equals(LedProfile other)
+        protected LedProfile() {; }
+        protected LedProfile(string name, int index, int psindex, ProfileType type)
         {
-            return other.UName == UName;
-        }
-        public override string ToString()
-        {
-            return Name;
-        }
-
-        public void SetMatrix(ColorMatrix m)
-        {
-            matrix = m;
+            Name = name;
+            ProfileIndex = index;
+            ProfileSetIndex = psindex;
+            ProfileType = type;
         }
 
         public virtual void Init(ColorMatrix m) {; }
         public virtual void Update(ColorMatrix m) {; }
         public virtual void Close() {; }
+
+        public bool Equals(LedProfile other)
+        {
+            return other.ProfileIndex == ProfileIndex && other.ProfileSetIndex == ProfileSetIndex;
+        }
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 
     public class StaticLedProfile : LedProfile
     {
         public StaticLedProfile() { }
 
-        public StaticLedProfile(string name, string parentProfileSet, int index, ColorMatrix m)
+        public StaticLedProfile(string name, int index, int psindex, ColorMatrix m) : base(name, index, psindex, ProfileType.Static)
         {
-            Index = index;
-            Parent = parentProfileSet;
+            ProfileIndex = index;
             Brightness = 64;
             LedColor = CColor.FromColor(Color.White);
-            ProfileType = ProfileType.Static;
-            Name = name;
-            UName = $"{parentProfileSet}:{name}";
             Ups = 30;
         }
 
@@ -98,14 +101,9 @@ namespace LedController.LedProfiles
 
         public RainbowLedProfile() { }
 
-        public RainbowLedProfile(string name, string parentProfileSet, int index, ColorMatrix m)
+        public RainbowLedProfile(string name, int index, int psindex, ColorMatrix m) : base(name, index, psindex, ProfileType.Rainbow)
         {
-            Index = index;
-            Parent = parentProfileSet;
             Brightness = 64;
-            ProfileType = ProfileType.Rainbow;
-            Name = name;
-            UName = $"{parentProfileSet}:{name}";
             Ups = 60;
         }
 
@@ -124,6 +122,15 @@ namespace LedController.LedProfiles
                 currHue = (currHue + deltaHue) % 360;
             }
             startHue = (startHue + deltaStartHue) % 360;
+        }
+    }
+
+    public class NoneLedProfile : LedProfile
+    {
+        public NoneLedProfile()
+        {
+            ProfileType = ProfileType.None;
+            Ups = 1;
         }
     }
 

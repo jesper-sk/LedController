@@ -1,0 +1,16 @@
+[11:25:50] Hello world!
+[11:25:50] Activating profile null
+[11:25:50] 	Closing previous profile... (null)
+[11:25:50] 	Initiating new profile...
+[11:25:50] New profile activated.
+[11:25:50] Loading config file...
+[11:29:49] Activating profile Default:Rainbow
+[11:29:49] 	Closing previous profile... (null)
+[11:29:49] 	Initiating new profile...
+[11:29:49] New profile activated.
+[11:33:00] Visualizer closed in form
+[11:33:46] Deativating Leds
+[11:33:46] Activating profile null
+[11:33:46] 	Closing previous profile... (Default:Rainbow)
+[11:33:46] 	Initiating new profile...
+[11:33:46] New profile activated.

@@ -30,7 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem(new string[] {
             "",
             "",
             "",
@@ -38,10 +38,11 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
-            this.contextMenuStrip2 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.showToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.hideToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MainNotifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
+            this.TrayContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.ShowHideToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ActiveProfileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.UpdateLogTimer = new System.Windows.Forms.Timer(this.components);
             this.ConfigTabPage = new System.Windows.Forms.TabPage();
@@ -92,6 +93,7 @@
             this.staticProfileColorButton = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.AmbilightGroupBox = new System.Windows.Forms.GroupBox();
+            this.AmbilightPrecisionTrackBar = new System.Windows.Forms.TrackBar();
             this.label9 = new System.Windows.Forms.Label();
             this.AmbilightBrightnessNumericUpDown = new System.Windows.Forms.NumericUpDown();
             this.AmbilightBrightnessTrackBar = new System.Windows.Forms.TrackBar();
@@ -125,13 +127,17 @@
             this.SelectActiveProfileButton = new System.Windows.Forms.Button();
             this.activeProfileLabel = new System.Windows.Forms.Label();
             this.FpsLabel = new System.Windows.Forms.Label();
+            this.mainFormBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.TabControl = new System.Windows.Forms.TabControl();
             this.BassTabPage = new System.Windows.Forms.TabPage();
+            this.AudioLevelPanel = new System.Windows.Forms.Panel();
+            this.AudioNumBandsLabel = new System.Windows.Forms.Label();
+            this.numBandsTrackBar = new System.Windows.Forms.TrackBar();
             this.StartAudioVisButton = new System.Windows.Forms.Button();
             this.AudioVisualizerPanel = new System.Windows.Forms.Panel();
             this.audioUpdateTimer = new System.Windows.Forms.Timer(this.components);
             this.statusStrip1.SuspendLayout();
-            this.contextMenuStrip2.SuspendLayout();
+            this.TrayContextMenu.SuspendLayout();
             this.ConfigTabPage.SuspendLayout();
             this.LogTabPage.SuspendLayout();
             this.VisualizerTabPage.SuspendLayout();
@@ -145,6 +151,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.StaticBrightnessNUD)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.StaticBrightnessTrackbar)).BeginInit();
             this.AmbilightGroupBox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.AmbilightPrecisionTrackBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.AmbilightBrightnessNumericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.AmbilightBrightnessTrackBar)).BeginInit();
             this.groupBox7.SuspendLayout();
@@ -157,8 +164,10 @@
             this.groupBox2.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox5.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.mainFormBindingSource)).BeginInit();
             this.TabControl.SuspendLayout();
             this.BassTabPage.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numBandsTrackBar)).BeginInit();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -182,40 +191,48 @@
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
             // 
-            // notifyIcon1
+            // MainNotifyIcon
             // 
-            this.notifyIcon1.ContextMenuStrip = this.contextMenuStrip2;
-            this.notifyIcon1.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon1.Icon")));
-            this.notifyIcon1.Text = "Led Controller";
-            this.notifyIcon1.Visible = true;
+            this.MainNotifyIcon.ContextMenuStrip = this.TrayContextMenu;
+            this.MainNotifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("MainNotifyIcon.Icon")));
+            this.MainNotifyIcon.Text = "Led Controller - Click to open";
+            this.MainNotifyIcon.Visible = true;
+            this.MainNotifyIcon.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.MainNotifyIcon_MouseDoubleClick);
+            this.MainNotifyIcon.MouseMove += new System.Windows.Forms.MouseEventHandler(this.MainNotifyIcon_MouseMove);
             // 
-            // contextMenuStrip2
+            // TrayContextMenu
             // 
-            this.contextMenuStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.showToolStripMenuItem,
-            this.hideToolStripMenuItem,
+            this.TrayContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ShowHideToolStripMenuItem,
+            this.ActiveProfileToolStripMenuItem,
+            this.toolStripSeparator1,
             this.exitToolStripMenuItem});
-            this.contextMenuStrip2.Name = "contextMenuStrip2";
-            this.contextMenuStrip2.Size = new System.Drawing.Size(104, 70);
+            this.TrayContextMenu.Name = "contextMenuStrip2";
+            this.TrayContextMenu.Size = new System.Drawing.Size(177, 76);
             // 
-            // showToolStripMenuItem
+            // ShowHideToolStripMenuItem
             // 
-            this.showToolStripMenuItem.Name = "showToolStripMenuItem";
-            this.showToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
-            this.showToolStripMenuItem.Text = "Show";
-            this.showToolStripMenuItem.Click += new System.EventHandler(this.showToolStripMenuItem_Click);
+            this.ShowHideToolStripMenuItem.Name = "ShowHideToolStripMenuItem";
+            this.ShowHideToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.ShowHideToolStripMenuItem.Text = "Show";
+            this.ShowHideToolStripMenuItem.Click += new System.EventHandler(this.ShowHideToolStripMenuItem_Click);
             // 
-            // hideToolStripMenuItem
+            // ActiveProfileToolStripMenuItem
             // 
-            this.hideToolStripMenuItem.Name = "hideToolStripMenuItem";
-            this.hideToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
-            this.hideToolStripMenuItem.Text = "Hide";
-            this.hideToolStripMenuItem.Click += new System.EventHandler(this.hideToolStripMenuItem_Click);
+            this.ActiveProfileToolStripMenuItem.Name = "ActiveProfileToolStripMenuItem";
+            this.ActiveProfileToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.ActiveProfileToolStripMenuItem.Text = "Select active profile";
+            this.ActiveProfileToolStripMenuItem.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.ActiveProfileToolStripMenuItem_DropDownItemClicked);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(173, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -231,7 +248,7 @@
             this.ConfigTabPage.Location = new System.Drawing.Point(4, 22);
             this.ConfigTabPage.Name = "ConfigTabPage";
             this.ConfigTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.ConfigTabPage.Size = new System.Drawing.Size(899, 393);
+            this.ConfigTabPage.Size = new System.Drawing.Size(899, 770);
             this.ConfigTabPage.TabIndex = 3;
             this.ConfigTabPage.Text = "Configuration";
             this.ConfigTabPage.UseVisualStyleBackColor = true;
@@ -276,7 +293,7 @@
             this.LogTabPage.Location = new System.Drawing.Point(4, 22);
             this.LogTabPage.Name = "LogTabPage";
             this.LogTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.LogTabPage.Size = new System.Drawing.Size(899, 393);
+            this.LogTabPage.Size = new System.Drawing.Size(899, 770);
             this.LogTabPage.TabIndex = 2;
             this.LogTabPage.Text = "Logger";
             this.LogTabPage.UseVisualStyleBackColor = true;
@@ -343,7 +360,7 @@
             this.VisualizerTabPage.Location = new System.Drawing.Point(4, 22);
             this.VisualizerTabPage.Name = "VisualizerTabPage";
             this.VisualizerTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.VisualizerTabPage.Size = new System.Drawing.Size(899, 393);
+            this.VisualizerTabPage.Size = new System.Drawing.Size(899, 770);
             this.VisualizerTabPage.TabIndex = 1;
             this.VisualizerTabPage.Text = "Visualizer";
             this.VisualizerTabPage.UseVisualStyleBackColor = true;
@@ -392,7 +409,7 @@
             this.ProfilesTabPage.Location = new System.Drawing.Point(4, 22);
             this.ProfilesTabPage.Name = "ProfilesTabPage";
             this.ProfilesTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.ProfilesTabPage.Size = new System.Drawing.Size(899, 393);
+            this.ProfilesTabPage.Size = new System.Drawing.Size(899, 770);
             this.ProfilesTabPage.TabIndex = 0;
             this.ProfilesTabPage.Text = "Profile Selection";
             // 
@@ -617,9 +634,9 @@
             this.profileListView.FullRowSelect = true;
             this.profileListView.GridLines = true;
             this.profileListView.HideSelection = false;
-            listViewItem3.StateImageIndex = 0;
+            listViewItem1.StateImageIndex = 0;
             this.profileListView.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem3});
+            listViewItem1});
             this.profileListView.Location = new System.Drawing.Point(105, 86);
             this.profileListView.MultiSelect = false;
             this.profileListView.Name = "profileListView";
@@ -730,6 +747,7 @@
             // 
             // AmbilightGroupBox
             // 
+            this.AmbilightGroupBox.Controls.Add(this.AmbilightPrecisionTrackBar);
             this.AmbilightGroupBox.Controls.Add(this.label9);
             this.AmbilightGroupBox.Controls.Add(this.AmbilightBrightnessNumericUpDown);
             this.AmbilightGroupBox.Controls.Add(this.AmbilightBrightnessTrackBar);
@@ -744,6 +762,18 @@
             this.AmbilightGroupBox.TabIndex = 29;
             this.AmbilightGroupBox.TabStop = false;
             this.AmbilightGroupBox.Text = "Selected LED Profile";
+            // 
+            // AmbilightPrecisionTrackBar
+            // 
+            this.AmbilightPrecisionTrackBar.Location = new System.Drawing.Point(9, 178);
+            this.AmbilightPrecisionTrackBar.Maximum = 11;
+            this.AmbilightPrecisionTrackBar.Minimum = 1;
+            this.AmbilightPrecisionTrackBar.Name = "AmbilightPrecisionTrackBar";
+            this.AmbilightPrecisionTrackBar.Size = new System.Drawing.Size(392, 45);
+            this.AmbilightPrecisionTrackBar.TabIndex = 43;
+            this.AmbilightPrecisionTrackBar.TickFrequency = 2;
+            this.AmbilightPrecisionTrackBar.Value = 11;
+            this.AmbilightPrecisionTrackBar.ValueChanged += new System.EventHandler(this.AmbilightPrecisionTrackBar_ValueChanged);
             // 
             // label9
             // 
@@ -1005,7 +1035,6 @@
             this.button1.TabIndex = 21;
             this.button1.Text = "Remove";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.Button1_Click);
             // 
             // groupBox4
             // 
@@ -1080,6 +1109,10 @@
             this.FpsLabel.TabIndex = 39;
             this.FpsLabel.Text = "-- Fps";
             // 
+            // mainFormBindingSource
+            // 
+            this.mainFormBindingSource.DataSource = typeof(LedController.MainForm);
+            // 
             // TabControl
             // 
             this.TabControl.Controls.Add(this.ProfilesTabPage);
@@ -1091,24 +1124,55 @@
             this.TabControl.Multiline = true;
             this.TabControl.Name = "TabControl";
             this.TabControl.SelectedIndex = 0;
-            this.TabControl.Size = new System.Drawing.Size(907, 419);
+            this.TabControl.Size = new System.Drawing.Size(907, 796);
             this.TabControl.TabIndex = 41;
-            this.TabControl.SelectedIndexChanged += new System.EventHandler(this.TabControl_SelectedIndexChanged);
             // 
             // BassTabPage
             // 
+            this.BassTabPage.Controls.Add(this.AudioLevelPanel);
+            this.BassTabPage.Controls.Add(this.AudioNumBandsLabel);
+            this.BassTabPage.Controls.Add(this.numBandsTrackBar);
             this.BassTabPage.Controls.Add(this.StartAudioVisButton);
             this.BassTabPage.Controls.Add(this.AudioVisualizerPanel);
             this.BassTabPage.Location = new System.Drawing.Point(4, 22);
             this.BassTabPage.Name = "BassTabPage";
-            this.BassTabPage.Size = new System.Drawing.Size(899, 393);
+            this.BassTabPage.Size = new System.Drawing.Size(899, 770);
             this.BassTabPage.TabIndex = 4;
             this.BassTabPage.Text = "Audio";
             this.BassTabPage.UseVisualStyleBackColor = true;
             // 
+            // AudioLevelPanel
+            // 
+            this.AudioLevelPanel.Location = new System.Drawing.Point(13, 358);
+            this.AudioLevelPanel.Name = "AudioLevelPanel";
+            this.AudioLevelPanel.Size = new System.Drawing.Size(751, 23);
+            this.AudioLevelPanel.TabIndex = 3;
+            // 
+            // AudioNumBandsLabel
+            // 
+            this.AudioNumBandsLabel.AutoSize = true;
+            this.AudioNumBandsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.AudioNumBandsLabel.Location = new System.Drawing.Point(857, 363);
+            this.AudioNumBandsLabel.Name = "AudioNumBandsLabel";
+            this.AudioNumBandsLabel.Size = new System.Drawing.Size(28, 13);
+            this.AudioNumBandsLabel.TabIndex = 2;
+            this.AudioNumBandsLabel.Text = "250";
+            // 
+            // numBandsTrackBar
+            // 
+            this.numBandsTrackBar.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.numBandsTrackBar.Location = new System.Drawing.Point(851, 3);
+            this.numBandsTrackBar.Maximum = 250;
+            this.numBandsTrackBar.Name = "numBandsTrackBar";
+            this.numBandsTrackBar.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.numBandsTrackBar.Size = new System.Drawing.Size(45, 349);
+            this.numBandsTrackBar.TabIndex = 0;
+            this.numBandsTrackBar.TickStyle = System.Windows.Forms.TickStyle.Both;
+            this.numBandsTrackBar.Scroll += new System.EventHandler(this.NumBandsTrackBar_Scroll);
+            // 
             // StartAudioVisButton
             // 
-            this.StartAudioVisButton.Location = new System.Drawing.Point(811, 358);
+            this.StartAudioVisButton.Location = new System.Drawing.Point(770, 358);
             this.StartAudioVisButton.Name = "StartAudioVisButton";
             this.StartAudioVisButton.Size = new System.Drawing.Size(75, 23);
             this.StartAudioVisButton.TabIndex = 0;
@@ -1120,12 +1184,12 @@
             // 
             this.AudioVisualizerPanel.Location = new System.Drawing.Point(13, 13);
             this.AudioVisualizerPanel.Name = "AudioVisualizerPanel";
-            this.AudioVisualizerPanel.Size = new System.Drawing.Size(873, 339);
+            this.AudioVisualizerPanel.Size = new System.Drawing.Size(832, 339);
             this.AudioVisualizerPanel.TabIndex = 0;
             // 
             // audioUpdateTimer
             // 
-            this.audioUpdateTimer.Interval = 8;
+            this.audioUpdateTimer.Interval = 16;
             this.audioUpdateTimer.Tick += new System.EventHandler(this.AudioUpdateTimer_Tick);
             // 
             // MainForm
@@ -1147,7 +1211,7 @@
             this.SizeChanged += new System.EventHandler(this.MainForm_SizeChanged);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
-            this.contextMenuStrip2.ResumeLayout(false);
+            this.TrayContextMenu.ResumeLayout(false);
             this.ConfigTabPage.ResumeLayout(false);
             this.ConfigTabPage.PerformLayout();
             this.LogTabPage.ResumeLayout(false);
@@ -1168,6 +1232,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.StaticBrightnessTrackbar)).EndInit();
             this.AmbilightGroupBox.ResumeLayout(false);
             this.AmbilightGroupBox.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.AmbilightPrecisionTrackBar)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.AmbilightBrightnessNumericUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.AmbilightBrightnessTrackBar)).EndInit();
             this.groupBox7.ResumeLayout(false);
@@ -1183,8 +1248,11 @@
             this.groupBox4.ResumeLayout(false);
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.mainFormBindingSource)).EndInit();
             this.TabControl.ResumeLayout(false);
             this.BassTabPage.ResumeLayout(false);
+            this.BassTabPage.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numBandsTrackBar)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1194,11 +1262,9 @@
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
-        private System.Windows.Forms.NotifyIcon notifyIcon1;
-        private System.Windows.Forms.ContextMenuStrip contextMenuStrip2;
-        private System.Windows.Forms.ToolStripMenuItem showToolStripMenuItem;
+        private System.Windows.Forms.NotifyIcon MainNotifyIcon;
+        private System.Windows.Forms.ContextMenuStrip TrayContextMenu;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem hideToolStripMenuItem;
         private System.Windows.Forms.Timer UpdateLogTimer;
         private System.Windows.Forms.TabPage ConfigTabPage;
         private System.Windows.Forms.CheckBox OpenOnStartupCheckBox;
@@ -1286,6 +1352,14 @@
         private System.Windows.Forms.Button StartAudioVisButton;
         private System.Windows.Forms.Panel AudioVisualizerPanel;
         private System.Windows.Forms.Timer audioUpdateTimer;
+        private System.Windows.Forms.Label AudioNumBandsLabel;
+        private System.Windows.Forms.TrackBar numBandsTrackBar;
+        private System.Windows.Forms.Panel AudioLevelPanel;
+        private System.Windows.Forms.ToolStripMenuItem ActiveProfileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem ShowHideToolStripMenuItem;
+        private System.Windows.Forms.TrackBar AmbilightPrecisionTrackBar;
+        private System.Windows.Forms.BindingSource mainFormBindingSource;
     }
 }
 

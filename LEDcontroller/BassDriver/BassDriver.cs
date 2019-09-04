@@ -11,55 +11,58 @@ using static Un4seen.BassWasapi.BassWasapi;
 
 namespace LedController.Bass
 {
-    public class BassDriver
+    public static class BassDriver
     {
-        private float[] fft;
-        private WASAPIPROC process;
+        private static float[] fft;
+        private static WASAPIPROC process;
 
-        public int DeviceIndex { get; private set; }
-        public int NumBands { get; private set; }
-        public BassDriverState State { get; private set; } = BassDriverState.Disabled;
-        public BassDriver(int devInd, int numLines = 16)
+        public static int DeviceIndex { get; private set; }
+        public static BassDriverState State { get; private set; } = BassDriverState.Dormant;
+
+        public static void Init()
         {
-            DeviceIndex = devInd;
-            NumBands = numLines;
-
             fft = new float[1024];
             process = new WASAPIPROC(Process);
 
             BASS_SetConfig(BASSConfig.BASS_CONFIG_UPDATETHREADS, false);
             bool result = BASS_Init(0, 44100, BASSInit.BASS_DEVICE_DEFAULT, IntPtr.Zero);
             if (!result) throw new Exception("BASS init error");
+            State = BassDriverState.Initialized;
         }
 
-        public void Enable()
+        public static void Enable(int devInd)
         {
-            if (State != BassDriverState.Enabled)
+            if (State == BassDriverState.Dormant) Init();
+            if (devInd != DeviceIndex)
             {
-                bool result = BASS_WASAPI_Init(DeviceIndex, 0, 0, BASSWASAPIInit.BASS_WASAPI_BUFFER, 1f, 0.05f, process, IntPtr.Zero);
-                if (!result)
-                {
-                    var error = BASS_ErrorGetCode();
-                    throw new Exception($"BASS Wasapi error: {error.ToString()}");
-                }
-                else
-                {
-                    State = BassDriverState.Enabled;
-                }
-                BASS_WASAPI_Start();
+                DeviceIndex = devInd;
+                Disable();
             }
+            else if (State == BassDriverState.Enabled) return;
 
+            bool result = BASS_WASAPI_Init(DeviceIndex, 0, 0, BASSWASAPIInit.BASS_WASAPI_BUFFER, 1f, 0.05f, process, IntPtr.Zero);
+            if (!result)
+            {
+                var error = BASS_ErrorGetCode();
+                throw new Exception($"BASS Wasapi error: {error.ToString()}");
+            }
+            else
+            {
+                State = BassDriverState.Enabled;
+            }
+            BASS_WASAPI_Start();
         }
-        public void Disable()
+        public static void Disable()
         {
             if (State == BassDriverState.Enabled)
             {
-                State = BassDriverState.Disabled;
+                State = BassDriverState.Initialized;
                 BASS_WASAPI_Stop(true);
+                Free();
             }
         }
 
-        public List<byte> GetBands(out short levelL, out short levelR)
+        public static List<byte> GetBands(int numBands, out short levelL, out short levelR)
         {
             if (State != BassDriverState.Enabled) throw new InvalidOperationException("Enable driver first");
             int LRLevel = BASS_WASAPI_GetLevel();
@@ -79,12 +82,12 @@ namespace LedController.Bass
 
             int x, y;
             int b0 = 0;
-            List<byte> res = new List<byte>(NumBands);
+            List<byte> res = new List<byte>(numBands);
 
-            for (x = 0; x < NumBands; x++)
+            for (x = 0; x < numBands; x++)
             {
                 float peak = 0;
-                int b1 = (int)Math.Pow(2, x * 10.0 / (NumBands - 1));
+                int b1 = (int)Math.Pow(2, x * 10.0 / (numBands - 1));
                 if (b1 > 1023) b1 = 1023;
                 if (b1 <= b0) b1 = b0 + 1;
                 for (; b0 < b1; b0++)
@@ -101,37 +104,25 @@ namespace LedController.Bass
             return res;
         }
 
-        public void SetNumBands(int n)
-        {
-            Disable();
-            NumBands = n;
-            Enable();
-        }
-
-        public void SetDeviceIndex(int i)
-        {
-            Disable();
-            DeviceIndex = i;
-            Enable();
-        }
-
-        private int Process(IntPtr buffer, int length, IntPtr user)
+        private static int Process(IntPtr buffer, int length, IntPtr user)
         {
             return length;
         }
 
-        public void Dispose()
+        public static void Free()
         {
             Disable();
             BASS_Free();
             BASS_WASAPI_Free();
+            State = BassDriverState.Dormant;
         }
     }
 
     public enum BassDriverState
     {
+        Dormant,
+        Initialized,
         Enabled,
-        Disabled,
         Error
     }
 }
