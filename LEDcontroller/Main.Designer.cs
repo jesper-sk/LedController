@@ -198,7 +198,7 @@
             this.MainNotifyIcon.Text = "Led Controller - Click to open";
             this.MainNotifyIcon.Visible = true;
             this.MainNotifyIcon.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.MainNotifyIcon_MouseDoubleClick);
-            this.MainNotifyIcon.MouseMove += new System.Windows.Forms.MouseEventHandler(this.MainNotifyIcon_MouseMove);
+            this.MainNotifyIcon.MouseDown += new System.Windows.Forms.MouseEventHandler(this.MainNotifyIcon_MouseDown);
             // 
             // TrayContextMenu
             // 
@@ -623,6 +623,7 @@
             this.profileSetComboBox.Size = new System.Drawing.Size(366, 21);
             this.profileSetComboBox.TabIndex = 7;
             this.profileSetComboBox.SelectedIndexChanged += new System.EventHandler(this.ProfileSetBox_SelectedIndexChanged);
+            this.profileSetComboBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ProfileSetComboBox_MouseClick);
             // 
             // profileListView
             // 

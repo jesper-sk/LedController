@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LedProfile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:type="AmbilightLedProfile">
+  <ProfileIndex>2</ProfileIndex>
+  <ProfileSetIndex>0</ProfileSetIndex>
+  <ProfileType>Ambilight</ProfileType>
+  <Ups>30</Ups>
+  <Brightness>255</Brightness>
+  <Name>Ambilight</Name>
+  <Speed>0</Speed>
+  <ScreenIndex>1</ScreenIndex>
+  <RatioProfile RatioWidth="43" RatioHeight="18" />
+</LedProfile>

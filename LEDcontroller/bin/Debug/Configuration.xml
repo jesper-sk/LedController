@@ -9,7 +9,7 @@
   <Strip>
     <Width>18</Width>
     <Height>8</Height>
-    <MasterLength>104</MasterLength>
+    <MasterLength>260</MasterLength>
     <Start>29</Start>
     <IsClockwise>true</IsClockwise>
     <BaudRate>0</BaudRate>

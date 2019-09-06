@@ -55,14 +55,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="LedController.exe" size="199144">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="LedController.exe" size="199656">
       <assemblyIdentity name="LedController" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>Dxq77oDGzlOUYZBcsc0B8VwcIXsjf+WJW0+dcPPLlTU=</dsig:DigestValue>
+        <dsig:DigestValue>dVcZcHfOKyl/evX7Lzj2yyO6rLyvjqFlQYq08IOcfRE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LedProfile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:type="MusicLedProfile">
+  <ProfileIndex>0</ProfileIndex>
+  <ProfileSetIndex>0</ProfileSetIndex>
+  <ProfileType>Static</ProfileType>
+  <Ups>0</Ups>
+  <Brightness>0</Brightness>
+  <Speed>0</Speed>
+  <ScreenIndex>0</ScreenIndex>
+  <DeviceName>Device name lol</DeviceName>
+  <DeviceIndex>0</DeviceIndex>
+</LedProfile>

@@ -1,5 +1,5 @@
 ﻿#define DEBUG
-
+//#define TEST
 //#define NEW
 
 using LedController.Bass;
@@ -20,6 +20,16 @@ namespace LedController
 {
     public partial class MainForm : Form
     {
+        public void Test()
+        {
+            MusicLedProfile prof = new MusicLedProfile();
+            prof.DeviceName = "Device name lol";
+            using (TextWriter w = new StreamWriter(@".\Testprof.xml")) new XmlSerializer(typeof(LedProfile)).Serialize(w, prof);
+            LedProfile prof1;
+            using (StreamReader r = new StreamReader(@".\Testprof.xml")) prof1 = new XmlSerializer(typeof(LedProfile)).Deserialize(r) as LedProfile;
+            Console.WriteLine((prof1 as MusicLedProfile)?.DeviceName ?? "Null :(");
+        }
+
         #region Definitions
         ComHandler comHandler;
         Config config;
@@ -116,6 +126,9 @@ namespace LedController
         #region Startup & Shutdown
         private void OnStart()
         {
+#if TEST
+            Test();
+#endif
             //Visible = false;
             initState = 1;
             Logger.Log("Hello world!");
@@ -156,7 +169,6 @@ namespace LedController
 
         private void OnVisible()
         {
-            Console.WriteLine("Beep");
             InitializeGroupBoxEventHandlers();
 
             //Define all Profile GroupBoxes
@@ -188,6 +200,7 @@ namespace LedController
             Logger.Log("Refreshing comports...");
             RefreshComPorts();
             Logger.Log("Loading profiles...");
+            //LoadAllProfiles();
             LoadAllProfiles();
             Logger.Log("Refreshing profilesets...");
             RefreshProfileSetComboBox();
@@ -210,6 +223,8 @@ namespace LedController
             StripInfoLabel.Text = $"Number of LEDs: {LedMatrix.MasterLength}\nLength: {LedMatrix.Width}\nHeight: {LedMatrix.Height}\nOverlap: {LedMatrix.MasterLength - LedMatrix.Length}\nRotating {(LedMatrix.IsCw ? "Clockwise" : "Counterclockwise")}\n\nTopleft index: {LedMatrix.TopLeft}\nTopright index: {LedMatrix.TopRight}\nBottomright index: {LedMatrix.BottomRight}\nBottomleft index: {LedMatrix.BottomLeft}\nStrip start index {LedMatrix.Start}";
 
             SaveProfileSetNames();
+
+            SaveAllProfiles();
 
             initState = 0; //We're now fully initiated
 
@@ -236,7 +251,7 @@ namespace LedController
                 Logger.Log("Saving Config file...");
                 SaveConfig();
                 Logger.Log("Saving Profiles...");
-                SaveProfilesInCurrentProfileSet();
+                SaveAllProfiles();
                 Logger.Log("\tSaving Aspect Ratio profiles...");
                 SaveRatioProfiles();
             }
@@ -458,7 +473,6 @@ namespace LedController
 
             if (profileListView.Items.Count > 0) profileListView.SelectedIndices.Add(0);
         }
-
         private void RefreshActiveProfileToolStripMenuItem()
         {
             ActiveProfileToolStripMenuItem.DropDownItems.Clear();
@@ -472,7 +486,7 @@ namespace LedController
 
             foreach (LedProfile p in profiles[profileSetComboBox.SelectedIndex])
             {
-                if(p != null)
+                if (p != null)
                 {
                     ToolStripMenuItem item = new ToolStripMenuItem()
                     {
@@ -490,14 +504,14 @@ namespace LedController
             {
                 if (ActiveProfile.ProfileSetIndex == profileSetComboBox.SelectedIndex)
                 {
-                    (ActiveProfileToolStripMenuItem.DropDownItems[ActiveProfile.ProfileIndex] as ToolStripMenuItem).CheckState = CheckState.Checked;
+                    (ActiveProfileToolStripMenuItem.DropDownItems[ActiveProfile.ProfileIndex + 2] as ToolStripMenuItem).CheckState = CheckState.Checked;
                 }
                 else
                 {
                     ActiveProfileToolStripMenuItem.DropDownItems.Add(new ToolStripSeparator());
                     ActiveProfileToolStripMenuItem.DropDownItems.Add(new ToolStripMenuItem()
                     {
-                        Text = Util.FormatProfileName(FormatProfileName(ActiveProfile)),
+                        Text = FormatProfileName(ActiveProfile),
                         Checked = true,
                         CheckState = CheckState.Checked
                     });
@@ -505,7 +519,7 @@ namespace LedController
             }
         }
 
-        private void MainNotifyIcon_MouseMove(object sender, MouseEventArgs e)
+        private void MainNotifyIcon_MouseDown(object sender, MouseEventArgs e)
         {
             RefreshActiveProfileToolStripMenuItem();
         }
@@ -518,6 +532,8 @@ namespace LedController
             if (anpsmf.ShowDialog() == DialogResult.OK)
             {
                 string name = anpsmf.profileSetNameBox.Text;
+                profiles.Add(new List<LedProfile>());
+                profileSetNames.Add(name);
                 SaveNewProfileSet(name);
                 RefreshProfileSetComboBox();
             }
@@ -554,8 +570,12 @@ namespace LedController
 
         private void ProfileSetBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (initState == 0) SaveSingleProfile(SelectedProfile);
             SelectProfileSet((string)profileSetComboBox.SelectedItem);
+        }
+
+        private void ProfileSetComboBox_MouseClick(object sender, MouseEventArgs e)
+        {
+            SaveProfileSet(profileSetComboBox.SelectedIndex);
         }
 
         private void Button2_Click(object sender, EventArgs e)
@@ -597,7 +617,7 @@ namespace LedController
                 }
                 LedProfile prof = GetProfileAs((ProfileType)intProfileMode, profileName, profileSetComboBox.SelectedIndex);
                 profiles[profileSetComboBox.SelectedIndex].Add(prof);
-                SaveSingleProfile(prof);
+                SaveProfileSet(profileSetComboBox.SelectedIndex);
                 RefreshProfileControls();
             }
         }
@@ -722,9 +742,11 @@ namespace LedController
             MessageBox.Show("Not yet implemented! (it sucks)");
             //AssignHotkey();
         }
-#endregion
+        #endregion
 
         #region XML Serialization
+        const string profileDir = @".\data\profiles";
+        const string configDir = @".\data\configuration.xml";
         private void SaveConfig()
         {
             try 
@@ -765,30 +787,67 @@ namespace LedController
             return File.Exists(Directory.GetCurrentDirectory() + @"\Configuration.xml");
         }
 
-        private void SaveProfilesInCurrentProfileSet()
+        private void LoadAllProfiles()
         {
-            try
-            {
-                Logger.Log("Saving profiles in current profileset...");
-                string dir = Directory.GetCurrentDirectory() + @"\Profilesets";
-                string profileSetDir = dir + @"\" + (string)profileSetComboBox.SelectedItem;
-                if (!Directory.Exists(profileSetDir))
-                {
-                    Directory.CreateDirectory(profileSetDir);
-                }
-                XmlSerializer profileSerializer = new XmlSerializer(typeof(LedProfile));
-                foreach(LedProfile p  in profiles[profileSetComboBox.SelectedIndex])
-                {
-                    TextWriter w = new StreamWriter($@"{profileSetDir}\Profile{p.ProfileIndex}.xml");
-                    Logger.Log($"\tSaving profile {p.Name}");
-                    profileSerializer.Serialize(w, p);
-                    w.Dispose();
-                }}
-            catch(Exception e) when (!Env.Debugging)
-            {
-                MessageBox.Show("Saving profiles failed:\n" + e.Message);
-            }
+            if (!Directory.Exists(profileDir))
+                Directory.CreateDirectory(profileDir);
 
+            if (!File.Exists($@"{profileDir}/_PsNames.xml")) //If this is the case, we know no profilesets are currently saved
+            {
+                profiles = new List<List<LedProfile>>() { new List<LedProfile>() };
+                profileSetNames = new List<string>() { "Default" };
+            }
+            else
+            {
+                using (StreamReader r = new StreamReader($@"{profileDir}\_PsNames.xml"))
+                    profileSetNames = (new XmlSerializer(typeof(List<string>)).Deserialize(r)) as List<string>;
+
+                int c = profileSetNames.Count;
+                profiles = new List<List<LedProfile>>(c);
+                XmlSerializer ser = new XmlSerializer(typeof(List<LedProfile>));
+                for (int i = 0; i < c; i++)
+                {
+                    using (StreamReader r = new StreamReader($@"{profileDir}\ProfileSet_{i}.xml"))
+                        profiles.Add((ser.Deserialize(r)) as List<LedProfile>);
+                }
+            }
+        }
+
+        private void SaveAllProfiles()
+        {
+            if (!Directory.Exists(profileDir))
+                Directory.CreateDirectory(profileDir);
+
+            using (TextWriter w = new StreamWriter($@"{profileDir}\_PsNames.xml"))
+                new XmlSerializer(typeof(List<string>)).Serialize(w, profileSetNames);
+
+            XmlSerializer ser = new XmlSerializer(typeof(List<LedProfile>));
+            for (int i = 0; i < profiles.Count; i++)
+                using (TextWriter w = new StreamWriter($@"{profileDir}/ProfileSet_{i}.xml"))
+                    ser.Serialize(w, profiles[i]);
+        }
+
+        private void SaveProfileSet(int psIndex)
+        {
+            Logger.Log($"Saving profileset no. {psIndex}...");
+            using (TextWriter w = new StreamWriter($@"{profileDir}\_PsNames.xml"))
+                new XmlSerializer(typeof(List<string>)).Serialize(w, profileSetNames);
+
+            using (TextWriter w = new StreamWriter($@"{profileDir}\ProfileSet_{psIndex}.xml"))
+                new XmlSerializer(typeof(List<LedProfile>)).Serialize(w, profiles[psIndex]);
+        }
+
+        private async void SaveProfileSetAsync(int psIndex)
+        {
+            Logger.Log($"Saving profileset no. {psIndex}...");
+            using (TextWriter w = new StreamWriter($@"{profileDir}\_PsNames.xml"))
+                new XmlSerializer(typeof(List<string>)).Serialize(w, profileSetNames);
+
+            await Task.Run(() =>
+            {
+                using (TextWriter w = new StreamWriter($@"{profileDir}\ProfileSet_{psIndex}.xml"))
+                    new XmlSerializer(typeof(List<LedProfile>)).Serialize(w, profiles[psIndex]);
+            });
         }
 
         private void SaveNewProfileSet(string profileSetName)
@@ -801,94 +860,6 @@ namespace LedController
             catch(Exception e) when (!Env.Debugging)
             {
                 MessageBox.Show("Saving Profilesets failed:\n" + e.Message);
-            }
-        }
-
-        private void LoadAllProfiles()
-        {
-            if (!Directory.Exists(@".\Profilesets")) { Directory.CreateDirectory(@".\Profilesets"); }
-            string[] pss = Directory.GetDirectories(@".\Profilesets");
-            if (pss.Length == 0)
-            {
-                Directory.CreateDirectory(@".\Profilesets\Default");
-                pss = new string[]{ @".\Profilesets\Default" };
-            }
-            profileSetNames = new List<string>(pss.Length);
-            profiles = new List<List<LedProfile>>(pss.Length);
-            for(int i = 0; i < pss.Length; i++)
-            {
-                string psdir = pss[i];
-                string[] spl = psdir.Split('\\');
-                string psn = spl[spl.Length - 1];
-                profileSetNames.Add(psn);
-
-                string[] files = Directory.GetFiles(psdir);
-                LedProfile[] profs = new LedProfile[files.Length];
-
-                XmlSerializer ser = new XmlSerializer(typeof(LedProfile));
-                for(int j = 0; j < files.Length; j++)
-                {
-                    using(StreamReader r = new StreamReader(files[j]))
-                    {
-                        LedProfile curr = ser.Deserialize(r) as LedProfile;
-                        profs[curr.ProfileIndex] = curr;
-                    }
-                }
-
-                List<LedProfile> ps = new List<LedProfile>(profs);
-                profiles.Add(ps);
-            }
-        }
-
-        private void newLoadAllProfiles()
-        {
-            if (!Directory.Exists($@".\profs")) Directory.CreateDirectory($@".\profs");
-
-            if (File.Exists($@".\profs\_psn.xml"))
-            {
-                XmlSerializer ser = new XmlSerializer(typeof(List<string>));
-                using (StreamReader r = new StreamReader($@".\profs\_psn.xml"))
-                {
-                    profileSetNames = ser.Deserialize(r) as List<string>;
-                }
-            }
-            else profileSetNames = new List<string>() { "Default" };
-
-            int numPs = profileSetNames.Count;
-            XmlSerializer typeser = new XmlSerializer(typeof(List<ProfileType>));
-            for (int i = 0; i < numPs; i++)
-            {
-                List<ProfileType> types;
-                using (StreamReader r = new StreamReader($@".\profs\ps{i}\_pt.xml")) types = typeser.Deserialize(r) as List<ProfileType>;
-                int numP = types.Count;
-                List<LedProfile> ps = new List<LedProfile>(numP);
-                for(int j = 0; j < numP; j++)
-                {
-                    XmlSerializer profser = GetCompatibleSerializer(types[j]);
-                    using (StreamReader r = new StreamReader($@".\profs\ps{i}\p{j}.xml")) ps.Add(profser.Deserialize(r) as LedProfile);
-                }
-                profiles.Add(ps);
-            }
-        }
-
-        private void SaveSingleProfile(LedProfile prof)
-        {
-            XmlSerializer ser = new XmlSerializer(typeof(LedProfile));
-            using (TextWriter w = new StreamWriter($@".\Profilesets\{profileSetNames[prof.ProfileSetIndex]}\Profile{prof.ProfileIndex}.xml"))
-            {
-                Logger.Log($"Saving profile {prof.Name}");
-                ser.Serialize(w, prof);
-            }
-        }
-
-        private void SaveAllProfiles()
-        {
-            foreach(List<LedProfile> ps in profiles)
-            {
-                foreach(LedProfile p in ps)
-                {
-                    SaveSingleProfile(p);
-                }
             }
         }
 
@@ -968,7 +939,7 @@ namespace LedController
 
         private void SaveToXmlButton_Click(object sender, EventArgs e)
         {
-            SaveProfilesInCurrentProfileSet();
+            SaveProfileSet(profileSetComboBox.SelectedIndex);
         }
 #endregion
 
@@ -1060,7 +1031,7 @@ namespace LedController
             SelectedProfile = new TestAmbilightLedProfile("TestAmbilight", "root", 0, LedMatrix);
             ActivateSelectedProfile();
             */
-            if (config.ProfileSetOnStartup != null && comHandler.IsConnected)
+            if (comHandler.IsConnected)
             {
                 try
                 {
