@@ -1,4 +1,5 @@
 ﻿#define PRECISION
+//#define MEDIAN
 
 using System;
 using System.ComponentModel;
@@ -462,25 +463,17 @@ namespace Driver
             return result;
         }
 
-
-        public CColor[] GetAvgCColorFromScreen(Rect[] rects, bool print, double precision)
+        public CColor[] GetAvgCColorFromScreen(Rect[] rects, double precision)
         {
-            CColor[] res = new CColor[rects.Length];
-
             if (State != MirrorState.Connected && State != MirrorState.Running)
                 throw new InvalidOperationException("In order to get current screen you must at least be connected to the driver");
 
             int bytesPerPixel = bitmapBitsPerPixel / 8;
-            int totalBytes = bitmapWidth * bytesPerPixel * bitmapHeight;
-            int alpha = bytesPerPixel - 3;
 
             GetChangesBuffer buffer = (GetChangesBuffer)Marshal.PtrToStructure(_getChangesBuffer, typeof(GetChangesBuffer));
             IntPtr pointer = buffer.UserBuffer;
 
-            StringBuilder log = new StringBuilder();
-
-            //Logger.Log($"Bitmap Width {bitmapWidth}, Height {bitmapHeight}");
-            //Logger.Log($"No. bytes: {totalBytes}");
+            CColor[] res = new CColor[rects.Length];
 
             unsafe
             {
@@ -489,31 +482,20 @@ namespace Driver
                 for(int i = 0; i < rects.Length; i++)
                 {
                     Rect currRect = rects[i];
+
                     byte* start =
                         origin +
                         (currRect.X + primaryScreenOffsetX) * bytesPerPixel +
                         (currRect.Y + primaryScreenOffsetY) * bitmapWidth * bytesPerPixel;
 
-                    //Logger.Log($"\nRect {i}, {currRect.ToString()}");
-                    //Logger.Log($"Coordinates offset: X={currRect.X + primaryScreenOffsetX},Y={currRect.Y + primaryScreenOffsetY}");
-                    //GetCoordinates(origin, curr, out int xs, out int ys, out int cs);
-                    //Logger.Log($"byte ({xs},{ys},{cs}), no. {curr - origin}");
-
-#if PRECISION
-                    int tot = 0;
-                    long[] totals = { 0, 0, 0 };
-
                     int numX = (int)(currRect.Width * precision);
                     int numY = (int)(currRect.Height * precision);
 
-                    int diffX = currRect.Width - numX;
-                    int diffY = currRect.Height - numY;
+                    int deltaX = (numX - 1) / (currRect.Width - numX) + 1;
+                    int deltaY = (numY - 1) / (currRect.Height - numY) + 1;
 
-                    int gapX = ((diffX > 0) ? (numX - 1) / diffX : 0);
-                    int gapY = ((diffY > 0) ? (numY - 1) / diffY : 0);
-
-                    int wid = numX + (numX - 1) * gapX;
-                    int hei = numY + (numY - 1) * gapY;
+                    int wid = numX + (numX - 1) * (deltaX - 1);
+                    int hei = numY + (numY - 1) * (deltaY - 1);
 
                     int startX = (currRect.Width - wid) / 2;
                     int startY = (currRect.Height - hei) / 2;
@@ -521,27 +503,16 @@ namespace Driver
                     int finX = startX + wid;
                     int finY = startY + hei;
 
-                    int deltaX = gapX + 1;
-                    int deltaY = gapY + 1;
+                    int tot = 0;
+                    long[] totals = { 0, 0, 0 };
 
-                    //Logger.Log($"startX:{startX}, startY:{startY}, {deltaX}, {deltaY}");
-
-                    for(int y = startY; y < finY; y += deltaY)
+                    for (int y = startY; y < finY; y += deltaY)
                     {
                         for (int x = startX; x < finX; x += deltaX)
                         {
                             for(int c = 0; c < 3; c++)
                             {
-                                byte* curr = start + (y * bitmapWidth * bytesPerPixel) + (x * bytesPerPixel) + c;
-                                try
-                                {
-                                    totals[c] += *curr;
-                                }
-                                catch(AccessViolationException)
-                                {
-                                    GetCoordinates(start, curr, out int xp, out int yp, out int cp);
-                                    Logger.Log($"AVE: for ({x},{y},{c}), pointer ({xp},{yp},{cp})");
-                                }
+                                totals[c] += *(start + (y * bitmapWidth * bytesPerPixel) + (x * bytesPerPixel) + c);
                             }
                             tot++;
                         }
@@ -552,287 +523,97 @@ namespace Driver
                     int r = (int)Round((double)totals[2] / tot);
 
                     res[i] = CColor.FromRgb(r, g, b);
-
-#else
-                    int tot = 0;
-                    long[] totals = { 0, 0, 0 };
-
-                    int x, y;
-                    x = y = 0;
-
-                    while(y < currRect.Height)
-                    {
-                        while(x < currRect.Width)
-                        {
-                            for(int c = 0; c < 3; c++)
-                            {
-                                byte* curr = start + (y * bitmapWidth * bytesPerPixel) + (x * bytesPerPixel) + c;
-                                totals[c] += *curr;
-                            }
-                            tot++;
-                            x++;
-                        }
-                        x = 0;
-                        y++;
-                    }
-
-                    int b = (int)Round((double)totals[0] / tot);
-                    int g = (int)Round((double)totals[1] / tot);
-                    int r = (int)Round((double)totals[2] / tot);
-
-                    res[i] = CColor.FromRgb(r, g, b);
-#endif
                 }
             }
-
-
-            if (print) File.WriteAllText("ding.txt", log.ToString());
 
             return res;
+        }
 
-            unsafe void oGetAverageColors(IntPtr buff, Rect currRect, out int r, out int g, out int b)
+        public CColor[] GetMedCColorFromScreen(Rect[] rects, double precision, int numHueSlices)
+        {
+            if (State != MirrorState.Connected && State != MirrorState.Running)
+                throw new InvalidOperationException("In order to get current screen you must at least be connected to the driver");
+
+            int bytesPerPixel = bitmapBitsPerPixel / 8;
+
+            GetChangesBuffer buffer = (GetChangesBuffer)Marshal.PtrToStructure(_getChangesBuffer, typeof(GetChangesBuffer));
+            IntPtr pointer = buffer.UserBuffer;
+
+            CColor[] res = new CColor[rects.Length];
+
+            unsafe
             {
-                byte* origin = (byte*)buff.ToPointer(); //Gets the byte-pointer of the top-left position of the screens
+                byte* origin = (byte*)pointer.ToPointer();
 
-                byte* recStart = 
-                    origin +
-                    (currRect.X + primaryScreenOffsetX) * bytesPerPixel +
-                    ((currRect.Y + primaryScreenOffsetY) * bitmapWidth) * bytesPerPixel;
-
-                int tot = 0;
-                long[] totals = { 0, 0, 0 };
-
-                byte* tr = recStart + (currRect.Width - 1) * bytesPerPixel;
-                byte* bl = recStart + (currRect.Height - 1) * (currRect.Width - 1) * bytesPerPixel;
-                byte* br = bl + (currRect.Width - 1) * bytesPerPixel;
-
-                AddColors2d(origin, recStart, tr, bl, br, currRect.Height, currRect.Width, ref totals, ref tot, 1);
-
-                b = (int)Round((double)totals[0] / tot);
-                g = (int)Round((double)totals[1] / tot);
-                r = (int)Round((double)totals[2] / tot);
-            }
-
-            unsafe void GetCoordinates(byte* origin, byte* point, out int x, out int y, out int c)
-            {
-                long d = point - origin;
-                y = Convert.ToInt32(DivRem(d, (long)bitmapWidth * bytesPerPixel, out d));
-                x = Convert.ToInt32(DivRem(d, (long)bytesPerPixel, out d));
-                c = Convert.ToInt32(d);
-            }
-
-#region Failed Trials
-            unsafe void AddColors(byte* origin, byte* scan0, int width, int height, ref long[] totals, ref int num, int maxI = -1, int i = 0)
-            {
-                if (i == maxI || (width == 0 && height == 0))
+                for (int i = 0; i < rects.Length; i++)
                 {
-                    byte* curr = &*scan0;
-                    for (int color = 0; color < 3; color++)
+                    Rect currRect = rects[i];
+
+                    byte* start =
+                        origin +
+                        (currRect.X + primaryScreenOffsetX) * bytesPerPixel +
+                        (currRect.Y + primaryScreenOffsetY) * bitmapWidth * bytesPerPixel;
+
+                    int numX = (int)(currRect.Width * precision);
+                    int numY = (int)(currRect.Height * precision);
+
+                    int deltaX = (numX - 1) / (currRect.Width - numX) + 1;
+                    int deltaY = (numY - 1) / (currRect.Height - numY) + 1;
+
+                    int wid = numX + (numX - 1) * (deltaX - 1);
+                    int hei = numY + (numY - 1) * (deltaY - 1);
+
+                    int startX = (currRect.Width - wid) / 2;
+                    int startY = (currRect.Height - hei) / 2;
+
+                    int finX = startX + wid;
+                    int finY = startY + hei;
+
+                    double[] hues = new double[numHueSlices];
+                    int[] hueCount = new int[numHueSlices];
+
+                    double sats = 0;
+                    double vals = 0;
+                    int count = 0;
+
+                    for (int y = startY; y < finY; y += deltaY)
                     {
-                        totals[color] += *curr;
-                        curr++;
-                    }
-                    num++;
-                }
-                else
-                {
-                    int newWidth = width / 2;
-                    int newHeight = height / 2;
-                    byte* scan1 = scan0 + (newWidth + 1) * bytesPerPixel;
-                    byte* scan2 = scan0 + (newHeight + 1) * bitmapWidth * bytesPerPixel;
-                    byte* scan3 = scan2 + (newWidth + 1) * bytesPerPixel;
-                    int ni = i + 1;
-                    AddColors(origin, scan0, newWidth, newHeight, ref totals, ref num, maxI, ni);
-                    AddColors(origin, scan1, newWidth, newHeight, ref totals, ref num, maxI, ni);
-                    AddColors(origin, scan2, newWidth, newHeight, ref totals, ref num, maxI, ni);
-                    AddColors(origin, scan3, newWidth, newHeight, ref totals, ref num, maxI, ni);
-                }
-            }
-
-            unsafe void AddColors2d(byte* origin, byte* tl, byte* tr, byte* bl, byte* br, int h, int w, ref long[] totals, ref int tot, int maxI = -1, int i = 0, string ind = "")
-            {
-                int nw = w / 2;
-                int nh = h / 2;
-
-                //Logger.Log($"nw: {nw}, nh: {nh}");
-
-                if ((nw == 0 && nh == 0) || i == maxI)
-                {
-                    AddColors0d(origin, tl, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                    AddColors0d(origin, tr, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                    AddColors0d(origin, bl, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                    AddColors0d(origin, br, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                }
-                else if (nw == 0)
-                {
-                    int hEven = h % 2 == 0 ? 1 : 0;
-
-                    byte*[][] n = new byte*[4][];
-                    for (int x = 0; x < 4; x++) n[x] = new byte*[2];
-
-                    //topleft
-                    n[0][0] = tl;
-                    n[0][1] = n[0][0] + nh * bitmapWidth * bytesPerPixel;
-
-                    //topright
-                    n[1][0] = tr;
-                    n[1][1] = n[1][0] + nh * bitmapWidth * bytesPerPixel;
-
-                    //bottomleft
-                    n[2][1] = bl;
-                    n[2][0] = n[2][0] - nh * bitmapWidth * bytesPerPixel;
-
-                    //bottomright
-                    n[3][1] = br;
-                    n[3][0] = n[3][0] - nh * bitmapWidth * bytesPerPixel;
-
-                    for (int x = 0; x < 4; x++)
-                    {
-                        //Logger.Log($"{ind}{x}:");
-                        for (int y = 0; y < 2; y++)
+                        for (int x = startX; x < finX; x += deltaX)
                         {
-                            //Logger.Log($"{ind}  {y}: {(*n[x][y]).ToString()}");
+                            byte* bp = start + (y * bitmapWidth * bytesPerPixel) + (x * bytesPerPixel);
+                            byte* gp = bp + 1;
+                            byte* rp = gp + 1;
+                            Util.RgbToHsv(*rp, *gp, *bp, out double h, out double s, out double v);
+                            int slice = (int)(h % numHueSlices);
+                            hues[slice] += h;
+                            hueCount[slice]++;
+                            sats += s;
+                            vals += v;
+                            count++;
                         }
                     }
 
-                    for (int j = 0; j < 4; j++)
-                    {
-                        AddColors1d(origin, n[j][0], n[j][1], nh, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                    }
-                }
-                else if (nh == 0)
-                {
-                    int wEven = w % 2 == 0 ? 1 : 0;
+                    int ind = 0;
+                    for (int j = 1; j < numHueSlices; j++)
+                        if (hueCount[j] > hueCount[ind])
+                            ind = j;
 
-                    byte*[][] n = new byte*[4][];
-                    for (int x = 0; x < 4; x++) n[x] = new byte*[2];
+                    double hueFinal = hues[ind] / hueCount[ind];
+                    double satFinal = sats / count;
+                    double valFinal = vals / count;
 
-                    //topleft
-                    n[0][0] = tl;
-                    n[0][1] = n[0][0] + nw * bytesPerPixel;
-
-                    //topright
-                    n[1][1] = tr;
-                    n[1][0] = n[1][1] - nw * bytesPerPixel;
-
-                    //bottomleft
-                    n[2][0] = bl;
-                    n[2][1] = n[2][0] + nw * bytesPerPixel;
-
-                    //topright
-                    n[3][1] = tr;
-                    n[3][0] = n[1][1] - nw * bytesPerPixel;
-
-                    for (int x = 0; x < 4; x++)
-                    {
-                        //Logger.Log($"{ind}{x}:");
-                        for (int y = 0; y < 2; y++)
-                        {
-                            //Logger.Log($"{ind}  {y}: {(*n[x][y]).ToString()}");
-                        }
-                    }
-
-                    for (int j = 0; j < 4; j++)
-                    {
-                        AddColors1d(origin, n[j][0], n[j][1], nw, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                    }
-                }
-                else
-                {
-                    int wEven = w % 2 == 0 ? 1 : 0;
-                    int hEven = h % 2 == 0 ? 1 : 0;
-
-                    byte*[,] n = new byte*[4, 4];
-
-                    //topleft
-                    n[0, 0] = tl;
-                    n[0, 1] = n[0, 0] + nw * bytesPerPixel;
-                    n[0, 2] = n[0, 0] + nh * bitmapWidth * bytesPerPixel;
-                    n[0, 3] = n[0, 2] + nw * bytesPerPixel;
-
-                    //topright
-                    n[1, 1] = tr;
-                    n[1, 0] = n[1, 1] - nw * bytesPerPixel;
-                    n[1, 2] = n[1, 0] + nh * bitmapWidth * bytesPerPixel;
-                    n[1, 3] = n[1, 2] + nw * bytesPerPixel;
-
-                    //bottomleft
-                    n[2, 2] = bl;
-                    n[2, 3] = n[2, 2] + nw * bytesPerPixel;
-                    n[2, 1] = n[2, 3] - nh * bitmapWidth * bytesPerPixel;
-                    n[2, 0] = n[2, 1] - nw * bytesPerPixel;
-
-                    //bottomright
-                    n[3, 3] = br;
-                    n[3, 2] = n[3, 3] - nw * bytesPerPixel;
-                    n[3, 0] = n[3, 2] - nh * bitmapWidth * bytesPerPixel;
-                    n[3, 1] = n[3, 0] + nw * bytesPerPixel;
-
-                    for (int x = 0; x < 4; x++)
-                    {
-                        //Logger.Log($"{ind}{x}:");
-                        for (int y = 0; y < 4; y++)
-                        {
-                            //Logger.Log($"{ind}  {y}: {(*n[x, y]).ToString()}");
-                        }
-                    }
-
-                    for (int j = 0; j < 4; j++)
-                    {
-                        AddColors2d(origin, n[j, 0], n[j, 1], n[j, 2], n[j, 3], nh, nw, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                    }
+                    res[i] = CColor.FromHsv(hueFinal, satFinal, valFinal);
                 }
             }
+            return res;
+        }
 
-            unsafe void AddColors1d(byte* origin, byte* f, byte* t, int l, ref long[] totals, ref int tot, int maxI, int i, string ind)
-            {
-                int nl = l / 2;
-                //Logger.Log($"{ind}nl: {nl}");
-
-                if (nl == 0)
-                {
-                    AddColors0d(origin, f, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                    AddColors0d(origin, t, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                }
-                else
-                {
-                    byte* ft = f + nl * bytesPerPixel;
-                    byte* tf = t - nl * bytesPerPixel;
-
-                    //Logger.Log($"{ind}0:");
-                    //Logger.Log($"{ind} 0: {*f}");
-                    //Logger.Log($"{ind} 1: {*ft}");
-                    //Logger.Log($"{ind}1:");
-                    //Logger.Log($"{ind} 0: {*tf}");
-                    //Logger.Log($"{ind} 1: {*t}");
-
-                    AddColors1d(origin, f, ft, nl, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                    AddColors1d(origin, tf, t, nl, ref totals, ref tot, maxI, i + 1, $"{ind}|   ");
-                }
-            }
-
-            unsafe void AddColors0d(byte* origin, byte* l, ref long[] totals, ref int tot, int maxI, int i, string ind)
-            {
-                byte* curr = l;
-                for (int color = 0; color < 3; color++)
-                {
-                    try
-                    {
-                        totals[color] += *curr;
-                    }
-                    catch
-                    {
-                        GetCoordinates(origin, curr, out int xa, out int ya, out int ca);
-                        Logger.Log($"AVE at abs({xa},{ya},{ca}), no. {curr - origin}");
-                        Console.ReadKey();
-                    }
-                    totals[color] += *curr;
-                    curr++;
-                }
-                tot++;
-            }
-#endregion
-
+        unsafe void GetCoordinates(byte* origin, byte* point, int bytesPerPixel, out int x, out int y, out int c)
+        {
+            long d = point - origin;
+            y = Convert.ToInt32(DivRem(d, (long)bitmapWidth * bytesPerPixel, out d));
+            x = Convert.ToInt32(DivRem(d, (long)bytesPerPixel, out d));
+            c = Convert.ToInt32(d);
         }
 
         private void GetPrimaryScreenOffsets(out int x, out int y)

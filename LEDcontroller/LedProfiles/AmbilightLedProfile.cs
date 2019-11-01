@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
-using System.Drawing.Imaging;
-using Driver;
-using System.Runtime.InteropServices;
-using Rectangle = System.Drawing.Rectangle;
+﻿using Driver;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using Rectangle = System.Drawing.Rectangle;
 
 namespace LedController.LedProfiles
 {
@@ -20,15 +12,25 @@ namespace LedController.LedProfiles
 
         [XmlIgnore]
         public Rect[] Rects { get; protected set; }
-        [XmlIgnore]
-        public double Precision = 1;
+
+        /*
+        public double Precision;
+        public double Smoothing;
+        public int NumHueSlices;
+        public bool UseMedian;
+        */
+
+        private CColor[] prev;
+        private CColor[] next;
+        int count;
+        int lim = 3;
 
         bool isChanging = false;
 
         public AmbilightLedProfile(string name, int index, int psindex, ColorMatrix m) : base(name, index, psindex, ProfileType.Ambilight)
         {
             Brightness = 255;
-            Ups = 30;
+            Ups = 60;
 
             for(int i = 0; i < Screen.AllScreens.Length; i++)
             {
@@ -48,66 +50,34 @@ namespace LedController.LedProfiles
         public override void Init(ColorMatrix m)
         {
             Rects = m.GetCaptureRects(ScreenIndex, RatioProfile);
-
+            count = lim;
+            next = new CColor[Rects.Length];
+            for (int i = 0; i < Rects.Length; i++) next[i] = new CColor();
             if (mirror.Load())
             {
                 if (mirror.Connect()) mirror.Start();
                 else MessageBox.Show("Could't connect to dfMirage driver", "Driver connection error");
             }
             else MessageBox.Show("Couldn't load the dfMirage driver", "Driver loading error");
-
-            Rect currRect = Rects[0];
-            Logger.Log($"\nFor {currRect.ToString()}, precision {Precision}:");
-
-            int numX = (int)(currRect.Width * Precision);
-            int numY = (int)(currRect.Height * Precision);
-
-            int diffX = currRect.Width - numX;
-            int diffY = currRect.Height - numY;
-
-            int gapX = diffX / (numX - 1);
-            int gapY = diffY / (numY - 1);
-
-            int wid = numX + (numX - 1) * gapX;
-            int hei = numY + (numY - 1) * gapY;
-
-            int startX = (currRect.Width - wid) / 2;
-            int startY = (currRect.Height - hei) / 2;
-
-            int finX = startX + wid;
-            int finY = startY + hei;
-
-            int deltaX = gapX + 1;
-            int deltaY = gapY + 1;
-
-            int tot = 0;
-            for (int y = startY; y < finY; y += deltaY)
-            {
-                for (int x = startX; x < finX; x += deltaX)
-                {
-                    tot++;
-                }
-            }
-
-            Logger.Log($"\nEvaluating {numX} in x and {numY} in y direction\nwith gaps {gapX}(x) and {gapY}(y)\ntotal width {wid} and height {hei}\nstarting ({startX},{startY})\nfinishing ({finX},{finY})\ntotal evals: {tot}x3\n");      
         }
 
         public override void Update(ColorMatrix m)
         {
             if (!isChanging)
             {
-                /*try
-                {*/
-                    m.AssignFrom(m.TopLeft, mirror.GetAvgCColorFromScreen(Rects, false, 1));
-                /*}
-                catch
+                if (count == lim)
                 {
-                    mirror.Stop();
-                    mirror.Disconnect();
-                    mirror.Unload();
-                    mirror.Dispose();
-                    throw;
-                }*/
+                    prev = next;
+                    next = mirror.GetAvgCColorFromScreen(Rects, 0.5);
+                    count = 0;
+                }
+                CColor[] res = new CColor[Rects.Length];
+                for(int i = 0; i < Rects.Length; i++)
+                {
+                    res[i] = CColor.Blend(prev[i], next[i], (double)(count + 1) / lim);
+                }
+                m.AssignFrom(m.TopLeft, res);
+                count++;
             }
             else for (int i = 0; i < m.MasterLength; i++){ m[i] = new CColor(); }
         }

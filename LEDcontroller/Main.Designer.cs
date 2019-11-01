@@ -66,8 +66,6 @@
             this.MusicBrightnessTrackbar = new System.Windows.Forms.TrackBar();
             this.label15 = new System.Windows.Forms.Label();
             this.MusicEffectComboBox = new System.Windows.Forms.ComboBox();
-            this.MusicHotkeyLabel = new System.Windows.Forms.Label();
-            this.label14 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
             this.MusicDeviceLabel = new System.Windows.Forms.Label();
             this.MusicSelectDeviceButton = new System.Windows.Forms.Button();
@@ -85,33 +83,38 @@
             this.typeName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.shorcutName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.StaticGroupBox = new System.Windows.Forms.GroupBox();
-            this.staticColortHotkeyLabel = new System.Windows.Forms.Label();
             this.StaticBrightnessNUD = new System.Windows.Forms.NumericUpDown();
-            this.label4 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.StaticBrightnessTrackbar = new System.Windows.Forms.TrackBar();
             this.staticProfileColorButton = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.AmbilightGroupBox = new System.Windows.Forms.GroupBox();
-            this.AmbilightPrecisionTrackBar = new System.Windows.Forms.TrackBar();
-            this.label9 = new System.Windows.Forms.Label();
-            this.AmbilightBrightnessNumericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.AmbilightUpsGroupBox = new System.Windows.Forms.GroupBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.AmbilightLimitUpsTrackBar = new System.Windows.Forms.TrackBar();
+            this.groupBox9 = new System.Windows.Forms.GroupBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.AmbilightNumHueSlicesNumericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.AmbilightMedianRadioButton = new System.Windows.Forms.RadioButton();
+            this.AmbilightAverageRadioButton = new System.Windows.Forms.RadioButton();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.AmbilightBrightnessTrackBar = new System.Windows.Forms.TrackBar();
-            this.AmbilightRecordStatusLabel = new System.Windows.Forms.Label();
-            this.label12 = new System.Windows.Forms.Label();
+            this.AmbilightBrightnessNumericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.groupBox8 = new System.Windows.Forms.GroupBox();
+            this.AmbilightPrecisionTrackBar = new System.Windows.Forms.TrackBar();
+            this.AmbilightPrecisionNud = new System.Windows.Forms.NumericUpDown();
+            this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.AmbilightSmoothingTrackbar = new System.Windows.Forms.TrackBar();
+            this.AmbilightSmoothingNud = new System.Windows.Forms.NumericUpDown();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.AmbilightCaptureProfileComboBox = new System.Windows.Forms.ComboBox();
             this.AmbilightCreateCaptureProfileButton = new System.Windows.Forms.Button();
             this.AmbilightCaptureScreenComboBox = new System.Windows.Forms.ComboBox();
             this.AmbilightShowCaptureAreasButton = new System.Windows.Forms.Button();
-            this.AmbilightHotkeyLabel = new System.Windows.Forms.Label();
-            this.label11 = new System.Windows.Forms.Label();
             this.RainbowGroupBox = new System.Windows.Forms.GroupBox();
             this.RainbowSpeedNud = new System.Windows.Forms.NumericUpDown();
             this.label8 = new System.Windows.Forms.Label();
             this.RainbowSpeedTrackBar = new System.Windows.Forms.TrackBar();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
             this.RainbowBrightnessNud = new System.Windows.Forms.NumericUpDown();
             this.label7 = new System.Windows.Forms.Label();
             this.RainbowBrightnessTrackBar = new System.Windows.Forms.TrackBar();
@@ -127,15 +130,17 @@
             this.SelectActiveProfileButton = new System.Windows.Forms.Button();
             this.activeProfileLabel = new System.Windows.Forms.Label();
             this.FpsLabel = new System.Windows.Forms.Label();
-            this.mainFormBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.TabControl = new System.Windows.Forms.TabControl();
             this.BassTabPage = new System.Windows.Forms.TabPage();
+            this.visStatusLabel = new System.Windows.Forms.Label();
+            this.ShowAnalyzerButton = new System.Windows.Forms.Button();
             this.AudioLevelPanel = new System.Windows.Forms.Panel();
             this.AudioNumBandsLabel = new System.Windows.Forms.Label();
             this.numBandsTrackBar = new System.Windows.Forms.TrackBar();
             this.StartAudioVisButton = new System.Windows.Forms.Button();
             this.AudioVisualizerPanel = new System.Windows.Forms.Panel();
             this.audioUpdateTimer = new System.Windows.Forms.Timer(this.components);
+            this.mainFormBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.statusStrip1.SuspendLayout();
             this.TrayContextMenu.SuspendLayout();
             this.ConfigTabPage.SuspendLayout();
@@ -151,9 +156,19 @@
             ((System.ComponentModel.ISupportInitialize)(this.StaticBrightnessNUD)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.StaticBrightnessTrackbar)).BeginInit();
             this.AmbilightGroupBox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.AmbilightPrecisionTrackBar)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.AmbilightBrightnessNumericUpDown)).BeginInit();
+            this.AmbilightUpsGroupBox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.AmbilightLimitUpsTrackBar)).BeginInit();
+            this.groupBox9.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.AmbilightNumHueSlicesNumericUpDown)).BeginInit();
+            this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.AmbilightBrightnessTrackBar)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.AmbilightBrightnessNumericUpDown)).BeginInit();
+            this.groupBox8.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.AmbilightPrecisionTrackBar)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.AmbilightPrecisionNud)).BeginInit();
+            this.groupBox6.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.AmbilightSmoothingTrackbar)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.AmbilightSmoothingNud)).BeginInit();
             this.groupBox7.SuspendLayout();
             this.RainbowGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.RainbowSpeedNud)).BeginInit();
@@ -164,10 +179,10 @@
             this.groupBox2.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox5.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.mainFormBindingSource)).BeginInit();
             this.TabControl.SuspendLayout();
             this.BassTabPage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numBandsTrackBar)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.mainFormBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -248,7 +263,7 @@
             this.ConfigTabPage.Location = new System.Drawing.Point(4, 22);
             this.ConfigTabPage.Name = "ConfigTabPage";
             this.ConfigTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.ConfigTabPage.Size = new System.Drawing.Size(899, 770);
+            this.ConfigTabPage.Size = new System.Drawing.Size(1590, 779);
             this.ConfigTabPage.TabIndex = 3;
             this.ConfigTabPage.Text = "Configuration";
             this.ConfigTabPage.UseVisualStyleBackColor = true;
@@ -293,7 +308,7 @@
             this.LogTabPage.Location = new System.Drawing.Point(4, 22);
             this.LogTabPage.Name = "LogTabPage";
             this.LogTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.LogTabPage.Size = new System.Drawing.Size(899, 770);
+            this.LogTabPage.Size = new System.Drawing.Size(1590, 779);
             this.LogTabPage.TabIndex = 2;
             this.LogTabPage.Text = "Logger";
             this.LogTabPage.UseVisualStyleBackColor = true;
@@ -360,7 +375,7 @@
             this.VisualizerTabPage.Location = new System.Drawing.Point(4, 22);
             this.VisualizerTabPage.Name = "VisualizerTabPage";
             this.VisualizerTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.VisualizerTabPage.Size = new System.Drawing.Size(899, 770);
+            this.VisualizerTabPage.Size = new System.Drawing.Size(1590, 779);
             this.VisualizerTabPage.TabIndex = 1;
             this.VisualizerTabPage.Text = "Visualizer";
             this.VisualizerTabPage.UseVisualStyleBackColor = true;
@@ -409,7 +424,7 @@
             this.ProfilesTabPage.Location = new System.Drawing.Point(4, 22);
             this.ProfilesTabPage.Name = "ProfilesTabPage";
             this.ProfilesTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.ProfilesTabPage.Size = new System.Drawing.Size(899, 770);
+            this.ProfilesTabPage.Size = new System.Drawing.Size(1590, 779);
             this.ProfilesTabPage.TabIndex = 0;
             this.ProfilesTabPage.Text = "Profile Selection";
             // 
@@ -420,8 +435,6 @@
             this.MusicGroupBox.Controls.Add(this.MusicBrightnessTrackbar);
             this.MusicGroupBox.Controls.Add(this.label15);
             this.MusicGroupBox.Controls.Add(this.MusicEffectComboBox);
-            this.MusicGroupBox.Controls.Add(this.MusicHotkeyLabel);
-            this.MusicGroupBox.Controls.Add(this.label14);
             this.MusicGroupBox.Controls.Add(this.label13);
             this.MusicGroupBox.Controls.Add(this.MusicDeviceLabel);
             this.MusicGroupBox.Controls.Add(this.MusicSelectDeviceButton);
@@ -460,6 +473,7 @@
             this.MusicBrightnessTrackbar.Name = "MusicBrightnessTrackbar";
             this.MusicBrightnessTrackbar.Size = new System.Drawing.Size(399, 45);
             this.MusicBrightnessTrackbar.TabIndex = 45;
+            this.MusicBrightnessTrackbar.TickFrequency = 8;
             this.MusicBrightnessTrackbar.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
             // 
             // label15
@@ -480,29 +494,11 @@
             this.MusicEffectComboBox.Size = new System.Drawing.Size(399, 21);
             this.MusicEffectComboBox.TabIndex = 43;
             // 
-            // MusicHotkeyLabel
-            // 
-            this.MusicHotkeyLabel.AutoSize = true;
-            this.MusicHotkeyLabel.Location = new System.Drawing.Point(56, 350);
-            this.MusicHotkeyLabel.Name = "MusicHotkeyLabel";
-            this.MusicHotkeyLabel.Size = new System.Drawing.Size(69, 13);
-            this.MusicHotkeyLabel.TabIndex = 30;
-            this.MusicHotkeyLabel.Text = "Not assigned";
-            // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(6, 350);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(44, 13);
-            this.label14.TabIndex = 29;
-            this.label14.Text = "Hotkey:";
-            // 
             // label13
             // 
             this.label13.AutoSize = true;
             this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label13.Location = new System.Drawing.Point(6, 329);
+            this.label13.Location = new System.Drawing.Point(6, 360);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(51, 13);
             this.label13.TabIndex = 2;
@@ -511,7 +507,7 @@
             // MusicDeviceLabel
             // 
             this.MusicDeviceLabel.AutoSize = true;
-            this.MusicDeviceLabel.Location = new System.Drawing.Point(56, 329);
+            this.MusicDeviceLabel.Location = new System.Drawing.Point(56, 360);
             this.MusicDeviceLabel.Name = "MusicDeviceLabel";
             this.MusicDeviceLabel.Size = new System.Drawing.Size(41, 13);
             this.MusicDeviceLabel.TabIndex = 1;
@@ -546,7 +542,7 @@
             this.ComPortComboBox.FormattingEnabled = true;
             this.ComPortComboBox.Location = new System.Drawing.Point(6, 19);
             this.ComPortComboBox.Name = "ComPortComboBox";
-            this.ComPortComboBox.Size = new System.Drawing.Size(75, 21);
+            this.ComPortComboBox.Size = new System.Drawing.Size(81, 21);
             this.ComPortComboBox.TabIndex = 0;
             this.ComPortComboBox.SelectedIndexChanged += new System.EventHandler(this.ComPortComboBox_SelectedIndexChanged);
             // 
@@ -565,7 +561,7 @@
             // 
             this.connectComButton.Location = new System.Drawing.Point(6, 75);
             this.connectComButton.Name = "connectComButton";
-            this.connectComButton.Size = new System.Drawing.Size(75, 23);
+            this.connectComButton.Size = new System.Drawing.Size(81, 23);
             this.connectComButton.TabIndex = 1;
             this.connectComButton.Text = "Connect";
             this.connectComButton.UseVisualStyleBackColor = true;
@@ -576,7 +572,7 @@
             this.refreshComButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.refreshComButton.Location = new System.Drawing.Point(6, 46);
             this.refreshComButton.Name = "refreshComButton";
-            this.refreshComButton.Size = new System.Drawing.Size(75, 23);
+            this.refreshComButton.Size = new System.Drawing.Size(82, 23);
             this.refreshComButton.TabIndex = 2;
             this.refreshComButton.Text = "Refresh";
             this.refreshComButton.UseVisualStyleBackColor = true;
@@ -664,9 +660,7 @@
             // 
             // StaticGroupBox
             // 
-            this.StaticGroupBox.Controls.Add(this.staticColortHotkeyLabel);
             this.StaticGroupBox.Controls.Add(this.StaticBrightnessNUD);
-            this.StaticGroupBox.Controls.Add(this.label4);
             this.StaticGroupBox.Controls.Add(this.label1);
             this.StaticGroupBox.Controls.Add(this.StaticBrightnessTrackbar);
             this.StaticGroupBox.Controls.Add(this.staticProfileColorButton);
@@ -677,16 +671,6 @@
             this.StaticGroupBox.TabIndex = 10;
             this.StaticGroupBox.TabStop = false;
             this.StaticGroupBox.Text = "Selected LED Profile";
-            // 
-            // staticColortHotkeyLabel
-            // 
-            this.staticColortHotkeyLabel.AutoSize = true;
-            this.staticColortHotkeyLabel.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.staticColortHotkeyLabel.Location = new System.Drawing.Point(57, 350);
-            this.staticColortHotkeyLabel.Name = "staticColortHotkeyLabel";
-            this.staticColortHotkeyLabel.Size = new System.Drawing.Size(69, 13);
-            this.staticColortHotkeyLabel.TabIndex = 28;
-            this.staticColortHotkeyLabel.Text = "Not assigned";
             // 
             // StaticBrightnessNUD
             // 
@@ -699,15 +683,6 @@
             this.StaticBrightnessNUD.Name = "StaticBrightnessNUD";
             this.StaticBrightnessNUD.Size = new System.Drawing.Size(75, 20);
             this.StaticBrightnessNUD.TabIndex = 4;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(7, 350);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(44, 13);
-            this.label4.TabIndex = 27;
-            this.label4.Text = "Hotkey:";
             // 
             // label1
             // 
@@ -725,6 +700,7 @@
             this.StaticBrightnessTrackbar.Name = "StaticBrightnessTrackbar";
             this.StaticBrightnessTrackbar.Size = new System.Drawing.Size(399, 45);
             this.StaticBrightnessTrackbar.TabIndex = 2;
+            this.StaticBrightnessTrackbar.TickFrequency = 8;
             this.StaticBrightnessTrackbar.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
             // 
             // staticProfileColorButton
@@ -748,15 +724,12 @@
             // 
             // AmbilightGroupBox
             // 
-            this.AmbilightGroupBox.Controls.Add(this.AmbilightPrecisionTrackBar);
-            this.AmbilightGroupBox.Controls.Add(this.label9);
-            this.AmbilightGroupBox.Controls.Add(this.AmbilightBrightnessNumericUpDown);
-            this.AmbilightGroupBox.Controls.Add(this.AmbilightBrightnessTrackBar);
-            this.AmbilightGroupBox.Controls.Add(this.AmbilightRecordStatusLabel);
-            this.AmbilightGroupBox.Controls.Add(this.label12);
+            this.AmbilightGroupBox.Controls.Add(this.AmbilightUpsGroupBox);
+            this.AmbilightGroupBox.Controls.Add(this.groupBox9);
+            this.AmbilightGroupBox.Controls.Add(this.groupBox3);
+            this.AmbilightGroupBox.Controls.Add(this.groupBox8);
+            this.AmbilightGroupBox.Controls.Add(this.groupBox6);
             this.AmbilightGroupBox.Controls.Add(this.groupBox7);
-            this.AmbilightGroupBox.Controls.Add(this.AmbilightHotkeyLabel);
-            this.AmbilightGroupBox.Controls.Add(this.label11);
             this.AmbilightGroupBox.Location = new System.Drawing.Point(6, 394);
             this.AmbilightGroupBox.Name = "AmbilightGroupBox";
             this.AmbilightGroupBox.Size = new System.Drawing.Size(414, 380);
@@ -764,66 +737,196 @@
             this.AmbilightGroupBox.TabStop = false;
             this.AmbilightGroupBox.Text = "Selected LED Profile";
             // 
-            // AmbilightPrecisionTrackBar
+            // AmbilightUpsGroupBox
             // 
-            this.AmbilightPrecisionTrackBar.Location = new System.Drawing.Point(9, 178);
-            this.AmbilightPrecisionTrackBar.Maximum = 11;
-            this.AmbilightPrecisionTrackBar.Minimum = 1;
-            this.AmbilightPrecisionTrackBar.Name = "AmbilightPrecisionTrackBar";
-            this.AmbilightPrecisionTrackBar.Size = new System.Drawing.Size(392, 45);
-            this.AmbilightPrecisionTrackBar.TabIndex = 43;
-            this.AmbilightPrecisionTrackBar.TickFrequency = 2;
-            this.AmbilightPrecisionTrackBar.Value = 11;
-            this.AmbilightPrecisionTrackBar.ValueChanged += new System.EventHandler(this.AmbilightPrecisionTrackBar_ValueChanged);
+            this.AmbilightUpsGroupBox.Controls.Add(this.label5);
+            this.AmbilightUpsGroupBox.Controls.Add(this.AmbilightLimitUpsTrackBar);
+            this.AmbilightUpsGroupBox.Location = new System.Drawing.Point(246, 197);
+            this.AmbilightUpsGroupBox.Name = "AmbilightUpsGroupBox";
+            this.AmbilightUpsGroupBox.Size = new System.Drawing.Size(162, 70);
+            this.AmbilightUpsGroupBox.TabIndex = 61;
+            this.AmbilightUpsGroupBox.TabStop = false;
+            this.AmbilightUpsGroupBox.Text = "Limit UPS";
             // 
-            // label9
+            // label5
             // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(13, 111);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(59, 13);
-            this.label9.TabIndex = 58;
-            this.label9.Text = "Brightness:";
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(6, 48);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(50, 13);
+            this.label5.TabIndex = 62;
+            this.label5.Text = "(30 UPS)";
+            // 
+            // AmbilightLimitUpsTrackBar
+            // 
+            this.AmbilightLimitUpsTrackBar.Location = new System.Drawing.Point(6, 19);
+            this.AmbilightLimitUpsTrackBar.Maximum = 60;
+            this.AmbilightLimitUpsTrackBar.Minimum = 5;
+            this.AmbilightLimitUpsTrackBar.Name = "AmbilightLimitUpsTrackBar";
+            this.AmbilightLimitUpsTrackBar.Size = new System.Drawing.Size(150, 45);
+            this.AmbilightLimitUpsTrackBar.SmallChange = 5;
+            this.AmbilightLimitUpsTrackBar.TabIndex = 61;
+            this.AmbilightLimitUpsTrackBar.TickFrequency = 5;
+            this.AmbilightLimitUpsTrackBar.Value = 5;
+            // 
+            // groupBox9
+            // 
+            this.groupBox9.Controls.Add(this.label4);
+            this.groupBox9.Controls.Add(this.AmbilightNumHueSlicesNumericUpDown);
+            this.groupBox9.Controls.Add(this.AmbilightMedianRadioButton);
+            this.groupBox9.Controls.Add(this.AmbilightAverageRadioButton);
+            this.groupBox9.Location = new System.Drawing.Point(246, 101);
+            this.groupBox9.Name = "groupBox9";
+            this.groupBox9.Size = new System.Drawing.Size(162, 90);
+            this.groupBox9.TabIndex = 42;
+            this.groupBox9.TabStop = false;
+            this.groupBox9.Text = "Measurement";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Enabled = false;
+            this.label4.Location = new System.Drawing.Point(6, 66);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(68, 13);
+            this.label4.TabIndex = 60;
+            this.label4.Text = "#Hue Slices:";
+            // 
+            // AmbilightNumHueSlicesNumericUpDown
+            // 
+            this.AmbilightNumHueSlicesNumericUpDown.Enabled = false;
+            this.AmbilightNumHueSlicesNumericUpDown.Location = new System.Drawing.Point(80, 64);
+            this.AmbilightNumHueSlicesNumericUpDown.Name = "AmbilightNumHueSlicesNumericUpDown";
+            this.AmbilightNumHueSlicesNumericUpDown.Size = new System.Drawing.Size(76, 20);
+            this.AmbilightNumHueSlicesNumericUpDown.TabIndex = 59;
+            // 
+            // AmbilightMedianRadioButton
+            // 
+            this.AmbilightMedianRadioButton.AutoSize = true;
+            this.AmbilightMedianRadioButton.Location = new System.Drawing.Point(96, 19);
+            this.AmbilightMedianRadioButton.Name = "AmbilightMedianRadioButton";
+            this.AmbilightMedianRadioButton.Size = new System.Drawing.Size(60, 17);
+            this.AmbilightMedianRadioButton.TabIndex = 1;
+            this.AmbilightMedianRadioButton.Text = "Median";
+            this.AmbilightMedianRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // AmbilightAverageRadioButton
+            // 
+            this.AmbilightAverageRadioButton.AutoSize = true;
+            this.AmbilightAverageRadioButton.Checked = true;
+            this.AmbilightAverageRadioButton.Location = new System.Drawing.Point(6, 19);
+            this.AmbilightAverageRadioButton.Name = "AmbilightAverageRadioButton";
+            this.AmbilightAverageRadioButton.Size = new System.Drawing.Size(65, 17);
+            this.AmbilightAverageRadioButton.TabIndex = 0;
+            this.AmbilightAverageRadioButton.TabStop = true;
+            this.AmbilightAverageRadioButton.Text = "Average";
+            this.AmbilightAverageRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.AmbilightBrightnessTrackBar);
+            this.groupBox3.Controls.Add(this.AmbilightBrightnessNumericUpDown);
+            this.groupBox3.Location = new System.Drawing.Point(6, 101);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(74, 272);
+            this.groupBox3.TabIndex = 42;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Brightness";
+            // 
+            // AmbilightBrightnessTrackBar
+            // 
+            this.AmbilightBrightnessTrackBar.Location = new System.Drawing.Point(15, 19);
+            this.AmbilightBrightnessTrackBar.Maximum = 255;
+            this.AmbilightBrightnessTrackBar.Name = "AmbilightBrightnessTrackBar";
+            this.AmbilightBrightnessTrackBar.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.AmbilightBrightnessTrackBar.Size = new System.Drawing.Size(45, 218);
+            this.AmbilightBrightnessTrackBar.TabIndex = 56;
+            this.AmbilightBrightnessTrackBar.TickFrequency = 8;
+            this.AmbilightBrightnessTrackBar.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
+            this.AmbilightBrightnessTrackBar.Value = 1;
             // 
             // AmbilightBrightnessNumericUpDown
             // 
-            this.AmbilightBrightnessNumericUpDown.Location = new System.Drawing.Point(333, 101);
+            this.AmbilightBrightnessNumericUpDown.Location = new System.Drawing.Point(6, 243);
             this.AmbilightBrightnessNumericUpDown.Maximum = new decimal(new int[] {
             255,
             0,
             0,
             0});
             this.AmbilightBrightnessNumericUpDown.Name = "AmbilightBrightnessNumericUpDown";
-            this.AmbilightBrightnessNumericUpDown.Size = new System.Drawing.Size(75, 20);
+            this.AmbilightBrightnessNumericUpDown.Size = new System.Drawing.Size(62, 20);
             this.AmbilightBrightnessNumericUpDown.TabIndex = 57;
             // 
-            // AmbilightBrightnessTrackBar
+            // groupBox8
             // 
-            this.AmbilightBrightnessTrackBar.Location = new System.Drawing.Point(6, 127);
-            this.AmbilightBrightnessTrackBar.Maximum = 255;
-            this.AmbilightBrightnessTrackBar.Name = "AmbilightBrightnessTrackBar";
-            this.AmbilightBrightnessTrackBar.Size = new System.Drawing.Size(402, 45);
-            this.AmbilightBrightnessTrackBar.TabIndex = 56;
-            this.AmbilightBrightnessTrackBar.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
-            this.AmbilightBrightnessTrackBar.Value = 1;
+            this.groupBox8.Controls.Add(this.AmbilightPrecisionTrackBar);
+            this.groupBox8.Controls.Add(this.AmbilightPrecisionNud);
+            this.groupBox8.Location = new System.Drawing.Point(86, 101);
+            this.groupBox8.Name = "groupBox8";
+            this.groupBox8.Size = new System.Drawing.Size(74, 272);
+            this.groupBox8.TabIndex = 58;
+            this.groupBox8.TabStop = false;
+            this.groupBox8.Text = "Precision";
             // 
-            // AmbilightRecordStatusLabel
+            // AmbilightPrecisionTrackBar
             // 
-            this.AmbilightRecordStatusLabel.AutoSize = true;
-            this.AmbilightRecordStatusLabel.Location = new System.Drawing.Point(302, 350);
-            this.AmbilightRecordStatusLabel.Name = "AmbilightRecordStatusLabel";
-            this.AmbilightRecordStatusLabel.Size = new System.Drawing.Size(99, 13);
-            this.AmbilightRecordStatusLabel.TabIndex = 55;
-            this.AmbilightRecordStatusLabel.Text = "Unloaded (inactive)";
+            this.AmbilightPrecisionTrackBar.Location = new System.Drawing.Point(15, 19);
+            this.AmbilightPrecisionTrackBar.Maximum = 100;
+            this.AmbilightPrecisionTrackBar.Minimum = 1;
+            this.AmbilightPrecisionTrackBar.Name = "AmbilightPrecisionTrackBar";
+            this.AmbilightPrecisionTrackBar.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.AmbilightPrecisionTrackBar.Size = new System.Drawing.Size(45, 218);
+            this.AmbilightPrecisionTrackBar.TabIndex = 56;
+            this.AmbilightPrecisionTrackBar.TickFrequency = 10;
+            this.AmbilightPrecisionTrackBar.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
+            this.AmbilightPrecisionTrackBar.Value = 1;
             // 
-            // label12
+            // AmbilightPrecisionNud
             // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(227, 350);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(69, 13);
-            this.label12.TabIndex = 54;
-            this.label12.Text = "Driver status:";
+            this.AmbilightPrecisionNud.Location = new System.Drawing.Point(6, 243);
+            this.AmbilightPrecisionNud.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.AmbilightPrecisionNud.Name = "AmbilightPrecisionNud";
+            this.AmbilightPrecisionNud.Size = new System.Drawing.Size(62, 20);
+            this.AmbilightPrecisionNud.TabIndex = 57;
+            this.AmbilightPrecisionNud.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // groupBox6
+            // 
+            this.groupBox6.Controls.Add(this.AmbilightSmoothingTrackbar);
+            this.groupBox6.Controls.Add(this.AmbilightSmoothingNud);
+            this.groupBox6.Location = new System.Drawing.Point(166, 101);
+            this.groupBox6.Name = "groupBox6";
+            this.groupBox6.Size = new System.Drawing.Size(74, 272);
+            this.groupBox6.TabIndex = 58;
+            this.groupBox6.TabStop = false;
+            this.groupBox6.Text = "Smoothing";
+            // 
+            // AmbilightSmoothingTrackbar
+            // 
+            this.AmbilightSmoothingTrackbar.Location = new System.Drawing.Point(15, 19);
+            this.AmbilightSmoothingTrackbar.Maximum = 100;
+            this.AmbilightSmoothingTrackbar.Name = "AmbilightSmoothingTrackbar";
+            this.AmbilightSmoothingTrackbar.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.AmbilightSmoothingTrackbar.Size = new System.Drawing.Size(45, 218);
+            this.AmbilightSmoothingTrackbar.TabIndex = 56;
+            this.AmbilightSmoothingTrackbar.TickFrequency = 10;
+            this.AmbilightSmoothingTrackbar.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
+            this.AmbilightSmoothingTrackbar.Value = 1;
+            // 
+            // AmbilightSmoothingNud
+            // 
+            this.AmbilightSmoothingNud.Location = new System.Drawing.Point(6, 243);
+            this.AmbilightSmoothingNud.Name = "AmbilightSmoothingNud";
+            this.AmbilightSmoothingNud.Size = new System.Drawing.Size(62, 20);
+            this.AmbilightSmoothingNud.TabIndex = 57;
             // 
             // groupBox7
             // 
@@ -831,9 +934,9 @@
             this.groupBox7.Controls.Add(this.AmbilightCreateCaptureProfileButton);
             this.groupBox7.Controls.Add(this.AmbilightCaptureScreenComboBox);
             this.groupBox7.Controls.Add(this.AmbilightShowCaptureAreasButton);
-            this.groupBox7.Location = new System.Drawing.Point(10, 19);
+            this.groupBox7.Location = new System.Drawing.Point(6, 19);
             this.groupBox7.Name = "groupBox7";
-            this.groupBox7.Size = new System.Drawing.Size(391, 76);
+            this.groupBox7.Size = new System.Drawing.Size(402, 76);
             this.groupBox7.TabIndex = 47;
             this.groupBox7.TabStop = false;
             this.groupBox7.Text = "Capture Screen";
@@ -850,7 +953,7 @@
             // AmbilightCreateCaptureProfileButton
             // 
             this.AmbilightCreateCaptureProfileButton.Enabled = false;
-            this.AmbilightCreateCaptureProfileButton.Location = new System.Drawing.Point(246, 17);
+            this.AmbilightCreateCaptureProfileButton.Location = new System.Drawing.Point(257, 17);
             this.AmbilightCreateCaptureProfileButton.Name = "AmbilightCreateCaptureProfileButton";
             this.AmbilightCreateCaptureProfileButton.Size = new System.Drawing.Size(139, 23);
             this.AmbilightCreateCaptureProfileButton.TabIndex = 42;
@@ -868,7 +971,7 @@
             // 
             // AmbilightShowCaptureAreasButton
             // 
-            this.AmbilightShowCaptureAreasButton.Location = new System.Drawing.Point(246, 44);
+            this.AmbilightShowCaptureAreasButton.Location = new System.Drawing.Point(257, 44);
             this.AmbilightShowCaptureAreasButton.Name = "AmbilightShowCaptureAreasButton";
             this.AmbilightShowCaptureAreasButton.Size = new System.Drawing.Size(139, 23);
             this.AmbilightShowCaptureAreasButton.TabIndex = 39;
@@ -876,32 +979,11 @@
             this.AmbilightShowCaptureAreasButton.UseVisualStyleBackColor = true;
             this.AmbilightShowCaptureAreasButton.Click += new System.EventHandler(this.AmbilightShowCaptureAreasButton_Click);
             // 
-            // AmbilightHotkeyLabel
-            // 
-            this.AmbilightHotkeyLabel.AutoSize = true;
-            this.AmbilightHotkeyLabel.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.AmbilightHotkeyLabel.Location = new System.Drawing.Point(56, 350);
-            this.AmbilightHotkeyLabel.Name = "AmbilightHotkeyLabel";
-            this.AmbilightHotkeyLabel.Size = new System.Drawing.Size(69, 13);
-            this.AmbilightHotkeyLabel.TabIndex = 30;
-            this.AmbilightHotkeyLabel.Text = "Not assigned";
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(6, 350);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(44, 13);
-            this.label11.TabIndex = 29;
-            this.label11.Text = "Hotkey:";
-            // 
             // RainbowGroupBox
             // 
             this.RainbowGroupBox.Controls.Add(this.RainbowSpeedNud);
             this.RainbowGroupBox.Controls.Add(this.label8);
             this.RainbowGroupBox.Controls.Add(this.RainbowSpeedTrackBar);
-            this.RainbowGroupBox.Controls.Add(this.label5);
-            this.RainbowGroupBox.Controls.Add(this.label6);
             this.RainbowGroupBox.Controls.Add(this.RainbowBrightnessNud);
             this.RainbowGroupBox.Controls.Add(this.label7);
             this.RainbowGroupBox.Controls.Add(this.RainbowBrightnessTrackBar);
@@ -935,27 +1017,9 @@
             this.RainbowSpeedTrackBar.Name = "RainbowSpeedTrackBar";
             this.RainbowSpeedTrackBar.Size = new System.Drawing.Size(399, 45);
             this.RainbowSpeedTrackBar.TabIndex = 29;
+            this.RainbowSpeedTrackBar.TickFrequency = 5;
             this.RainbowSpeedTrackBar.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
             this.RainbowSpeedTrackBar.Value = 1;
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.label5.Location = new System.Drawing.Point(56, 350);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(69, 13);
-            this.label5.TabIndex = 28;
-            this.label5.Text = "Not assigned";
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(6, 350);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(44, 13);
-            this.label6.TabIndex = 27;
-            this.label6.Text = "Hotkey:";
             // 
             // RainbowBrightnessNud
             // 
@@ -985,6 +1049,7 @@
             this.RainbowBrightnessTrackBar.Name = "RainbowBrightnessTrackBar";
             this.RainbowBrightnessTrackBar.Size = new System.Drawing.Size(399, 45);
             this.RainbowBrightnessTrackBar.TabIndex = 2;
+            this.RainbowBrightnessTrackBar.TickFrequency = 8;
             this.RainbowBrightnessTrackBar.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
             // 
             // NullGroupBox
@@ -1110,10 +1175,6 @@
             this.FpsLabel.TabIndex = 39;
             this.FpsLabel.Text = "-- Fps";
             // 
-            // mainFormBindingSource
-            // 
-            this.mainFormBindingSource.DataSource = typeof(LedController.MainForm);
-            // 
             // TabControl
             // 
             this.TabControl.Controls.Add(this.ProfilesTabPage);
@@ -1125,11 +1186,14 @@
             this.TabControl.Multiline = true;
             this.TabControl.Name = "TabControl";
             this.TabControl.SelectedIndex = 0;
-            this.TabControl.Size = new System.Drawing.Size(907, 796);
+            this.TabControl.Size = new System.Drawing.Size(1598, 805);
             this.TabControl.TabIndex = 41;
+            this.TabControl.SelectedIndexChanged += new System.EventHandler(this.TabControl_SelectedIndexChanged);
             // 
             // BassTabPage
             // 
+            this.BassTabPage.Controls.Add(this.visStatusLabel);
+            this.BassTabPage.Controls.Add(this.ShowAnalyzerButton);
             this.BassTabPage.Controls.Add(this.AudioLevelPanel);
             this.BassTabPage.Controls.Add(this.AudioNumBandsLabel);
             this.BassTabPage.Controls.Add(this.numBandsTrackBar);
@@ -1137,45 +1201,67 @@
             this.BassTabPage.Controls.Add(this.AudioVisualizerPanel);
             this.BassTabPage.Location = new System.Drawing.Point(4, 22);
             this.BassTabPage.Name = "BassTabPage";
-            this.BassTabPage.Size = new System.Drawing.Size(899, 770);
+            this.BassTabPage.Size = new System.Drawing.Size(1590, 779);
             this.BassTabPage.TabIndex = 4;
             this.BassTabPage.Text = "Audio";
             this.BassTabPage.UseVisualStyleBackColor = true;
+            // 
+            // visStatusLabel
+            // 
+            this.visStatusLabel.AutoSize = true;
+            this.visStatusLabel.Location = new System.Drawing.Point(10, 371);
+            this.visStatusLabel.Name = "visStatusLabel";
+            this.visStatusLabel.Size = new System.Drawing.Size(148, 13);
+            this.visStatusLabel.TabIndex = 0;
+            this.visStatusLabel.Text = "Press \"start\" to start visualizin\'";
+            // 
+            // ShowAnalyzerButton
+            // 
+            this.ShowAnalyzerButton.Location = new System.Drawing.Point(727, 358);
+            this.ShowAnalyzerButton.Name = "ShowAnalyzerButton";
+            this.ShowAnalyzerButton.Size = new System.Drawing.Size(118, 23);
+            this.ShowAnalyzerButton.TabIndex = 4;
+            this.ShowAnalyzerButton.Text = "Open in new window";
+            this.ShowAnalyzerButton.UseVisualStyleBackColor = true;
+            this.ShowAnalyzerButton.Click += new System.EventHandler(this.ShowAnalyzerButton_Click);
             // 
             // AudioLevelPanel
             // 
             this.AudioLevelPanel.Location = new System.Drawing.Point(13, 358);
             this.AudioLevelPanel.Name = "AudioLevelPanel";
-            this.AudioLevelPanel.Size = new System.Drawing.Size(751, 23);
+            this.AudioLevelPanel.Size = new System.Drawing.Size(663, 10);
             this.AudioLevelPanel.TabIndex = 3;
             // 
             // AudioNumBandsLabel
             // 
             this.AudioNumBandsLabel.AutoSize = true;
             this.AudioNumBandsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.AudioNumBandsLabel.Location = new System.Drawing.Point(857, 363);
+            this.AudioNumBandsLabel.Location = new System.Drawing.Point(861, 363);
             this.AudioNumBandsLabel.Name = "AudioNumBandsLabel";
-            this.AudioNumBandsLabel.Size = new System.Drawing.Size(28, 13);
+            this.AudioNumBandsLabel.Size = new System.Drawing.Size(21, 13);
             this.AudioNumBandsLabel.TabIndex = 2;
-            this.AudioNumBandsLabel.Text = "250";
+            this.AudioNumBandsLabel.Text = "30";
             // 
             // numBandsTrackBar
             // 
             this.numBandsTrackBar.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.numBandsTrackBar.Location = new System.Drawing.Point(851, 3);
-            this.numBandsTrackBar.Maximum = 250;
+            this.numBandsTrackBar.Maximum = 400;
+            this.numBandsTrackBar.Minimum = 1;
             this.numBandsTrackBar.Name = "numBandsTrackBar";
             this.numBandsTrackBar.Orientation = System.Windows.Forms.Orientation.Vertical;
             this.numBandsTrackBar.Size = new System.Drawing.Size(45, 349);
             this.numBandsTrackBar.TabIndex = 0;
+            this.numBandsTrackBar.TickFrequency = 50;
             this.numBandsTrackBar.TickStyle = System.Windows.Forms.TickStyle.Both;
+            this.numBandsTrackBar.Value = 30;
             this.numBandsTrackBar.Scroll += new System.EventHandler(this.NumBandsTrackBar_Scroll);
             // 
             // StartAudioVisButton
             // 
-            this.StartAudioVisButton.Location = new System.Drawing.Point(770, 358);
+            this.StartAudioVisButton.Location = new System.Drawing.Point(682, 358);
             this.StartAudioVisButton.Name = "StartAudioVisButton";
-            this.StartAudioVisButton.Size = new System.Drawing.Size(75, 23);
+            this.StartAudioVisButton.Size = new System.Drawing.Size(39, 23);
             this.StartAudioVisButton.TabIndex = 0;
             this.StartAudioVisButton.Text = "Start";
             this.StartAudioVisButton.UseVisualStyleBackColor = true;
@@ -1192,6 +1278,10 @@
             // 
             this.audioUpdateTimer.Interval = 16;
             this.audioUpdateTimer.Tick += new System.EventHandler(this.AudioUpdateTimer_Tick);
+            // 
+            // mainFormBindingSource
+            // 
+            this.mainFormBindingSource.DataSource = typeof(LedController.MainForm);
             // 
             // MainForm
             // 
@@ -1232,10 +1322,24 @@
             ((System.ComponentModel.ISupportInitialize)(this.StaticBrightnessNUD)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.StaticBrightnessTrackbar)).EndInit();
             this.AmbilightGroupBox.ResumeLayout(false);
-            this.AmbilightGroupBox.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.AmbilightPrecisionTrackBar)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.AmbilightBrightnessNumericUpDown)).EndInit();
+            this.AmbilightUpsGroupBox.ResumeLayout(false);
+            this.AmbilightUpsGroupBox.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.AmbilightLimitUpsTrackBar)).EndInit();
+            this.groupBox9.ResumeLayout(false);
+            this.groupBox9.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.AmbilightNumHueSlicesNumericUpDown)).EndInit();
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.AmbilightBrightnessTrackBar)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.AmbilightBrightnessNumericUpDown)).EndInit();
+            this.groupBox8.ResumeLayout(false);
+            this.groupBox8.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.AmbilightPrecisionTrackBar)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.AmbilightPrecisionNud)).EndInit();
+            this.groupBox6.ResumeLayout(false);
+            this.groupBox6.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.AmbilightSmoothingTrackbar)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.AmbilightSmoothingNud)).EndInit();
             this.groupBox7.ResumeLayout(false);
             this.RainbowGroupBox.ResumeLayout(false);
             this.RainbowGroupBox.PerformLayout();
@@ -1249,11 +1353,11 @@
             this.groupBox4.ResumeLayout(false);
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.mainFormBindingSource)).EndInit();
             this.TabControl.ResumeLayout(false);
             this.BassTabPage.ResumeLayout(false);
             this.BassTabPage.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numBandsTrackBar)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.mainFormBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1293,32 +1397,23 @@
         private System.Windows.Forms.ColumnHeader typeName;
         private System.Windows.Forms.ColumnHeader shorcutName;
         private System.Windows.Forms.GroupBox StaticGroupBox;
-        private System.Windows.Forms.Label staticColortHotkeyLabel;
         private System.Windows.Forms.NumericUpDown StaticBrightnessNUD;
-        private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TrackBar StaticBrightnessTrackbar;
         private System.Windows.Forms.Button staticProfileColorButton;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.GroupBox AmbilightGroupBox;
-        private System.Windows.Forms.Label label9;
         private System.Windows.Forms.NumericUpDown AmbilightBrightnessNumericUpDown;
         private System.Windows.Forms.TrackBar AmbilightBrightnessTrackBar;
-        private System.Windows.Forms.Label AmbilightRecordStatusLabel;
-        private System.Windows.Forms.Label label12;
         private System.Windows.Forms.GroupBox groupBox7;
         private System.Windows.Forms.ComboBox AmbilightCaptureProfileComboBox;
         private System.Windows.Forms.Button AmbilightCreateCaptureProfileButton;
         private System.Windows.Forms.ComboBox AmbilightCaptureScreenComboBox;
         private System.Windows.Forms.Button AmbilightShowCaptureAreasButton;
-        private System.Windows.Forms.Label AmbilightHotkeyLabel;
-        private System.Windows.Forms.Label label11;
         private System.Windows.Forms.GroupBox RainbowGroupBox;
         private System.Windows.Forms.NumericUpDown RainbowSpeedNud;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.TrackBar RainbowSpeedTrackBar;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label6;
         private System.Windows.Forms.NumericUpDown RainbowBrightnessNud;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TrackBar RainbowBrightnessTrackBar;
@@ -1343,8 +1438,6 @@
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label MusicDeviceLabel;
         private System.Windows.Forms.Button MusicSelectDeviceButton;
-        private System.Windows.Forms.Label MusicHotkeyLabel;
-        private System.Windows.Forms.Label label14;
         private System.Windows.Forms.NumericUpDown MusicBrightnessNud;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.TrackBar MusicBrightnessTrackbar;
@@ -1359,8 +1452,24 @@
         private System.Windows.Forms.ToolStripMenuItem ActiveProfileToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem ShowHideToolStripMenuItem;
-        private System.Windows.Forms.TrackBar AmbilightPrecisionTrackBar;
         private System.Windows.Forms.BindingSource mainFormBindingSource;
+        private System.Windows.Forms.GroupBox AmbilightUpsGroupBox;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TrackBar AmbilightLimitUpsTrackBar;
+        private System.Windows.Forms.GroupBox groupBox9;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.NumericUpDown AmbilightNumHueSlicesNumericUpDown;
+        private System.Windows.Forms.RadioButton AmbilightMedianRadioButton;
+        private System.Windows.Forms.RadioButton AmbilightAverageRadioButton;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.GroupBox groupBox8;
+        private System.Windows.Forms.TrackBar AmbilightPrecisionTrackBar;
+        private System.Windows.Forms.NumericUpDown AmbilightPrecisionNud;
+        private System.Windows.Forms.GroupBox groupBox6;
+        private System.Windows.Forms.TrackBar AmbilightSmoothingTrackbar;
+        private System.Windows.Forms.NumericUpDown AmbilightSmoothingNud;
+        private System.Windows.Forms.Button ShowAnalyzerButton;
+        private System.Windows.Forms.Label visStatusLabel;
     }
 }
 

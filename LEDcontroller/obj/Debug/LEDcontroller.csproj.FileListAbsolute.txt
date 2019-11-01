@@ -129,3 +129,4 @@ C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\
 C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\obj\Debug\LedController.exe.manifest
 C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\obj\Debug\LedController.application
 C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\obj\Debug\LedController.csproj.CopyComplete
+C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\obj\Debug\LedController.SpectrumAnalyzer.resources

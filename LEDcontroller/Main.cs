@@ -1,6 +1,5 @@
 ﻿#define DEBUG
 //#define TEST
-//#define NEW
 
 using LedController.Bass;
 using LedController.LedProfiles;
@@ -221,8 +220,6 @@ namespace LedController
             }
 
             StripInfoLabel.Text = $"Number of LEDs: {LedMatrix.MasterLength}\nLength: {LedMatrix.Width}\nHeight: {LedMatrix.Height}\nOverlap: {LedMatrix.MasterLength - LedMatrix.Length}\nRotating {(LedMatrix.IsCw ? "Clockwise" : "Counterclockwise")}\n\nTopleft index: {LedMatrix.TopLeft}\nTopright index: {LedMatrix.TopRight}\nBottomright index: {LedMatrix.BottomRight}\nBottomleft index: {LedMatrix.BottomLeft}\nStrip start index {LedMatrix.Start}";
-
-            SaveProfileSetNames();
 
             SaveAllProfiles();
 
@@ -863,16 +860,6 @@ namespace LedController
             }
         }
 
-        private void SaveProfileSetNames()
-        {
-            XmlSerializer ser = new XmlSerializer(typeof(List<string>));
-            using(TextWriter w = new StreamWriter($@".\Profilesets\psnames.xml"))
-            {
-                Logger.Log($"Saving Profileset names...");
-                ser.Serialize(w, profileSetNames);
-            }
-        }
-
         private LedProfile LoadSingleProfile(string profileSet, int index)
         {
             string dir = Directory.GetCurrentDirectory() + $@"\ProfileSets\{profileSet}";
@@ -1104,10 +1091,10 @@ namespace LedController
                 x = y = i = 0;
                 //Action<int, int, CColor> a = new Action<int, int, CColor>((xCoord, yCoord, cColor) => { visualizer.FillRect(xCoord, yCoord, cColor); });
 
-                do { visualizer.FillRect(c[i++], (++x * Visualizer.SqrSize), (y * Visualizer.SqrSize)); } while (x < LedMatrix.Width - 1);
-                do { visualizer.FillRect(c[i++], (x * Visualizer.SqrSize), (++y * Visualizer.SqrSize)); } while (y < LedMatrix.Height - 1);
-                do { visualizer.FillRect(c[i++], (--x * Visualizer.SqrSize), (y * Visualizer.SqrSize)); } while (x > 0);
-                do { visualizer.FillRect(c[i++], (x * Visualizer.SqrSize), (--y * Visualizer.SqrSize)); } while (y > 0);
+                do { visualizer.FillRect(c[i++], (++x * visualizer.SqrSize), (y * visualizer.SqrSize)); } while (x < LedMatrix.Width - 1);
+                do { visualizer.FillRect(c[i++], (x * visualizer.SqrSize), (++y * visualizer.SqrSize)); } while (y < LedMatrix.Height - 1);
+                do { visualizer.FillRect(c[i++], (--x * visualizer.SqrSize), (y * visualizer.SqrSize)); } while (x > 0);
+                do { visualizer.FillRect(c[i++], (x * visualizer.SqrSize), (--y * visualizer.SqrSize)); } while (y > 0);
             }
             if (TabControl.SelectedIndex == 1)
             {
@@ -1209,9 +1196,38 @@ namespace LedController
                 throw new InvalidOperationException("Expected selectedProfile of type AmbilightLedProfile");
             }
         }
-#endregion
+        #endregion
 
         #region Music
+        private bool analyzerWindowPresent = false;
+        private SpectrumAnalyzer analyzer;
+        private void AudioTabEnabled()
+        {
+            ClearAnalyzer();
+            if (BassDriver.State == BassDriverState.Enabled)
+            {
+                visStatusLabel.Text = $"Visualizing {BassDriver.CurrentDeviceName}, index {BassDriver.CurrentDeviceIndex}";
+                audioUpdateTimer.Enabled = true;
+                analyzingAudio = true;
+                StartAudioVisButton.Text = "Stop";
+            }
+        }
+        private void AudioTabDisabled()
+        {
+            if (analyzingAudio)
+            {
+                if ((ActiveProfile == null || ActiveProfile.ProfileType != ProfileType.Music) && !analyzerWindowPresent)
+                {
+                    BassDriver.Disable();
+                    BassDriver.Free();
+                }
+                ClearAnalyzer();
+                audioUpdateTimer.Enabled = false;
+                analyzingAudio = false;
+                StartAudioVisButton.Text = "Start";
+                visStatusLabel.Text = "Press \"Start\" to start visualizin\'";
+            }
+        }
         private void ShowSelectWasapiDevice()
         {
             if (SelectedProfile is MusicLedProfile p)
@@ -1237,23 +1253,84 @@ namespace LedController
         {
             if (analyzingAudio)
             {
+                if (ActiveProfile == null || ActiveProfile.ProfileType != ProfileType.Music)
+                {
+                    BassDriver.Disable();
+                    BassDriver.Free();
+                }
+                ClearAnalyzer();
                 audioUpdateTimer.Enabled = false;
-                BassDriver.Disable();
-                BassDriver.Free();
                 analyzingAudio = false;
                 StartAudioVisButton.Text = "Start";
+                visStatusLabel.Text = "Press \"Start\" to start visualizin\'";
             }
             else
             {
-                BassDriver.Enable(32);
-                audioUpdateTimer.Enabled = true;
-                analyzingAudio = true;
-                StartAudioVisButton.Text = "Stop";
+                var dial = new SelectWasapiDeviceForm();
+                dial.ShowDialog();
+                if(dial.DialogResult == DialogResult.OK)
+                {
+                    int devInd = dial.GetAbsoluteSelectedIndex(out string name);
+                    BassDriver.Enable(devInd);
+                    visStatusLabel.Text = $"Visualizing {name}, index {devInd}";
+                    audioUpdateTimer.Enabled = true;
+                    analyzingAudio = true;
+                    StartAudioVisButton.Text = "Stop";
+                }
+            }
+        }
+
+        private void ShowAnalyzerButton_Click(object sender, EventArgs e)
+        {
+            if (!analyzerWindowPresent)
+            {
+                if (!analyzingAudio)
+                {
+                    var dial = new SelectWasapiDeviceForm();
+                    dial.ShowDialog();
+                    if (dial.DialogResult == DialogResult.OK)
+                    {
+                        int devInd = dial.GetAbsoluteSelectedIndex(out string name);
+                        BassDriver.Enable(devInd);
+                    }
+                }
+                analyzer = new SpectrumAnalyzer();
+                analyzer.Show();
+                analyzer.FormClosing += new FormClosingEventHandler(Analyzer_Close);
+                analyzerWindowPresent = true;
+                ShowAnalyzerButton.Text = "Close analyzer";
+            }
+            else
+            {
+                analyzer.Close();
+            }
+        }
+
+        private void Analyzer_Close(object sender, FormClosingEventArgs e)
+        {
+            analyzer.Dispose();
+            analyzerWindowPresent = false;
+            ShowAnalyzerButton.Text = "Show in new window";
+            if (!analyzingAudio && (ActiveProfile == null || ActiveProfile.ProfileType != ProfileType.Music))
+            {
+                BassDriver.Disable();
+                BassDriver.Free();
             }
         }
         private void AudioUpdateTimer_Tick(object sender, EventArgs e)
         {
-            DrawAnalyzer(BassDriver.GetBands(numBandsTrackBar.Value, out short l, out short r), l, r);
+            if (BassDriver.State == BassDriverState.Enabled)
+            {
+                DrawAnalyzer(BassDriver.GetBands(numBandsTrackBar.Value, out short l, out short r), l, r);
+            }
+            else
+            {
+                ClearAnalyzer();
+                audioUpdateTimer.Enabled = false;
+                analyzingAudio = false;
+                StartAudioVisButton.Text = "Start";
+                visStatusLabel.Text = "Press \"Start\" to start visualizin\'";
+            }
         }
 
         private bool NumBandsChanged = false;
@@ -1281,7 +1358,7 @@ namespace LedController
                     {
                         e.FillRectangle(brush, new Rectangle(x, 0, w, y));
                     }
-                    using (SolidBrush brush = new SolidBrush(Color.FromArgb(173, 43, 46)))
+                    using (SolidBrush brush = new SolidBrush(Color.FromArgb(92, 33, 24)))
                     {
                         e.FillRectangle(brush, new Rectangle(x, y - h, w, h));
                         //Console.WriteLine($"X={x}Y={y}W={w}H{h}");
@@ -1303,7 +1380,7 @@ namespace LedController
                     e.FillRectangle(brush, new Rectangle(0, lys, AudioLevelPanel.Width, lh));
                     e.FillRectangle(brush, new Rectangle(0, lys + 1 + lh, AudioLevelPanel.Width, lh));
                 }
-                using (SolidBrush brush = new SolidBrush(Color.FromArgb(173, 43, 46)))
+                using (SolidBrush brush = new SolidBrush(Color.FromArgb(92, 33, 24)))
                 {
                     e.FillRectangle(brush, new Rectangle(0, lys, hl, lh));
                     e.FillRectangle(brush, new Rectangle(0, lys + 1 + lh, hr, lh));
@@ -1311,12 +1388,14 @@ namespace LedController
             }
         }
 
+        private void ClearAnalyzer() { DrawAnalyzer(new byte[numBandsTrackBar.Value].ToList(), 0, 0); }
+
         private void NumBandsTrackBar_Scroll(object sender, EventArgs e)
         {
             AudioNumBandsLabel.Text = numBandsTrackBar.Value.ToString();
             NumBandsChanged = true;
         }
-#endregion
+        #endregion
 
         #region Logger
         public void ShowBalloon(string title, string text, ToolTipIcon icon, int customTimeout = 5000)
@@ -1372,6 +1451,13 @@ namespace LedController
             UpdateLogTimer.Interval = (int)Math.Pow(10, LogUpdateIntervalComboBox.SelectedIndex);
         }
         #endregion
+
+        private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //From Audiotab
+            if (TabControl.SelectedIndex == 2) AudioTabEnabled();
+            else AudioTabDisabled();
+        }
     }
 
     public class CListViewItem : ListViewItem

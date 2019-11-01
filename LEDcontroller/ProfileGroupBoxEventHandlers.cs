@@ -24,9 +24,6 @@ namespace LedController
             staticProfileColorButton.VisibleChanged += new System.EventHandler(StaticProfileColorButton_VisibleChanged);
             staticProfileColorButton.Click += new System.EventHandler(StaticProfileColorButton_Click);
 
-            staticColortHotkeyLabel.VisibleChanged += new System.EventHandler(StaticColortHotkeyLabel_VisibleChanged);
-            staticColortHotkeyLabel.Click += new System.EventHandler(StaticColortHotkeyLabel_Click);
-
             /*
              * Rainbow Cycle
              */
@@ -108,14 +105,6 @@ namespace LedController
             {
                 staticProfileColorButton.BackColor = MyDialog.Color;
                 SelectedProfile.LedColor = staticProfileColorButton.BackColor;
-            }
-        }
-
-        private void StaticColortHotkeyLabel_VisibleChanged(object sender, EventArgs e)
-        {
-            if (staticColortHotkeyLabel.Visible)
-            {
-                staticColortHotkeyLabel.Text = /*SelectedProfile.Hotkey?.ToString() ?? */"Not assigned";
             }
         }
 
@@ -305,14 +294,7 @@ namespace LedController
             }
             else throw new NotImplementedException("Invalid LedProfile, expected type AmbilightLedProfile");
         }
-        void AmbilightPrecisionTrackBar_ValueChanged(object s, EventArgs e)
-        {
-            if (SelectedProfile is AmbilightLedProfile prof)
-            {
-                prof.Precision = (double)AmbilightPrecisionTrackBar.Value / 11;
-                Logger.Log($"Precision = {prof.Precision}");
-            }
-        }
+
         #endregion
         void ProfileSettingsChanged()
         {

@@ -16,7 +16,8 @@ namespace LedController.Bass
         private static float[] fft;
         private static WASAPIPROC process;
 
-        public static int DeviceIndex { get; private set; }
+        public static int CurrentDeviceIndex { get; private set; }
+        public static string CurrentDeviceName { get { return BASS_WASAPI_GetDeviceInfo(CurrentDeviceIndex).name; } }
         public static BassDriverState State { get; private set; } = BassDriverState.Dormant;
 
         public static void Init()
@@ -32,15 +33,16 @@ namespace LedController.Bass
 
         public static void Enable(int devInd)
         {
+            if (devInd > BASS_WASAPI_GetDeviceCount()) throw new InvalidOperationException("Invalid device index");
             if (State == BassDriverState.Dormant) Init();
-            if (devInd != DeviceIndex)
+            if (devInd != CurrentDeviceIndex)
             {
-                DeviceIndex = devInd;
+                CurrentDeviceIndex = devInd;
                 Disable();
             }
             else if (State == BassDriverState.Enabled) return;
 
-            bool result = BASS_WASAPI_Init(DeviceIndex, 0, 0, BASSWASAPIInit.BASS_WASAPI_BUFFER, 1f, 0.05f, process, IntPtr.Zero);
+            bool result = BASS_WASAPI_Init(CurrentDeviceIndex, 0, 0, BASSWASAPIInit.BASS_WASAPI_BUFFER, 1f, 0.05f, process, IntPtr.Zero);
             if (!result)
             {
                 var error = BASS_ErrorGetCode();

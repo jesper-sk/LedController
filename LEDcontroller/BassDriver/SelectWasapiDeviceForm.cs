@@ -35,7 +35,7 @@ namespace LedController.Bass
                     Clvi curr = new Clvi();
                     curr.absIndex = i;
                     string fullName = info.name;
-                    List<string> spl = fullName.Split('(').ToList<string>();
+                    List<string> spl = fullName.Split('(').ToList();
                     string driver = spl[spl.Count - 1];
                     driver = driver.Substring(0, driver.Length - 1);
                     spl.RemoveAt(spl.Count - 1);

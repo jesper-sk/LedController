@@ -125,6 +125,116 @@ namespace LedController.LedProfiles
         }
     }
 
+    public class PolitieLedProfile : LedProfile
+    {
+        bool redVisible, blueVisible, redVisibleVisible, blueVisibleVisible;
+        int redCount, blueCount, darkCount;
+        int redCountCount, blueCountCount;
+        public PolitieLedProfile() { }
+
+        public PolitieLedProfile(string name, int index, int psindex, ColorMatrix m) : base(name, index, psindex, ProfileType.Rainbow)
+        {
+            Brightness = 255;
+            Ups = 60;
+        }
+
+        public override void Init(ColorMatrix m)
+        {
+            redVisible = blueVisible = false;
+            redCount = blueCount = redCountCount = blueCountCount = 0;
+        }
+
+        public override void Update(ColorMatrix m)
+        {
+            CColor[] colorsRed = new CColor[m.Length / 2];
+            CColor[] colorsBlue = new CColor[m.Length / 2];
+
+            if (redVisible)
+            {
+                if (redVisibleVisible)
+                {
+                    for (int i = 0; i < m.Length / 2; i++)
+                    {
+                        colorsRed[i] = CColor.FromColor(Color.Red);
+                        colorsBlue[i] = CColor.FromColor(Color.Black);
+                    }
+                    if (redCountCount++ > 3)
+                    {
+                        redVisibleVisible = false;
+                        redCountCount = 0;
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < m.Length / 2; i++)
+                    {
+                        colorsRed[i] = CColor.FromColor(Color.Black);
+                        colorsBlue[i] = CColor.FromColor(Color.Black);
+                    }
+                    if (redCountCount++ > 3)
+                    {
+                        redVisibleVisible = true;
+                        redCountCount = 0;
+                    }
+                }
+                if (redCount++ > 4)
+                {
+                    redCount = 0;
+                    redVisible = false;
+                    redVisibleVisible = true;
+                    blueVisible = true;
+                }
+            }
+            else if (blueVisible)
+            {
+                if (blueVisibleVisible)
+                {
+                    for (int i = 0; i < m.Length / 2; i++)
+                    {
+                        colorsRed[i] = CColor.FromColor(Color.Black);
+                        colorsBlue[i] = CColor.FromColor(Color.Blue);
+                    }
+                    if (blueCountCount++ > 1)
+                    {
+                        blueVisibleVisible = false;
+                        blueCountCount = 0;
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < m.Length / 2; i++)
+                    {
+                        colorsRed[i] = CColor.FromColor(Color.Black);
+                        colorsBlue[i] = CColor.FromColor(Color.Black);
+                    }
+                    if (blueCountCount++ > 1)
+                    {
+                        blueVisibleVisible = true;
+                        blueCountCount = 0;
+                    }
+                }
+                if (blueCount++ > 4)
+                {
+                    blueCount = 0;
+                    blueVisible = false;
+                    blueVisibleVisible = true;
+                }
+            }
+            else
+            { 
+                for (int i = 0; i < m.Length / 2; i++)
+                {
+                    colorsRed[i] = CColor.FromColor(Color.Black);
+                    colorsBlue[i] = CColor.FromColor(Color.Black);
+                }
+                if (darkCount++ > 15) redVisible = true;
+            }
+
+            m.AssignFrom(m.TopLeft + (m.Width / 2) - 1, colorsRed);
+            m.AssignFrom(m.BottomLeft + (m.Width / 2) - 1, colorsBlue);
+        }
+    }
+
     public class NoneLedProfile : LedProfile
     {
         public NoneLedProfile()

@@ -117,55 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="statusStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>116, 17</value>
-  </metadata>
-  <metadata name="contextMenuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>337, 17</value>
-  </metadata>
-  <metadata name="MainNotifyIcon.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>492, 17</value>
-  </metadata>
-  <metadata name="TrayContextMenu.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>605, 17</value>
+  <metadata name="updateTimer.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
   </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="MainNotifyIcon.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAAMMOAADDDgAAAAAAAAAA
-        AAD///8A////AP///wD///8A////SP///////////////////////////////////0j///8A////AP//
-        /wD///8A////AP///wD///8A////fP////////8A////AP///wD///8A////AP///wD/////////fP//
-        /wD///8A////AP///wD///8A////SP////////8A////AP///wD///8A////AP///wD///8A////AP//
-        //////9I////AP///wD///8A////AP////////8A////AP///wD///8A////AP///wD///8A////AP//
-        /wD///8A/////////wD///8A////AP///wD/////////AP///0j/////////////////////////////
-        //////9I////AP////////8A////AP///wD///8A/////////3z/////////AP///wD///8A////AP//
-        /wD///8A/////////3z/////////AP///wD///8A////AP//////////////AP///wD///8A////AP//
-        /wD///8A////AP///wD//////////////wD///8A////AP///wD/////////AP///wD///8A////AP//
-        /wD///8A////AP///wD///8A////AP////////8A////AP///wD///8A/////////wD///8A////AP//
-        /wD///8A////AP///wD///8A////AP///wD/////////AP///wD///8A////AP//////////////AP//
-        /wD///8A////AP///wD///8A////AP///wD//////////////wD///8A////AP///wD/////////fP//
-        //////8A////AP///wD///8A////AP///wD/////////fP////////8A////AP///wD///8A////////
-        /wD///9I////////////////////////////////////SP///wD/////////AP///wD///8A////AP//
-        //////8A////AP///wD///8A////AP///wD///8A////AP///wD///8A/////////wD///8A////AP//
-        /wD///9I/////////wD///8A////AP///wD///8A////AP///wD///8A/////////2T///8A////AP//
-        /wD///8A////AP///3z/////////AP///wD///8A////AP///wD///8A/////////3z///8A////AP//
-        /wD///8A////AP///wD///8A////SP///////////////////////////////////0j///8A////AP//
-        /wD///8A8A8AAOfnAADP8wAA3/sAANALAADH4wAAz/MAAN/7AADf+wAAz/MAAMfjAADQCwAA3/sAAM/z
-        AADn5wAA8A8AAA==
-</value>
-  </data>
-  <metadata name="UpdateLogTimer.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>760, 17</value>
-  </metadata>
-  <metadata name="audioUpdateTimer.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>903, 17</value>
-  </metadata>
-  <metadata name="mainFormBindingSource.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>1056, 17</value>
-  </metadata>
-  <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>43</value>
-  </metadata>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAABAAIAEBAAAAEAIABoBAAAJgAAACAgAAABACAAqBAAAI4EAAAoAAAAEAAAACAAAAABACAAAAAAAAAE

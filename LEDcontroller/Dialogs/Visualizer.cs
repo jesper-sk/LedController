@@ -7,24 +7,24 @@ namespace LedController
 {
     public partial class Visualizer : Form
     {
-        public const int SqrSize = 50;
+        public int SqrSize { get; private set; } = 50;
         int width, height;
         Graphics e;
-
+        int paddingX, paddingY;
 
         public Visualizer(int mw, int mh)
         {
             InitializeComponent();
             width = mw;
             height = mh;
-            FormBorderStyle = FormBorderStyle.FixedSingle;
+            paddingX = paddingY = 12;
         }
 
         public void FillRect(CColor c, int x, int y)
         {
-            using(SolidBrush b = new SolidBrush(c.ToColor()))
+            using (SolidBrush b = new SolidBrush(c.ToColor()))
             {
-                e.FillRectangle(b, 12 + x, 12 + y, SqrSize, SqrSize);
+                e.FillRectangle(b, paddingX + x, paddingY + y, SqrSize, SqrSize);
             }
         }
 
@@ -46,6 +46,15 @@ namespace LedController
         public new void Dispose()
         {
             e.Dispose();
+        }
+
+        private void Visualizer_Resize(object sender, EventArgs _)
+        {
+            SqrSize = Math.Min((ClientSize.Width - 12) / width, (ClientSize.Height - 12) / height);
+            paddingX = (ClientSize.Width - (SqrSize * width)) / 2;
+            paddingY = (ClientSize.Height - (SqrSize * height)) / 2;
+
+            e = CreateGraphics();
         }
 
         ~Visualizer()

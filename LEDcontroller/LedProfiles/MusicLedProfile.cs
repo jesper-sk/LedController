@@ -23,7 +23,7 @@ namespace LedController.LedProfiles
 
         public override void Init(ColorMatrix m)
         {
-            BassDriver.Enable(32);
+            BassDriver.Enable(13);
         }
 
         public override void Update(ColorMatrix m)

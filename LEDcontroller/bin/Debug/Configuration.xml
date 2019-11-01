@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Com>COM4</Com>
-  <ConnectOnStartup>false</ConnectOnStartup>
+  <ConnectOnStartup>true</ConnectOnStartup>
   <StartupOnLogin>false</StartupOnLogin>
   <StartMinimized>false</StartMinimized>
   <ProfileSetOnStartup>0</ProfileSetOnStartup>
@@ -9,7 +9,7 @@
   <Strip>
     <Width>18</Width>
     <Height>8</Height>
-    <MasterLength>260</MasterLength>
+    <MasterLength>1039</MasterLength>
     <Start>29</Start>
     <IsClockwise>true</IsClockwise>
     <BaudRate>0</BaudRate>
