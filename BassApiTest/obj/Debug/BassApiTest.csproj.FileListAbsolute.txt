@@ -8,3 +8,10 @@ C:\Users\Jesper\Documents\LedController\BassApiTest\obj\Debug\BassApiTest.csproj
 C:\Users\Jesper\Documents\LedController\BassApiTest\obj\Debug\BassApiTest.csproj.CopyComplete
 C:\Users\Jesper\Documents\LedController\BassApiTest\obj\Debug\BassApiTest.exe
 C:\Users\Jesper\Documents\LedController\BassApiTest\obj\Debug\BassApiTest.pdb
+C:\Users\Jesper\Documents\LedController project\LedController\BassApiTest\bin\Debug\BassApiTest.exe.config
+C:\Users\Jesper\Documents\LedController project\LedController\BassApiTest\bin\Debug\BassApiTest.exe
+C:\Users\Jesper\Documents\LedController project\LedController\BassApiTest\bin\Debug\BassApiTest.pdb
+C:\Users\Jesper\Documents\LedController project\LedController\BassApiTest\obj\Debug\BassApiTest.csprojAssemblyReference.cache
+C:\Users\Jesper\Documents\LedController project\LedController\BassApiTest\obj\Debug\BassApiTest.csproj.CopyComplete
+C:\Users\Jesper\Documents\LedController project\LedController\BassApiTest\obj\Debug\BassApiTest.exe
+C:\Users\Jesper\Documents\LedController project\LedController\BassApiTest\obj\Debug\BassApiTest.pdb

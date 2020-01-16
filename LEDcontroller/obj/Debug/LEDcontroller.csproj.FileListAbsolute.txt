@@ -117,16 +117,29 @@ C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\obj\
 C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\obj\Debug\LedController.SetupLedForm.resources
 C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\obj\Debug\LedController.Visualizer.resources
 C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\obj\Debug\LedController.csproj.GenerateResource.cache
-C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\obj\Debug\LedController.csproj.CoreCompileInputs.cache
-C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\obj\Debug\LedController.exe
-C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\obj\Debug\LedController.pdb
-C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\Debug\LedController.exe.config
-C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\Debug\LedController.exe.manifest
-C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\Debug\LedController.application
-C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\Debug\LedController.exe
-C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\Debug\LedController.pdb
-C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\Debug\Bass.Net.xml
-C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\obj\Debug\LedController.exe.manifest
-C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\obj\Debug\LedController.application
 C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\obj\Debug\LedController.csproj.CopyComplete
 C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\obj\Debug\LedController.SpectrumAnalyzer.resources
+C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\Debug\Led Controller.exe.config
+C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\Debug\Led Controller.exe.manifest
+C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\Debug\Led Controller.application
+C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\Debug\Led Controller.exe
+C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\Debug\Led Controller.pdb
+C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\Debug\Xceed.Wpf.AvalonDock.Themes.Aero.dll
+C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\Debug\Xceed.Wpf.AvalonDock.Themes.Metro.dll
+C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\Debug\Xceed.Wpf.AvalonDock.Themes.VS2010.dll
+C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\Debug\Xceed.Wpf.AvalonDock.dll
+C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\Debug\Xceed.Wpf.Toolkit.dll
+C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\Debug\de\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\Debug\es\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\Debug\fr\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\Debug\hu\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\Debug\it\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\Debug\pt-BR\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\Debug\ro\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\Debug\ru\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\Debug\sv\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\bin\Debug\zh-Hans\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\obj\Debug\Led Controller.exe.manifest
+C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\obj\Debug\Led Controller.application
+C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\obj\Debug\Led Controller.exe
+C:\Users\Jesper\Documents\LedController project\LedController\LEDcontroller\obj\Debug\Led Controller.pdb

@@ -12,6 +12,14 @@ namespace LedController.LedProfiles
     {
         public string DeviceName;
         public int DeviceIndex;
+
+        private const double maxRos = 0.4;
+        private readonly double[] maxRates = { 0.8, 0, 0, 0, 0, 0 };
+        private double downWards = 0.02;
+        private double rateOfChange;
+        private byte[] prev;
+
+        RainbowLedProfile prof;
         public MusicLedProfile() {; }
         public MusicLedProfile(string name, int index, int psindex, ColorMatrix m) : base(name, index, psindex, ProfileType.Music)
         {
@@ -23,13 +31,20 @@ namespace LedController.LedProfiles
 
         public override void Init(ColorMatrix m)
         {
-            BassDriver.Enable(13);
+            BassDriver.Enable(11);
+            prof = new RainbowLedProfile();
+            Brightness = 64;
+            prof.Speed = 60;
+            rateOfChange = 0;
+            prev = new byte[6];
+            prof.Init(m);
         }
 
         public override void Update(ColorMatrix m)
         {
+            if (m is null) throw new ArgumentNullException(nameof(m));
             m.Clear();
-
+            /*
             var bands = BassDriver.GetBands(4, out short l, out short r);
             int w = m.Width / 2;
             int h = m.Height / 2;
@@ -61,7 +76,27 @@ namespace LedController.LedProfiles
             m.AssignUpto(m.BottomRight - 1, colors[2][0]);
 
             m.AssignFrom(m.BottomLeft - 1, colors[3][0]);
-            m.AssignUpto(m.BottomLeft - 1, colors[3][1]);
+            m.AssignUpto(m.BottomLeft - 1, colors[3][1]);*/
+            var bands = BassDriver.GetBands(6, out short l, out short r);
+            rateOfChange = 0;
+            for (int i = 0; i < bands.Count; i++)
+            {
+                double prc = (bands[i] - prev[i]) / 255.0;
+                prc = prc < 0 ? 0 : Math.Pow(prc, 1);
+                double cng = maxRates[i] * prc;
+                rateOfChange += cng;
+                prev[i] = bands[i];
+            }
+            rateOfChange -= downWards;
+            rateOfChange = rateOfChange < (maxRos * -1) ? maxRos * -1 : rateOfChange;
+            rateOfChange = rateOfChange > maxRos ? maxRos : rateOfChange;
+
+            int brightness = (int)(rateOfChange * 255) + Brightness;
+
+            brightness = Math.Max(Math.Min(brightness, 255), 0);
+
+            Brightness = (byte)brightness;
+            prof.Update(m);
         }
 
         public override void Close()

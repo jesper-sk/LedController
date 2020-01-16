@@ -67,6 +67,16 @@ namespace LedController.LedProfiles
         {
             return Name;
         }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as LedProfile);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
 
     public class StaticLedProfile : LedProfile

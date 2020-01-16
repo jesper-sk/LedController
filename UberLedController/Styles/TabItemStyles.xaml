@@ -1,0 +1,43 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:UberLedController.Styles">
+    
+    <Style x:Key="TabItemStyle" TargetType="{x:Type TabItem}">
+        <Setter Property="Background" Value="{DynamicResource DarkBackground}"/>
+        <Setter Property="Foreground" Value="{DynamicResource DarkLightAccent}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource DarkBackground}"/>
+        <Setter Property="FontFamily" Value="Nirmala UI"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TabItem}">
+                    <Border>
+                        <Grid>
+                            <Grid>
+                                <Border x:Name="border" Background="{TemplateBinding Background}"/>
+                            </Grid>
+                            <ContentPresenter ContentSource="Header"
+                                                    Margin="6,0,6,0"
+                                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource DarkSelected}" />
+                            <Setter Property="Foreground" Value="{DynamicResource LightAccentColor}"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource LightAccentColor}" />
+                            <Setter Property="Foreground" Value="{DynamicResource DarkBackground}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="TabControlStyle" TargetType="{x:Type TabControl}">
+        <Setter Property="Background" Value="{DynamicResource LightAccentColor}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+</ResourceDictionary>

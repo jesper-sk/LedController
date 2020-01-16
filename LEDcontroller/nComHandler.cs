@@ -1,17 +1,10 @@
-﻿using System;
+﻿using LedController.LedProfiles;
+using System;
 using System.Collections.Generic;
-using System.IO.Ports;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Drawing;
-using System.Timers;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using LedController.LedProfiles;
-using System.Xml.Serialization;
-using System.Windows.Threading;
 using System.IO;
+using System.IO.Ports;
+using System.Timers;
+using System.Xml.Serialization;
 using Timer = System.Timers.Timer;
 
 namespace LedController
@@ -104,15 +97,12 @@ namespace LedController
         }
     }
 
-
-
-
     public static class LedHandler
     {
-        private static List<LedStrip> strips = new List<LedStrip>();
+        private static readonly List<LedStrip> strips = new List<LedStrip>();
 
-        public static LedhandlerState ErrorState = LedhandlerState.OK;
-        public static string Error;
+        public static LedhandlerState State = LedhandlerState.OK;
+        public static string Message;
         public static void AddStrip(StripInfo info)
         {
             strips.Add(new LedStrip(info));
@@ -130,12 +120,12 @@ namespace LedController
                 }
                 catch(Exception e)
                 {
-                    ErrorState = LedhandlerState.DeviceFailedToConnect;
-                    Error = e.Message;
+                    State = LedhandlerState.DeviceFailedToConnect;
+                    Message = e.Message;
                     return false;
                 }
                 strip.State = StripState.Open;
-                ErrorState = LedhandlerState.OK;
+                State = LedhandlerState.OK;
                 return true;
             }
         }
@@ -152,12 +142,12 @@ namespace LedController
                 }
                 catch (Exception e)
                 {
-                    ErrorState = LedhandlerState.DeviceFailedToDisconnect;
-                    Error = e.Message;
+                    State = LedhandlerState.DeviceFailedToDisconnect;
+                    Message = e.Message;
                     return false;
                 }
                 strip.State = StripState.Closed;
-                ErrorState = LedhandlerState.OK;
+                State = LedhandlerState.OK;
                 return true;
             }
         }
@@ -181,7 +171,8 @@ namespace LedController
             XmlSerializer ser = new XmlSerializer(typeof(List<StripInfo>));
             List<StripInfo> toSave = new List<StripInfo>(strips.Count);
             foreach (LedStrip strip in strips) toSave.Add(strip.ToStripInfo());
-            using (TextWriter writer = new StreamWriter(@".\LedInfo.txt")) ser.Serialize(writer, toSave);
+            using TextWriter writer = new StreamWriter(@".\LedInfo.txt");
+            ser.Serialize(writer, toSave);
         }
 
         public static bool LoadFromFile()
@@ -189,7 +180,7 @@ namespace LedController
             XmlSerializer ser = new XmlSerializer(typeof(List<StripInfo>));
             List<StripInfo> info;
             if (!File.Exists(@".\LedInfo.txt")) return false;
-            using (FileStream stream = new FileStream(@".\LedInfo.txt", FileMode.Open)) { info = (List<StripInfo>) ser.Deserialize(stream); }
+            using (FileStream stream = new FileStream(@".\LedInfo.txt", FileMode.Open)) info = (List<StripInfo>)ser.Deserialize(stream); 
             foreach(StripInfo inf in info) { strips.Add(new LedStrip(inf)); }
             return true;
         }

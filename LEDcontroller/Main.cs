@@ -294,15 +294,14 @@ namespace LedController
 
         private XmlSerializer GetCompatibleSerializer(ProfileType type)
         {
-            XmlSerializer ser;
-            switch (type)
+            var ser = type switch
             {
-                case ProfileType.Static: ser = new XmlSerializer(typeof(StaticLedProfile)); break;
-                case ProfileType.Rainbow: ser = new XmlSerializer(typeof(RainbowLedProfile)); break;
-                case ProfileType.Ambilight: ser = new XmlSerializer(typeof(AmbilightLedProfile)); break;
-                case ProfileType.Music: ser = new XmlSerializer(typeof(MusicLedProfile)); break;
-                default: ser = new XmlSerializer(typeof(LedProfile)); break;
-            }
+                ProfileType.Static => new XmlSerializer(typeof(StaticLedProfile)),
+                ProfileType.Rainbow => new XmlSerializer(typeof(RainbowLedProfile)),
+                ProfileType.Ambilight => new XmlSerializer(typeof(AmbilightLedProfile)),
+                ProfileType.Music => new XmlSerializer(typeof(MusicLedProfile)),
+                _ => new XmlSerializer(typeof(LedProfile)),
+            };
             return ser;
         }
 
@@ -337,15 +336,15 @@ namespace LedController
         //Add GroupBox of LedProfile in here
         private GroupBox GetProfileGroupBox(ProfileType id)
         {
-            switch (id)
+            return id switch
             {
-                case ProfileType.Static: return StaticGroupBox;
-                case ProfileType.Rainbow: return RainbowGroupBox;
-                case ProfileType.Ambilight: return AmbilightGroupBox;
-                case ProfileType.Music: return MusicGroupBox;
+                ProfileType.Static => StaticGroupBox,
+                ProfileType.Rainbow => RainbowGroupBox,
+                ProfileType.Ambilight => AmbilightGroupBox,
+                ProfileType.Music => MusicGroupBox,
 
-                default: return NullGroupBox;
-            }
+                _ => NullGroupBox,
+            };
         }
 #endregion
         /*  </!!!Add new LedProfiles over here!!!>  */
@@ -804,8 +803,8 @@ namespace LedController
                 XmlSerializer ser = new XmlSerializer(typeof(List<LedProfile>));
                 for (int i = 0; i < c; i++)
                 {
-                    using (StreamReader r = new StreamReader($@"{profileDir}\ProfileSet_{i}.xml"))
-                        profiles.Add((ser.Deserialize(r)) as List<LedProfile>);
+                    using StreamReader r = new StreamReader($@"{profileDir}\ProfileSet_{i}.xml");
+                    profiles.Add((ser.Deserialize(r)) as List<LedProfile>);
                 }
             }
         }
@@ -842,8 +841,8 @@ namespace LedController
 
             await Task.Run(() =>
             {
-                using (TextWriter w = new StreamWriter($@"{profileDir}\ProfileSet_{psIndex}.xml"))
-                    new XmlSerializer(typeof(List<LedProfile>)).Serialize(w, profiles[psIndex]);
+                using TextWriter w = new StreamWriter($@"{profileDir}\ProfileSet_{psIndex}.xml");
+                new XmlSerializer(typeof(List<LedProfile>)).Serialize(w, profiles[psIndex]);
             });
         }
 
@@ -873,14 +872,9 @@ namespace LedController
 
         private LedProfile LoadSingleProfile(int psind, int index)
         {
-            string[] dirs = Directory.GetDirectories(@".\Profilesets");
-            string dir = Directory.GetCurrentDirectory() + $@"\ProfileSets\{dirs[psind]}";
-            string[] files = Directory.GetFiles(dir);
-            XmlSerializer profSerializer = new XmlSerializer(typeof(LedProfile));
-            StreamReader r = new StreamReader(files[index]);
-            LedProfile res = profSerializer.Deserialize(r) as LedProfile;
-            r.Dispose();
-            return res;
+            XmlSerializer s = new XmlSerializer(typeof(LedProfile[]));
+            using StreamReader r = new StreamReader($@".\data\profiles\ProfileSet_{psind}.xml");
+            return (s.Deserialize(r) as LedProfile[])[index];
         }
 
         private void LoadRatioProfiles(RatioProfile activeRatio = null)
@@ -1109,18 +1103,16 @@ namespace LedController
                 int x, y, i;
                 x = y = i = 0;
 
-                using (Graphics e = VisualizerPanel.CreateGraphics())
-                {
-                    do { FillRect(c[i++], xs + (++x * sqr), ys + (y * sqr)); } while (x < LedMatrix.Width - 1);
-                    do { FillRect(c[i++], xs + (x * sqr), ys + (++y * sqr)); } while (y < LedMatrix.Height - 1);
-                    do { FillRect(c[i++], xs + (--x * sqr), ys + (y * sqr)); } while (x > 0);
-                    do { FillRect(c[i++], xs + (x * sqr), ys + (--y * sqr)); } while (y > 0);
+                using Graphics e = VisualizerPanel.CreateGraphics();
+                do { FillRect(c[i++], xs + (++x * sqr), ys + (y * sqr)); } while (x < LedMatrix.Width - 1);
+                do { FillRect(c[i++], xs + (x * sqr), ys + (++y * sqr)); } while (y < LedMatrix.Height - 1);
+                do { FillRect(c[i++], xs + (--x * sqr), ys + (y * sqr)); } while (x > 0);
+                do { FillRect(c[i++], xs + (x * sqr), ys + (--y * sqr)); } while (y > 0);
 
-                    void FillRect(CColor ccolor, int xstart, int ystart)
-                    {
-                        using (SolidBrush b = new SolidBrush(ccolor.ToColor()))
-                            e.FillRectangle(b, new Rectangle(xstart, ystart, sqr, sqr));
-                    }
+                void FillRect(CColor ccolor, int xstart, int ystart)
+                {
+                    using (SolidBrush b = new SolidBrush(ccolor.ToColor()))
+                        e.FillRectangle(b, new Rectangle(xstart, ystart, sqr, sqr));
                 }
             }
         }

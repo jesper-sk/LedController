@@ -1,0 +1,43 @@
+﻿<Window x:Class="UberLedControllerCore.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UberLedController"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        Title="MainWindow" 
+        Height="510" 
+        Width="662" 
+        Background="#FFDADADA" 
+        BorderBrush="Black" 
+        Margin="1" 
+        MinWidth="662" 
+        MinHeight="320" 
+        WindowStyle="None"
+        ResizeMode="CanResizeWithGrip" 
+        AllowsTransparency="True">
+    <Grid Background="#FF24292E">
+        <TabControl Background="#A0A0A0" BorderThickness="0" Margin="2,2,2,2">
+            <TabItem Header="Connections" Height="24" Style="{StaticResource TabItemStyle}">
+                <Grid Background="#FFDADADA"/>
+            </TabItem>
+            <TabItem Header="Profile Editor" Height="24" Style="{StaticResource TabItemStyle}">
+                <Grid Background="#FFDADADA"/>
+            </TabItem>
+            <TabItem Header="Logger" Height="24" Style="{StaticResource TabItemStyle}">
+                <Grid Background="#FFDADADA"/>
+            </TabItem>
+            <TabItem Header="Configuration" Height="24" Style="{StaticResource TabItemStyle}">
+                <Grid Background="#FFDADADA"/>
+            </TabItem>
+            <TabItem Header="Enslavement" Height="24" Style="{StaticResource TabItemStyle}">
+                <Grid Background="#FFDADADA"/>
+            </TabItem>
+        </TabControl>
+        <Button x:Name="CloseButton" Content="Esc" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,3,2,2" BorderBrush="White" Style="{StaticResource CloseButtonStyle}" Click="CloseButton_Click"/>
+        <Button x:Name="MaximizeButton" Content="Max" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,3,39,2" BorderBrush="White" Style="{StaticResource MinMaxButtonStyle}" Click="MaximizeButton_Click"/>
+        <Button x:Name="MinimizeButton" Content="Min" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,3,76,2" BorderBrush="White" Style="{StaticResource MinMaxButtonStyle}" Click="MinimizeButton_Click"/>
+        <Label Content="Led Controller" HorizontalAlignment="Right" VerticalAlignment="Top" Style="{StaticResource TitleLabelStyle}" Margin="0,0,124,0" Width="101" Height="25"/>
+    </Grid>
+</Window>

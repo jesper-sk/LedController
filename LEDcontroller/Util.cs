@@ -52,18 +52,12 @@ namespace LedController
             if (delta == 0) h = s = 0;
             else
             {
-                switch (dom)
+                h = dom switch
                 {
-                    case 1: 
-                        h = 60 * ((gNorm - bNorm) / delta % 6);
-                        break;
-                    case 2:
-                        h = 60 * (((bNorm - rNorm) / delta) + 2);
-                        break;
-                    default: //dom is 3
-                        h = 60 * (((rNorm - gNorm) / delta) + 4);
-                        break;
-                }
+                    1 => 60 * ((gNorm - bNorm) / delta % 6),
+                    2 => 60 * (((bNorm - rNorm) / delta) + 2),
+                    _ => 60 * (((rNorm - gNorm) / delta) + 4),
+                };
                 while (h < 0) h += 360;
                 s = delta / cMax;
             }
@@ -159,7 +153,7 @@ namespace LedController
             g = Clamp((byte)(G * 255.0));
             b = Clamp((byte)(B * 255.0));
 
-            byte Clamp(byte i)
+            static byte Clamp(byte i)
             {
                 if (i < 0) return 0;
                 if (i > 255) return 255;
@@ -288,18 +282,12 @@ namespace LedController
             if (delta == 0) h = s = 0;
             else
             {
-                switch (dom)
+                h = dom switch
                 {
-                    case 1:
-                        h = 60 * ((gNorm - bNorm) / delta % 6);
-                        break;
-                    case 2:
-                        h = 60 * (((bNorm - rNorm) / delta) + 2);
-                        break;
-                    default: //dom is 3
-                        h = 60 * (((rNorm - gNorm) / delta) + 4);
-                        break;
-                }
+                    1 => 60 * ((gNorm - bNorm) / delta % 6),
+                    2 => 60 * (((bNorm - rNorm) / delta) + 2),
+                    _ => 60 * (((rNorm - gNorm) / delta) + 4),
+                };
                 while (h < 0) h += 360;
                 s = delta / cMax;
             }

@@ -1,0 +1,5 @@
+C:\Users\Jesper\Documents\LedController project\LedController\UberLedControllerCore\obj\Debug\netcoreapp3.1\UberLedControllerCore.csprojAssemblyReference.cache
+C:\Users\Jesper\Documents\LedController project\LedController\UberLedControllerCore\obj\Debug\netcoreapp3.1\MainWindow.g.cs
+C:\Users\Jesper\Documents\LedController project\LedController\UberLedControllerCore\obj\Debug\netcoreapp3.1\App.g.cs
+C:\Users\Jesper\Documents\LedController project\LedController\UberLedControllerCore\obj\Debug\netcoreapp3.1\UberLedControllerCore_MarkupCompile.cache
+C:\Users\Jesper\Documents\LedController project\LedController\UberLedControllerCore\obj\Debug\netcoreapp3.1\UberLedControllerCore_MarkupCompile.lref
