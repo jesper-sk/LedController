@@ -30,12 +30,11 @@
     </Window.Resources>
     <Grid Background="{DynamicResource DarkBackground}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="30" x:Name="TitleBarRowDefinition"/>
-            <RowDefinition Height="50" x:Name="TopButtonsRowDefinition"/>
-            <RowDefinition Height="*" x:Name="MainRowDefinition"/>
+            <RowDefinition Height="0" x:Name="TitleBarRowDefinition"/>
+            <RowDefinition x:Name="MainRowDefinition"/>
         </Grid.RowDefinitions>
 
-        <Grid x:Name="HeaderGrid" Grid.Row="0">
+        <!--<Grid x:Name="HeaderGrid" Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -65,8 +64,8 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Label x:Name="TitleLabel" Content="Led Controller" Style="{DynamicResource TitleLabelStyle}" Grid.Column="1" VerticalContentAlignment="Center" Padding="3,0,10,0"/>
-                <Image x:Name="InFocusImage" Source="tray16_light.png" />
-                <Image x:Name="OutFocusImage" Source="tray16_darknew.png" Visibility="Hidden"/>
+                <Image x:Name="InFocusImage" Height="16" Source="tray16_light.png" />
+                <Image x:Name="OutFocusImage" Height="16" Width="16" Source="tray16_darknew.png" Visibility="Hidden"/>
             </Grid>
             <Grid x:Name="HeaderModButtonGrid" Grid.Column="2">
                 <Grid.ColumnDefinitions>
@@ -75,13 +74,93 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Button x:Name="CloseButton" Style="{DynamicResource CloseButtonStyle}" Click="CloseButton_Click" Grid.Column="2" FontFamily="Segoe UI Symbol">&#xe21c;</Button>
-                <Button x:Name="MaximizeButton" Style="{DynamicResource MinMaxButtonStyle}" Click="MaximizeButton_Click" Grid.Column="1" FontFamily="Segoe UI Symbol">&#xe20c;</Button>
-                <Button x:Name="MinimizeButton" Style="{DynamicResource MinMaxButtonStyle}" Click="MinimizeButton_Click" Grid.Column="0" FontFamily="Segoe UI Symbol" FontSize="15" FontWeight="Bold" Padding="1" VerticalContentAlignment="Center">-</Button>
+                <Button x:Name="CloseButton" Style="{DynamicResource CloseButtonStyle}" Click="CloseButton_Click" Margin="0,2,0,2" Grid.Column="2" FontFamily="Segoe UI Symbol">&#xe21c;</Button>
+                <Button x:Name="MaximizeButton" Style="{DynamicResource MinMaxButtonStyle}" Click="MaximizeButton_Click" Margin="0,2,0,2" Grid.Column="1" FontFamily="Segoe UI Symbol">&#xe20c;</Button>
+                <Button x:Name="MinimizeButton" Style="{DynamicResource MinMaxButtonStyle}" Click="MinimizeButton_Click" Margin="0,2,0,2" Grid.Column="0" FontFamily="Segoe UI Symbol" FontSize="15" FontWeight="Bold" Padding="1" VerticalContentAlignment="Center">-</Button>
             </Grid>
-        </Grid>
+        </Grid>-->
+        <DockPanel Grid.Row="1" 
+                   Background="{DynamicResource DarkBackground}"
+                   HorizontalAlignment="Stretch"
+                   LastChildFill="True">
+            <Expander x:Name="DeviceToolbarExpander" 
+                      ExpandDirection="Down"
+                      VerticalAlignment="Top"
+                      Margin="0,0,0,0"
+                      FlowDirection="LeftToRight"
+                      DockPanel.Dock="Top" HorizontalContentAlignment="Stretch">
+                <Expander.Header>
+                    <Grid x:Name="HeaderGrid" Grid.Row="0">
+                        <!--<Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="300"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="130"/>
+                        </Grid.ColumnDefinitions>-->
+                        <DockPanel x:Name="TitlebarStackPanel"
+                                   HorizontalAlignment="Stretch" 
+                                   Width="500">
+                            <Menu Name="menu1" IsMainMenu="True" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Center" DockPanel.Dock="Left">
+                                <MenuItem Header="_Configuration" Style="{DynamicResource TitlebarMenuStyle}">
+                                    <MenuItem Header="_Open" IsCheckable="False"/>
+                                    <MenuItem Header="_Doe eens een lange optie" IsCheckable="True"/>
+                                    <MenuItem Header="_Open" IsCheckable="False"/>
+                                    <MenuItem Header="_Open" IsCheckable="False"/>
+                                    <MenuItem Header="_Open" IsCheckable="True"/>
+                                </MenuItem>
+                                <MenuItem Header="_Menu" Style="{DynamicResource TitlebarMenuStyle}" VerticalContentAlignment="Center">
+                                    <MenuItem Header="_Open" IsCheckable="False"/>
+                                    <MenuItem Header="_Open" IsCheckable="True"/>
+                                    <MenuItem Header="_Open" IsCheckable="False"/>
+                                    <MenuItem Header="_Open" IsCheckable="False"/>
+                                    <MenuItem Header="_Open" IsCheckable="True"/>
+                                </MenuItem>
+                            </Menu>
+                            <Grid x:Name="HeaderNameGrid" DockPanel.Dock="Right">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label x:Name="TitleLabel" Content="Led Controller" Style="{DynamicResource TitleLabelStyle}" Grid.Column="1" VerticalContentAlignment="Center" Padding="3,0,10,0"/>
+                                <Image x:Name="InFocusImage" Height="16" Source="tray16_light.png" />
+                                <Image x:Name="OutFocusImage" Height="16" Width="16" Source="tray16_darknew.png" Visibility="Hidden"/>
+                            </Grid>
+                            <Grid x:Name="HeaderModButtonGrid" Width="130" DockPanel.Dock="Right">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
 
-        <Grid x:Name="ButtonsGrid" Grid.Row="1">
+                                <Button x:Name="CloseButton" Style="{DynamicResource CloseButtonStyle}" Click="CloseButton_Click" Margin="0,2,0,2" Grid.Column="2" FontFamily="Segoe UI Symbol">&#xe21c;</Button>
+                                <Button x:Name="MaximizeButton" Style="{DynamicResource MinMaxButtonStyle}" Click="MaximizeButton_Click" Margin="0,2,0,2" Grid.Column="1" FontFamily="Segoe UI Symbol">&#xe20c;</Button>
+                                <Button x:Name="MinimizeButton" Style="{DynamicResource MinMaxButtonStyle}" Click="MinimizeButton_Click" Margin="0,2,0,2" Grid.Column="0" FontFamily="Segoe UI Symbol" FontSize="15" FontWeight="Bold" Padding="1" VerticalContentAlignment="Center">-</Button>
+                            </Grid>
+                        </DockPanel>
+                        <Grid x:Name="HeaderMenuGrid" Grid.Column="0">
+
+                        </Grid>
+
+
+                    </Grid>
+                </Expander.Header>
+                <Border BorderBrush="{DynamicResource DarkBoundary}" 
+                        BorderThickness="1"
+                        Height="55" 
+                        Margin="-1,0,-1,0"
+                        HorizontalAlignment="Stretch">
+                    <StackPanel Background="{DynamicResource DarkBackground}">
+
+
+                    </StackPanel>
+                </Border>
+            </Expander>
+            <Grid x:Name="ContentGrid" 
+                  Background="{DynamicResource LightAccentColor}"
+                  Margin="0,1,0,0"
+                  DockPanel.Dock="Top"/>
+        </DockPanel>
+
+        <!--<Grid x:Name="ButtonsGrid" Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
@@ -90,16 +169,19 @@
 
             <Grid Grid.Column="0">
                 <Border BorderBrush="{DynamicResource DarkBoundary}" BorderThickness="1">
-                    <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,0,0,0">
-                        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{DynamicResource DarkLightAccent}">Selected device</TextBlock>
-                        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{DynamicResource LightAccentColor}" FontWeight="Bold">None</TextBlock>
-                    </StackPanel>
+                    <Expander VerticalAlignment="Center" VerticalContentAlignment="Top" Margin="10,0,0,0">
+                        <Expander.Header>
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0">
+                                <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{DynamicResource DarkLightAccent}">Selected device</TextBlock>
+                                <TextBlock x:Name="SelectedDeviceTextBlock" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{DynamicResource LightAccentColor}" FontWeight="Bold">None</TextBlock>
+                            </StackPanel>
+                        </Expander.Header>
+                        <StackPanel>
+
+                        </StackPanel>
+                    </Expander>
                 </Border>
             </Grid>
-        </Grid>
-
-        <Grid x:Name="ContentGrid" Grid.Row="2" Background="{DynamicResource LightAccentColor}">
-            
-        </Grid>
+        </Grid>-->
     </Grid>
 </Window>

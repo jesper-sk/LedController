@@ -28,7 +28,7 @@ namespace UberLedController
             }
             Forms.NotifyIcon notifyIcon = new Forms.NotifyIcon()
             {
-                Icon = new Icon(@"C:\Users\Jesper\Documents\LedController project\LedController\UberLedController\Resources\tray16_dark.ico"),
+                Icon = Resources["tray16_dark.ico"] as Icon,
                 Text = "Led Controller - Click to open",
                 Visible = true
             };

@@ -16,8 +16,11 @@
         <SolidColorBrush x:Key="RedCloseColor" Color="#A7001C"/>
         <SolidColorBrush x:Key="DemiLightAccentColor" Color="#F6F8FA"/>
         <SolidColorBrush x:Key="LightAccentColor" Color="#FFFFFF"/>
-        <SolidColorBrush x:Key="HeaderbarTextColor" Color="{DynamicResource FocusHeaderTextColor}"/>
         <SolidColorBrush x:Key="TranslucentOverlay" Color="#7F24292E"/>
+        
+        <!--Text Colors-->
+        <SolidColorBrush x:Key="HeaderbarTextColor" Color="{DynamicResource FocusHeaderTextColor}"/>
+        <SolidColorBrush x:Key="DarkTextColor" Color="#24292E"/>
 
         <!--Default styles-->
         <Style x:Key="{x:Type Label}" TargetType="{x:Type Label}">
