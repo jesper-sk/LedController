@@ -1,21 +1,21 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Jesper\\Documents\\LedController project\\LedController\\UberLedController\\UberLedController.csproj": {}
+    "C:\\Users\\jespe\\Documents\\Projekkies\\LedController\\UberLedController\\UberLedController.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Jesper\\Documents\\LedController project\\LedController\\UberLedController\\UberLedController.csproj": {
+    "C:\\Users\\jespe\\Documents\\Projekkies\\LedController\\UberLedController\\UberLedController.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Jesper\\Documents\\LedController project\\LedController\\UberLedController\\UberLedController.csproj",
+        "projectUniqueName": "C:\\Users\\jespe\\Documents\\Projekkies\\LedController\\UberLedController\\UberLedController.csproj",
         "projectName": "UberLedController",
-        "projectPath": "C:\\Users\\Jesper\\Documents\\LedController project\\LedController\\UberLedController\\UberLedController.csproj",
-        "packagesPath": "C:\\Users\\Jesper\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Jesper\\Documents\\LedController project\\LedController\\UberLedController\\obj\\",
+        "projectPath": "C:\\Users\\jespe\\Documents\\Projekkies\\LedController\\UberLedController\\UberLedController.csproj",
+        "packagesPath": "C:\\Users\\jespe\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\jespe\\Documents\\Projekkies\\LedController\\UberLedController\\obj\\",
         "projectStyle": "PackageReference",
         "skipContentFileWrite": true,
         "configFilePaths": [
-          "C:\\Users\\Jesper\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\jespe\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [

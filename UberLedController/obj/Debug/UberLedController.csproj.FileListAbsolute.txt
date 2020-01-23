@@ -33,3 +33,38 @@ C:\Users\Jesper\Documents\LedController project\LedController\UberLedController\
 C:\Users\Jesper\Documents\LedController project\LedController\UberLedController\obj\Debug\Styles\MenuStyles.baml
 C:\Users\Jesper\Documents\LedController project\LedController\UberLedController\obj\Debug\Styles\LabelStyles.baml
 C:\Users\Jesper\Documents\LedController project\LedController\UberLedController\obj\Debug\Styles\TabItemStyles.baml
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\bin\Debug\UberLedController.exe.config
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\bin\Debug\UberLedController.exe
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\bin\Debug\UberLedController.pdb
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\bin\Debug\Xceed.Wpf.AvalonDock.Themes.Aero.dll
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\bin\Debug\Xceed.Wpf.AvalonDock.Themes.Metro.dll
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\bin\Debug\Xceed.Wpf.AvalonDock.Themes.VS2010.dll
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\bin\Debug\Xceed.Wpf.AvalonDock.dll
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\bin\Debug\Xceed.Wpf.Toolkit.dll
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\bin\Debug\de\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\bin\Debug\es\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\bin\Debug\fr\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\bin\Debug\hu\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\bin\Debug\it\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\bin\Debug\pt-BR\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\bin\Debug\ro\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\bin\Debug\ru\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\bin\Debug\sv\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\bin\Debug\zh-Hans\Xceed.Wpf.AvalonDock.resources.dll
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\UberLedController.csprojAssemblyReference.cache
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\MainWindow.g.cs
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\App.g.cs
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\UberLedController_MarkupCompile.cache
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\UberLedController_MarkupCompile.lref
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\App.baml
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\Styles\ButtonStyles.baml
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\MainWindow.baml
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\Styles\LabelStyles.baml
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\Styles\TabItemStyles.baml
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\Styles\MenuStyles.baml
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\UberLedController.g.resources
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\UberLedController.Properties.Resources.resources
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\UberLedController.csproj.GenerateResource.cache
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\UberLedController.csproj.CopyComplete
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\UberLedController.exe
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\UberLedController.pdb
