@@ -73,7 +73,7 @@ namespace LedController.Bass
                 var error = BASS_ErrorGetCode();
                 throw new Exception($"BASS Wasapi error: {error.ToString()}");
             }
-            else { Util.HighLow32(LRLevel, out levelR, out levelL); }
+            else { LRLevel.HighLow(out levelR, out levelL); }
 
             int ret = BASS_WASAPI_GetData(fft, (int)BASSData.BASS_DATA_FFT2048);  
             if (ret < 0)

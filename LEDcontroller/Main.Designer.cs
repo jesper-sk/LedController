@@ -141,6 +141,7 @@
             this.AudioVisualizerPanel = new System.Windows.Forms.Panel();
             this.audioUpdateTimer = new System.Windows.Forms.Timer(this.components);
             this.mainFormBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.button3 = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.TrayContextMenu.SuspendLayout();
             this.ConfigTabPage.SuspendLayout();
@@ -1054,6 +1055,7 @@
             // 
             // NullGroupBox
             // 
+            this.NullGroupBox.Controls.Add(this.button3);
             this.NullGroupBox.Controls.Add(this.label3);
             this.NullGroupBox.Location = new System.Drawing.Point(477, 6);
             this.NullGroupBox.Name = "NullGroupBox";
@@ -1283,6 +1285,16 @@
             // 
             this.mainFormBindingSource.DataSource = typeof(LedController.MainForm);
             // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(0, 17);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(75, 23);
+            this.button3.TabIndex = 42;
+            this.button3.Text = "button3";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1470,6 +1482,7 @@
         private System.Windows.Forms.NumericUpDown AmbilightSmoothingNud;
         private System.Windows.Forms.Button ShowAnalyzerButton;
         private System.Windows.Forms.Label visStatusLabel;
+        private System.Windows.Forms.Button button3;
     }
 }
 

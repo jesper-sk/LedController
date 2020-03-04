@@ -1450,6 +1450,25 @@ namespace LedController
             if (TabControl.SelectedIndex == 2) AudioTabEnabled();
             else AudioTabDisabled();
         }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            CColor[] a = new CColor[24];
+            CColor[] b = new CColor[24];
+            CColor[] c = new CColor[24];
+            for(int i = 0; i < 24; i++)
+            {
+                a[i] = CColor.FromRgb(255, 0, 0);
+                b[i] = CColor.FromRgb(0, 255, 0);
+                c[i] = CColor.FromRgb(0, 0, 255);
+            }
+            Console.WriteLine(a.ToFullString());
+            Console.WriteLine(b.ToFullString());
+            Console.WriteLine(c.ToFullString());
+            Console.WriteLine();
+            var blend = CColor.EqualBlend(a, b, c);
+            Console.WriteLine(blend.ToFullString());
+        }
     }
 
     public class CListViewItem : ListViewItem
