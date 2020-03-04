@@ -82,5 +82,11 @@ namespace UberLedController
             //TitleLabel.Foreground = Application.Current.Resources["DarkLightAccent"] as SolidColorBrush;
             Application.Current.Resources["HeaderbarTextColor"] = new SolidColorBrush((Color)Application.Current.Resources["UnFocusHeaderTextColor"]);
         }
+
+        private void ActiveDeviceButton_Click(object sender, EventArgs e)
+        {
+            if (DevicesGrid.Visibility == Visibility.Visible) DevicesGrid.Visibility = Visibility.Collapsed;
+            else DevicesGrid.Visibility = Visibility.Visible;
+        }
     }
 }

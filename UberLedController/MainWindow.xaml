@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UberLedController"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:c="clr-namespace:UberLedController.Controls"
         mc:Ignorable="d"
         Title="MainWindow" 
         Height="510" 
@@ -29,95 +30,230 @@
         </ResourceDictionary>
     </Window.Resources>
     <Grid Background="{DynamicResource DarkBackground}">
-        <DockPanel Grid.Row="1" 
-                   Background="{DynamicResource DarkBackground}"
-                   HorizontalAlignment="Stretch"
-                   LastChildFill="True">
-            <Expander x:Name="DeviceToolbarExpander" 
-                      ExpandDirection="Down"
-                      VerticalAlignment="Top"
-                      Padding="2,2,2,2"
-                      FlowDirection="LeftToRight"
-                      DockPanel.Dock="Top" 
-                      HorizontalContentAlignment="Stretch">
-                <Border BorderBrush="{DynamicResource DarkBoundary}" 
-                        BorderThickness="1"
-                        Height="55" 
-                        Margin="-3,0,-3,-3"
-                        HorizontalAlignment="Stretch">
-                    <StackPanel Background="{DynamicResource DarkBackground}">
-                        <Button Height="55"
-                                HorizontalContentAlignment="Left" 
-                                HorizontalAlignment="Left"
-                                BorderBrush="{DynamicResource DarkBoundary}"
-                                BorderThickness="1">
-                            <StackPanel Margin="15,0,0,0" HorizontalAlignment="Left" Width="200">
-                                <TextBlock Text="Selected Device"
-                                           Foreground="{DynamicResource DarkLightAccent}"/>
-                                <TextBlock Text="None"
-                                           FontWeight="Bold"/>
-                            </StackPanel>
-                        </Button>
-                    </StackPanel>
+        <Grid>
+            <DockPanel Background="{DynamicResource DarkBackground}"
+                       HorizontalAlignment="Stretch"
+                       LastChildFill="True">
+                <Expander x:Name="DeviceToolbarExpander" 
+                          ExpandDirection="Down"
+                          VerticalAlignment="Top"
+                          Padding="2,2,2,2"
+                          FlowDirection="LeftToRight"
+                          DockPanel.Dock="Top" 
+                          IsExpanded="True"
+                          HorizontalContentAlignment="Stretch">
+                    <Border BorderBrush="{DynamicResource DarkBoundary}" 
+                            BorderThickness="0,1,0,0"
+                            Height="45" 
+                            Margin="-3,0,-3,-4"
+                            HorizontalAlignment="Stretch">
+                        <StackPanel Background="{DynamicResource DarkBackground}"
+                                    Orientation="Horizontal">
+                            <Button Height="45"
+                                    Style="{DynamicResource ShowDeviceSidebarButtonStyle}"
+                                    HorizontalContentAlignment="Left" 
+                                    HorizontalAlignment="Left"
+                                    Click="ActiveDeviceButton_Click"
+                                    Width="251">
+                                <Button.Content>
+                                    <StackPanel HorizontalAlignment="Left" 
+                                                Width="235"
+                                                Margin="15,0,0,0">
+                                        <TextBlock Text="Selected Device"
+                                                   Foreground="{DynamicResource DarkLightAccent}"/>
+                                        <TextBlock x:Name="SelectedDeviceTextBlock"
+                                                   Foreground="{DynamicResource LightAccentColor}"
+                                                   Text="None"
+                                                   FontWeight="DemiBold"/>
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+                            <Button x:Name="MultiPurposeDeviceButton"
+                                    Height="45"
+                                    Style="{DynamicResource ShowDeviceSidebarButtonStyle}"
+                                    HorizontalAlignment="Left"
+                                    Width="180">
+                                <StackPanel HorizontalAlignment="Left" 
+                                                Width="165"
+                                                Margin="15,0,0,0">
+                                    <TextBlock x:Name="MultiPurposeDeviceButtonActionTextBlock"
+                                               Text="Connect"
+                                               FontWeight="DemiBold"
+                                               Foreground="{DynamicResource LightAccentColor}"/>
+                                    <TextBlock x:Name="MultiPurposeDeviceButtonStatusTextBlock"
+                                               Foreground="{DynamicResource DarkLightAccent}"
+                                               Text="Paired - COM7"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+                </Expander>
+                <Border BorderBrush="{DynamicResource DarkBackground}"
+                        BorderThickness="1,0,1,1">
+                    <DockPanel Background="{DynamicResource LightAccentColor}"
+                               Margin="0,1,0,0"
+                               DockPanel.Dock="Top"
+                               LastChildFill="True">
+                        <Border x:Name="DevicesGrid"
+                                BorderBrush="{DynamicResource LightBoundary}"
+                                BorderThickness="0,1,1,0"
+                                Width="250"
+                                Visibility="Visible">
+                            <Grid Background="{DynamicResource DemiLightAccentColor}"
+                                  DockPanel.Dock="Left">
+
+                                <Button x:Name="AddDeviceButton"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    Style="{DynamicResource DeviceSidebarButtonStyle}"
+                                    Margin="10,5,5,5"
+                                    Width="100"
+                                    Height="22"
+                                    Content="Add device"/>
+
+                                <Button x:Name="UnpairDeviceButton"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Top"
+                                    Style="{DynamicResource DeviceSidebarButtonStyle}"
+                                    Margin="10,5,10,10"
+                                    Width="100"
+                                    Height="22"
+                                    Content="Unpair selected"/>
+
+                                <!--<Separator Background="{DynamicResource DarkBoundary}"
+                                           Margin="10,41,10,0"
+                                           VerticalAlignment="Top"/>-->
+
+                                <TextBlock x:Name="DeviceStatusTextBlock"
+                                           Margin="26,31,10,0"
+                                           VerticalAlignment="Top"
+                                           HorizontalAlignment="Left"
+                                           Text="3 devices, 0 connected" 
+                                           TextAlignment="Center"
+                                           Foreground="{DynamicResource DarkBackground}"
+                                           Background="{DynamicResource DemiLightAccentColor}"/>
+
+                                <CheckBox x:Name="SelectAllDevicesCheckBox"
+                                          Margin="5,32,10,0"
+                                          VerticalAlignment="Top"
+                                          HorizontalAlignment="Left"
+                                          BorderBrush="{DynamicResource DarkBackground}" 
+                                          Height="16" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+
+                                <Border Margin="0,53,0,42"
+                                        BorderBrush="{DynamicResource LightBoundary}"
+                                        BorderThickness="0,1,0,1">
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                        <StackPanel x:Name="DevicesStackPanel"
+                                                    Background="{DynamicResource LightAccentColor}">
+                                            <c:DeviceItem/>
+                                            <c:DeviceItem/>
+                                            <c:DeviceItem/>
+                                            <c:DeviceItem/>
+                                            <c:DeviceItem/>
+                                            <c:DeviceItem/>
+                                            <c:DeviceItem/>
+                                            <c:DeviceItem/>
+                                            <c:DeviceItem/>
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </Border>
+
+                                <Button HorizontalAlignment="Left" 
+                                    VerticalAlignment="Bottom"
+                                    Style="{DynamicResource DeviceSidebarButtonStyle}"
+                                    Margin="10,10,10,10"
+                                    Width="100"
+                                    Height="22"
+                                    Content="Reset"/>
+
+                                <Button HorizontalAlignment="Right" 
+                                    VerticalAlignment="Bottom"
+                                    Style="{DynamicResource DeviceSidebarButtonStyle}"
+                                    Margin="10,10,10,10"
+                                    Width="100"
+                                    Height="22"
+                                    Content="Accept"/>
+                                
+                            </Grid>
+                        </Border>
+                        <Grid x:Name="ContentGrid">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <GridSplitter x:Name="MainGridListContentSplitter"
+                                          Grid.Column="1"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Stretch"
+                                          Width="3"
+                                          ShowsPreview="True"
+                                          Background="{DynamicResource DarkBoundary}"/>
+                            <Grid />
+                        </Grid>
+                    </DockPanel>
                 </Border>
-            </Expander>
-            <Grid x:Name="ContentGrid" 
-                  Background="{DynamicResource LightAccentColor}"
-                  Margin="0,1,0,0"
-                  DockPanel.Dock="Top">
-
-            </Grid>
-        </DockPanel>
-        <Grid x:Name="HeaderGrid" 
-              Margin="26,2,0,0"
-              VerticalAlignment="Top">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="130"/>
-            </Grid.ColumnDefinitions>
-            <Grid x:Name="HeaderMenuGrid" 
-                  Grid.Column="0">
-                <Menu Name="menu1" 
-                      IsMainMenu="True" 
-                      VerticalContentAlignment="Center" 
-                      HorizontalAlignment="Left" 
-                      VerticalAlignment="Center">
-                    <MenuItem Header="_Configuration" Style="{DynamicResource TitlebarMenuStyle}">
-                        <MenuItem Header="_Open" IsCheckable="False"/>
-                        <MenuItem Header="_Doe eens een lange optie" IsCheckable="True"/>
-                        <MenuItem Header="_Open" IsCheckable="False"/>
-                        <MenuItem Header="_Open" IsCheckable="False"/>
-                        <MenuItem Header="_Open" IsCheckable="True"/>
-                    </MenuItem>
-                    <MenuItem Header="_Menu" Style="{DynamicResource TitlebarMenuStyle}" VerticalContentAlignment="Center">
-                        <MenuItem Header="_Open" IsCheckable="False"/>
-                        <MenuItem Header="_Open" IsCheckable="True"/>
-                        <MenuItem Header="_Open" IsCheckable="False"/>
-                        <MenuItem Header="_Open" IsCheckable="False"/>
-                        <MenuItem Header="_Open" IsCheckable="True"/>
-                    </MenuItem>
-                </Menu>
-            </Grid>
-            <Grid x:Name="HeaderNameGrid" Grid.Column="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="16"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Label x:Name="TitleLabel" Content="Led Controller" Style="{DynamicResource TitleLabelStyle}" Grid.Column="1" VerticalContentAlignment="Center" Padding="3,0,10,0"/>
-                <Image x:Name="InFocusImage" Height="16" Source="tray16_light.png" />
-                <Image x:Name="OutFocusImage" Height="16" Width="16" Source="tray16_darknew.png" Visibility="Hidden"/>
-            </Grid>
-            <Grid x:Name="HeaderModButtonGrid" Grid.Column="2">
+            </DockPanel>
+            <Grid x:Name="HeaderGrid" 
+                          Margin="26,3,0,0"
+                          VerticalAlignment="Top">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="130"/>
                 </Grid.ColumnDefinitions>
+                <Grid x:Name="HeaderMenuGrid" 
+                              Grid.Column="0">
+                    <Menu Name="menu1" 
+                                  IsMainMenu="True" 
+                                  VerticalContentAlignment="Center" 
+                                  HorizontalAlignment="Left" 
+                                  VerticalAlignment="Center">
+                        <MenuItem Header="_Menu" Style="{DynamicResource TitlebarMenuStyle}">
+                            <MenuItem Header="Configuration" IsCheckable="False"/>
+                        </MenuItem>
+                    </Menu>
+                </Grid>
+                <Grid x:Name="HeaderNameGrid" Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label x:Name="TitleLabel" Content="Led Controller" Style="{DynamicResource TitleLabelStyle}" Grid.Column="1" VerticalContentAlignment="Center" Padding="3,0,10,0"/>
+                    <Image x:Name="InFocusImage" Height="16" Source="tray16_light.png" />
+                    <Image x:Name="OutFocusImage" Height="16" Width="16" Source="tray16_darknew.png" Visibility="Hidden"/>
+                </Grid>
+                <Grid x:Name="HeaderModButtonGrid" Grid.Column="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                <Button x:Name="CloseButton" Style="{DynamicResource CloseButtonStyle}" Click="CloseButton_Click" Margin="0,2,0,2" Grid.Column="2" FontFamily="Segoe UI Symbol">&#xe21c;</Button>
-                <Button x:Name="MaximizeButton" Style="{DynamicResource MinMaxButtonStyle}" Click="MaximizeButton_Click" Margin="0,2,0,2" Grid.Column="1" FontFamily="Segoe UI Symbol">&#xe20c;</Button>
-                <Button x:Name="MinimizeButton" Style="{DynamicResource MinMaxButtonStyle}" Click="MinimizeButton_Click" Margin="0,2,0,2" Grid.Column="0" FontFamily="Segoe UI Symbol" FontSize="15" FontWeight="Bold" Padding="1" VerticalContentAlignment="Center">-</Button>
+                    <Button x:Name="CloseButton" 
+                                    Style="{DynamicResource CloseButtonStyle}" 
+                                    Click="CloseButton_Click" 
+                                    Margin="0,0,0,0" 
+                                    Grid.Column="2" 
+                                    FontFamily="Segoe UI Symbol">&#xe21c;</Button>
+                    <Button x:Name="MaximizeButton" 
+                                    Style="{DynamicResource MinMaxButtonStyle}" 
+                                    Click="MaximizeButton_Click" 
+                                    Margin="0,0,0,0" 
+                                    Grid.Column="1" 
+                                    FontFamily="Segoe UI Symbol">&#xe20c;</Button>
+                    <Button x:Name="MinimizeButton" 
+                                    Style="{DynamicResource MinMaxButtonStyle}" 
+                                    Click="MinimizeButton_Click" 
+                                    Margin="0,0,0,0" 
+                                    Grid.Column="0" 
+                                    FontFamily="Segoe UI Symbol" 
+                                    FontSize="15" 
+                                    FontWeight="Bold" 
+                                    Padding="1" 
+                                    VerticalContentAlignment="Center">-</Button>
+                </Grid>
             </Grid>
         </Grid>
     </Grid>
