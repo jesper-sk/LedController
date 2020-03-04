@@ -7,20 +7,31 @@ using System.Text;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using System.IO;
+using System.Linq;
 
 namespace LedController
 {
     public static class Util
     {
-        public static double Map(double x, double inLow, double inHigh, double outLow, double outHigh)
+        public static double Map(this double x, double inLow, double inHigh, double outLow, double outHigh)
         {
             return (x - inLow) * (outHigh - outLow) / (inHigh - inLow) + outLow;
         }
 
-        public static unsafe void HighLow32(int val, out short high, out short low)
+        public static unsafe void HighLow(this int val, out short high, out short low)
         {
             low = ((short*)&val)[0];
             high = ((short*)&val)[1];
+        }
+
+        public static int Isqrt(this int n)
+        {
+            if (n < 0) throw new ArgumentException(nameof(n) + " was smaller than 0");
+            if (n < 2) return n;
+            int small = Isqrt(n >> 2) << 1;
+            int large = small + 1;
+            if (small * large > n) return small;
+            return large;
         }
 
         public static List<T> Permute<T> ( IList<T> input
@@ -172,35 +183,62 @@ namespace LedController
             }
         }
 
-        public static string IListToString<T>(IList<T> inp)
+        public static string ByteToString(byte[] inp)
         {
-            if (inp is null) throw new ArgumentNullException(nameof(inp));
             StringBuilder sb = new StringBuilder();
-            sb.Append('{');
+            sb.Append('[');
             sb.Append(inp[0]);
-            for (int i = 1; i < inp.Count; i++)
+            for (int i = 1; i < inp.Length; i++)
             {
-                T b = inp[i];
+                byte b = inp[i];
                 sb.Append(", ");
-                sb.Append(b.ToString());
+                sb.Append(b);
             }
-            sb.Append('}');
+            sb.Append(']');
             return sb.ToString();
         }
 
-
-        public static string IEnumerableToString<T>(IEnumerable<T> inp)
+        public static string ByteToString(List<byte> inp)
         {
-            if (inp is null) throw new ArgumentNullException(nameof(inp));
             StringBuilder sb = new StringBuilder();
-            sb.Append('{');
+            sb.Append('[');
+            sb.Append(inp[0]);
+            for (int i = 1; i < inp.Count; i++)
+            {
+                byte b = inp[i];
+                sb.Append(", ");
+                sb.Append(b);
+            }
+            sb.Append(']');
+            return sb.ToString();
+        }
+
+        public static string ToFullString<T>(this IList<T> inp)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append('[');
+            sb.Append(inp[0]);
+            for (int i = 1; i < inp.Count; i++)
+            {
+                string item = inp[i].ToString();
+                sb.Append(", ");
+                sb.Append(item);
+            }
+            sb.Append(']');
+            return sb.ToString();
+        }
+
+        public static string ToFullString<T>(this IEnumerable<T> inp)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append('[');
             foreach(T item in inp)
             {
-                sb.Append(item.ToString());
+                string str = item.ToString();
+                sb.Append(str);
                 sb.Append(", ");
             }
             sb.Remove(sb.Length - 2, 2);
-            sb.Append("}");
             return sb.ToString();
         }
 
@@ -453,9 +491,109 @@ namespace LedController
             }
         }
 
+        public static CColor EqualBlend(IEnumerable<CColor> colors)
+        {
+            int l = colors.Count();
+            return FromRgb(
+                (colors.Select(c => c.R * c.R).Sum() / l).Isqrt(),
+                (colors.Select(c => c.G * c.G).Sum() / l).Isqrt(),
+                (colors.Select(c => c.B * c.B).Sum() / l).Isqrt()
+                );
+        }
+
+        public static IEnumerable<CColor> EqualBlend(params IEnumerable<CColor>[] lists) => new Func<IEnumerable<CColor>, CColor>((cols) => EqualBlend(cols)).ZipOver(lists);
+
         public override string ToString()
         {
             return $"R={R},G={G},B={B}";
+        }
+    }
+
+    public sealed class UniformZipEntry<T>
+    {
+        public UniformZipEntry(int index, IEnumerable<T> values)
+        {
+            Index = index;
+            Values = values;
+        }
+        public int Index { get; private set; }
+        public readonly IEnumerable<T> Values;
+    }
+
+    public static class FuncExtensions
+    {
+        public static IEnumerable<T2> ZipOver<T1, T2>(
+            this Func<IEnumerable<T1>, T2> func, 
+            params IEnumerable<T1>[] inps)
+        {
+            if (inps.Length == 0) throw new ArgumentException("No input given");
+            var enums = from inp in inps select inps.GetEnumerator();
+            while (true)
+            {
+                bool done = false;
+                foreach(var e in enums)
+                {
+                    bool b = e.MoveNext();
+                    Console.WriteLine(b);
+                    if (!b)
+                    {
+                        done = true;
+                        break;
+                    }
+                }
+                if (done) break;
+                IEnumerable<T1> vals = enums.Select(e => (T1)e.Current);
+                yield return func(vals);
+            }
+        }
+    }
+    public static class EnumerableExtensions
+    {
+        public static IEnumerable<UniformZipEntry<T>> UniformZip<T>(
+            params IEnumerable<T>[] enums)
+        {
+            if (enums.Length == 0)
+                throw new ArgumentException("Argument was empty", nameof(enums));
+            foreach (var e in enums) 
+                if (e is null) 
+                    throw new ArgumentNullException("One of the passed enumerables was null!");
+
+            int index = 0;
+
+            var enumerators = from e in enums select e.GetEnumerator();
+            while (true)
+            {
+                //bool done = false;
+                //foreach(var enu in enumerators)
+                //{
+                //    bool b = enu.MoveNext();
+                //    if (!b)
+                //    {
+                //        done = true;
+                //        break;
+                //    }
+                //}
+                //if (done) break;
+
+                var bools = from e in enumerators select e.MoveNext();
+                if (bools.Any(b => !b))
+                {
+                    if (bools.Any(b => b))
+                        throw new InvalidOperationException("One of the collections ran out of items earlier than the rest!");
+                    break;
+                }
+                var vals = from e in enumerators select e.Current;
+                yield return new UniformZipEntry<T>(
+                    index++,
+                    vals.ToArray()
+                    );
+            }
+            foreach (var enumerator in enumerators) enumerator.Dispose();
+
+            IEnumerable<T> GetCurrentValues()
+            {
+                foreach (var enu in enumerators) yield return enu.Current;
+            }
         }
     }
     public class DirectBitmap : IDisposable
