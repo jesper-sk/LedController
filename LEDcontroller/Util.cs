@@ -183,65 +183,6 @@ namespace LedController
             }
         }
 
-        public static string ByteToString(byte[] inp)
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append('[');
-            sb.Append(inp[0]);
-            for (int i = 1; i < inp.Length; i++)
-            {
-                byte b = inp[i];
-                sb.Append(", ");
-                sb.Append(b);
-            }
-            sb.Append(']');
-            return sb.ToString();
-        }
-
-        public static string ByteToString(List<byte> inp)
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append('[');
-            sb.Append(inp[0]);
-            for (int i = 1; i < inp.Count; i++)
-            {
-                byte b = inp[i];
-                sb.Append(", ");
-                sb.Append(b);
-            }
-            sb.Append(']');
-            return sb.ToString();
-        }
-
-        public static string ToFullString<T>(this IList<T> inp)
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append('[');
-            sb.Append(inp[0]);
-            for (int i = 1; i < inp.Count; i++)
-            {
-                string item = inp[i].ToString();
-                sb.Append(", ");
-                sb.Append(item);
-            }
-            sb.Append(']');
-            return sb.ToString();
-        }
-
-        public static string ToFullString<T>(this IEnumerable<T> inp)
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append('[');
-            foreach(T item in inp)
-            {
-                string str = item.ToString();
-                sb.Append(str);
-                sb.Append(", ");
-            }
-            sb.Remove(sb.Length - 2, 2);
-            return sb.ToString();
-        }
-
         public static string FormatProfileName(string name)
         {
             if (name == null) return "None";
@@ -491,6 +432,8 @@ namespace LedController
             }
         }
 
+        public static CColor BlendWith(this CColor c1, CColor c2, double t = 0.5) => Blend(c1, c2, t);
+
         public static CColor EqualBlend(IEnumerable<CColor> colors)
         {
             int l = colors.Count();
@@ -595,8 +538,42 @@ namespace LedController
                 foreach (var enu in enumerators) yield return enu.Current;
             }
         }
+
+        public static string ToFullString<T>(this IEnumerable<T> inp)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append('{');
+            foreach (T item in inp)
+            {
+                string str = item.ToString();
+                sb.Append(str);
+                sb.Append(", ");
+            }
+            sb.Remove(sb.Length - 2, 2);
+            sb.Append('}');
+            return sb.ToString();
+        }
     }
-    public class DirectBitmap : IDisposable
+
+    public static class ListExtensions
+    {
+        public static string ToFullString<T>(this IList<T> inp)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append('{');
+            sb.Append(inp[0]);
+            for (int i = 1; i < inp.Count; i++)
+            {
+                string item = inp[i].ToString();
+                sb.Append(", ");
+                sb.Append(item);
+            }
+            sb.Append('}');
+            return sb.ToString();
+        }
+    }
+
+        public class DirectBitmap : IDisposable
     {
         public Bitmap Bitmap { get; private set; }
         public Int32[] Bits { get; private set; }

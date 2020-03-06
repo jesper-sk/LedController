@@ -8,8 +8,8 @@
         xmlns:c="clr-namespace:UberLedController.Controls"
         mc:Ignorable="d"
         Title="MainWindow" 
-        Height="510" 
-        Width="662" 
+        Height="529" 
+        Width="809" 
         Background="#FFDADADA" 
         BorderBrush="Black" 
         Margin="1" 
@@ -174,23 +174,53 @@
                                     Width="100"
                                     Height="22"
                                     Content="Accept"/>
-                                
+
                             </Grid>
                         </Border>
                         <Grid x:Name="ContentGrid">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition/>
-                                <ColumnDefinition Width="Auto"/>
+                                <!--<ColumnDefinition Width="Auto"/>-->
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
-                            <GridSplitter x:Name="MainGridListContentSplitter"
+                            <!--<GridSplitter x:Name="MainGridListContentSplitter"
                                           Grid.Column="1"
                                           HorizontalAlignment="Center"
                                           VerticalAlignment="Stretch"
                                           Width="3"
-                                          ShowsPreview="True"
-                                          Background="{DynamicResource DarkBoundary}"/>
-                            <Grid />
+                                          ShowsPreview="True" 
+                                          Background="{x:Null}"/>
+                            <Grid />-->
+                            <Border Grid.Column="0"
+                                    BorderBrush="{DynamicResource LightBoundary}"
+                                    BorderThickness="0,1,0,0">
+                                <Grid x:Name="LedProfileGrid"
+                                      Background="{DynamicResource DemiLightAccentColor}">
+                                    <Border Margin="0,53,0,42"
+                                            BorderBrush="{DynamicResource LightBoundary}"
+                                            BorderThickness="0,1">
+                                        <StackPanel x:Name="LedProfileContainerStackPanel"
+                                                    Background="{DynamicResource LightAccentColor}">
+                                            
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                            <Border Grid.Column="1"
+                                    BorderBrush="{DynamicResource LightBoundary}"
+                                    BorderThickness="1,1,0,0">
+                                <Grid x:Name="ProfileDetailsGrid"
+                                      Background="{DynamicResource DemiLightAccentColor}">
+                                    <Border Margin="0,53,0,42"
+                                            BorderBrush="{DynamicResource LightBoundary}"
+                                            BorderThickness="0,1">
+                                        <StackPanel x:Name="ProfileDetailsContainerStackPanel"
+                                                    Background="{DynamicResource LightAccentColor}">
+
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                            </Border>
                         </Grid>
                     </DockPanel>
                 </Border>
@@ -203,26 +233,25 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="130"/>
                 </Grid.ColumnDefinitions>
-                <Grid x:Name="HeaderMenuGrid" 
-                              Grid.Column="0">
-                    <Menu Name="menu1" 
-                                  IsMainMenu="True" 
-                                  VerticalContentAlignment="Center" 
-                                  HorizontalAlignment="Left" 
-                                  VerticalAlignment="Center">
-                        <MenuItem Header="_Menu" Style="{DynamicResource TitlebarMenuStyle}">
-                            <MenuItem Header="Configuration" IsCheckable="False"/>
-                        </MenuItem>
-                    </Menu>
-                </Grid>
                 <Grid x:Name="HeaderNameGrid" Grid.Column="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="16"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Label x:Name="TitleLabel" Content="Led Controller" Style="{DynamicResource TitleLabelStyle}" Grid.Column="1" VerticalContentAlignment="Center" Padding="3,0,10,0"/>
-                    <Image x:Name="InFocusImage" Height="16" Source="tray16_light.png" />
-                    <Image x:Name="OutFocusImage" Height="16" Width="16" Source="tray16_darknew.png" Visibility="Hidden"/>
+                    <Label x:Name="TitleLabel" 
+                           Content="Led Controller" Style="{DynamicResource TitleLabelStyle}" 
+                           Grid.Column="1" 
+                           VerticalContentAlignment="Center" 
+                           Padding="3,0,10,0"
+                           Cursor="ScrollAll"/>
+                    <Image x:Name="InFocusImage" 
+                           Height="16" 
+                           Source="tray16_light.png" />
+                    <Image x:Name="OutFocusImage" 
+                           Height="16" 
+                           Width="16" 
+                           Source="tray16_darknew.png"
+                           Visibility="Hidden"/>
                 </Grid>
                 <Grid x:Name="HeaderModButtonGrid" Grid.Column="2">
                     <Grid.ColumnDefinitions>
@@ -253,6 +282,18 @@
                                     FontWeight="Bold" 
                                     Padding="1" 
                                     VerticalContentAlignment="Center">-</Button>
+                </Grid>
+                <Grid x:Name="HeaderMenuGrid" 
+                              Grid.Column="0">
+                    <Menu x:Name="menu1" 
+                                  IsMainMenu="True" 
+                                  VerticalContentAlignment="Center" 
+                                  HorizontalAlignment="Left" 
+                                  VerticalAlignment="Center">
+                        <MenuItem Header="_Menu" Style="{DynamicResource TitlebarMenuStyle}">
+                            <MenuItem Header="Configuration" IsCheckable="False"/>
+                        </MenuItem>
+                    </Menu>
                 </Grid>
             </Grid>
         </Grid>
