@@ -781,20 +781,20 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\jespe\\.nuget\\packages\\": {}
+    "C:\\Users\\Jesper\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\jespe\\Documents\\Projekkies\\LedController\\LEDcontroller\\LedController.csproj",
+      "projectUniqueName": "C:\\Users\\Jesper\\Documents\\LedController project\\LedController\\LEDcontroller\\LedController.csproj",
       "projectName": "LedController",
-      "projectPath": "C:\\Users\\jespe\\Documents\\Projekkies\\LedController\\LEDcontroller\\LedController.csproj",
-      "packagesPath": "C:\\Users\\jespe\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\jespe\\Documents\\Projekkies\\LedController\\LEDcontroller\\obj\\",
+      "projectPath": "C:\\Users\\Jesper\\Documents\\LedController project\\LedController\\LEDcontroller\\LedController.csproj",
+      "packagesPath": "C:\\Users\\Jesper\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Jesper\\Documents\\LedController project\\LedController\\LEDcontroller\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
       "configFilePaths": [
-        "C:\\Users\\jespe\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Jesper\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
