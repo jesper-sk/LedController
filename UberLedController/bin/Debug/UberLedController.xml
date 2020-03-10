@@ -1,0 +1,234 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>UberLedController</name>
+    </assembly>
+    <members>
+        <member name="T:UberLedController.App">
+            <summary>
+            Interaction logic for App.xaml
+            </summary>
+            <summary>
+            App
+            </summary>
+        </member>
+        <member name="M:UberLedController.App.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:UberLedController.App.Main">
+            <summary>
+            Application Entry Point.
+            </summary>
+        </member>
+        <member name="T:UberLedController.Coloring.CColor">
+            <summary>
+            Custom serializable color class
+            </summary>
+        </member>
+        <member name="T:UberLedController.Controls.DeviceItem">
+            <summary>
+            Interaction logic for DeviceItem.xaml
+            </summary>
+            <summary>
+            DeviceItem
+            </summary>
+        </member>
+        <member name="M:UberLedController.Controls.DeviceItem.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:UberLedController.LedProfiles.LedProfile">
+            <summary>
+            Base Led Profile class. Every profile must inherit this class.
+            </summary>
+        </member>
+        <member name="P:UberLedController.LedProfiles.LedProfile.Name">
+            <summary>
+            The name of the profile that will be displayed in the UI
+            </summary>
+        </member>
+        <member name="P:UberLedController.LedProfiles.LedProfile.ProfileIndex">
+            <summary>
+            Unique specifier of this profile within its profile set.
+            </summary>
+        </member>
+        <member name="P:UberLedController.LedProfiles.LedProfile.ProfileSetIndex">
+            <summary>
+            Unique specifier of the profile set that contains this profile.
+            </summary>
+        </member>
+        <member name="P:UberLedController.LedProfiles.LedProfile.ProfileType">
+            <summary>
+            Determines the type of this profile
+            </summary>
+        </member>
+        <member name="P:UberLedController.LedProfiles.LedProfile.Ups">
+            <summary>
+            The updates per second. How many times per second Update() should be invoked.
+            </summary>
+        </member>
+        <member name="P:UberLedController.LedProfiles.LedProfile.Brightness">
+            <summary>
+            The master brightness of this profile. Will be sent to the device.
+            </summary>
+        </member>
+        <member name="M:UberLedController.LedProfiles.LedProfile.#ctor">
+            <summary>
+            Reserved for XML deserialization. Do not use.
+            </summary>
+        </member>
+        <member name="M:UberLedController.LedProfiles.LedProfile.#ctor(System.String,System.Int32,System.Int32,UberLedController.LedProfiles.ProfileType)">
+            <summary>
+            Base constructor. Each class that inhertits LedProfile should call this using base().
+            </summary>
+            <param name="name">Profile name</param>
+            <param name="idx">Profile index</param>
+            <param name="psidx">Profile set index</param>
+            <param name="type">Profile type</param>
+        </member>
+        <member name="T:UberLedController.LedProfiles.ProfileType">
+            <summary>
+            Determines the type of a led profile.
+            </summary>
+        </member>
+        <member name="F:UberLedController.LedProfiles.ProfileType.Static">
+            <summary>
+            Static color
+            </summary>
+        </member>
+        <member name="F:UberLedController.LedProfiles.ProfileType.Rainbow">
+            <summary>
+            Rotating rainbow
+            </summary>
+        </member>
+        <member name="F:UberLedController.LedProfiles.ProfileType.Ambilight">
+            <summary>
+            Screen capture and project on strip
+            </summary>
+        </member>
+        <member name="F:UberLedController.LedProfiles.ProfileType.Music">
+            <summary>
+            Music integration
+            </summary>
+        </member>
+        <member name="F:UberLedController.LedProfiles.ProfileType.None">
+            <summary>
+            For None profile type
+            </summary>
+        </member>
+        <member name="F:UberLedController.LedProfiles.ProfileType.Other">
+            <summary>
+            For debuggin purposes
+            </summary>
+        </member>
+        <member name="T:UberLedController.LedProfiles.NoneLedProfile">
+            <summary>
+            Activate a NoneLedProfile object whenver no profile should be activated
+            </summary>
+        </member>
+        <member name="P:UberLedController.LedstripDefinitions.ColorMatrix.Length">
+            <summary>
+            The strip length, with possible led overlap exlcluded
+            </summary>
+        </member>
+        <member name="P:UberLedController.LedstripDefinitions.ColorMatrix.LengthOverlap">
+            <summary>
+            The strip length, with possible led overlap included.
+            </summary>
+        </member>
+        <member name="M:UberLedController.LedstripDefinitions.ColorMatrix.#ctor">
+            <summary>
+            For XML deserialization.
+            </summary>
+        </member>
+        <member name="F:UberLedController.Startup.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:UberLedController.Startup.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:UberLedController.Startup.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="T:UberLedController.MainWindow">
+            <summary>
+            Interaction logic for MainWindow.xaml
+            </summary>
+            <summary>
+            MainWindow
+            </summary>
+        </member>
+        <member name="M:UberLedController.MainWindow.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:UberLedController.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:UberLedController.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:UberLedController.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:UberLedController.Properties.Resources.tray_light">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+            </summary>
+        </member>
+        <member name="P:UberLedController.Properties.Resources.tray16_dark">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+            </summary>
+        </member>
+        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
+            <summary>
+            GeneratedInternalTypeHelper
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
+            <summary>
+            CreateInstance
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            GetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            SetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
+            <summary>
+            CreateDelegate
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
+            <summary>
+            AddEventHandler
+            </summary>
+        </member>
+    </members>
+</doc>

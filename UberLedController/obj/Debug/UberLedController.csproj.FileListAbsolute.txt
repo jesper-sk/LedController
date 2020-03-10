@@ -71,3 +71,7 @@ C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\Ub
 C:\Users\Jesper\Documents\LedController project\LedController\UberLedController\obj\Debug\Controls\DeviceItem.g.cs
 C:\Users\Jesper\Documents\LedController project\LedController\UberLedController\obj\Debug\GeneratedInternalTypeHelper.g.cs
 C:\Users\Jesper\Documents\LedController project\LedController\UberLedController\obj\Debug\Controls\DeviceItem.baml
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\bin\Debug\UberLedController.xml
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\Controls\DeviceItem.g.cs
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\GeneratedInternalTypeHelper.g.cs
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\Controls\DeviceItem.baml
