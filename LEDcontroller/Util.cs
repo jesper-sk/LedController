@@ -34,6 +34,17 @@ namespace LedController
             return large;
         }
 
+        public static List<T> Permute<T> ( IList<T> input
+                                         , Func<int, int> index )
+        {
+            List<T> result = new List<T>(input.Count);
+            for ( int i = 0
+                ; i < input.Count
+                ; i++)
+            {   result[index(i)] = input[i];    }
+            return result;
+        }
+
         public static void RgbToHsv(byte r, byte g, byte b, out double h, out double s, out double v)
         {
             double cMax;
@@ -77,16 +88,14 @@ namespace LedController
 
         public static void HsvToRgb(double h, double s, double v, out int r, out int g, out int b)
         {
-            double H = h;
-            while (H < 0) { H += 360; };
-            while (H >= 360) { H -= 360; };
+            double H = h % 360;
+
+            if (H < 0) throw new InvalidOperationException("h should be greater than 0");
+
             double R, G, B;
-            if (v <= 0)
-            { R = G = B = 0; }
-            else if (s <= 0)
-            {
-                R = G = B = v;
-            }
+
+            if (v <= 0) R = G = B = 0; 
+            else if (s <= 0) R = G = B = v;
             else
             {
                 double hf = H / 60.0;
@@ -170,65 +179,6 @@ namespace LedController
                 if (i > 255) return 255;
                 return i;
             }
-        }
-
-        public static string ByteToString(byte[] inp)
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append('[');
-            sb.Append(inp[0]);
-            for (int i = 1; i < inp.Length; i++)
-            {
-                byte b = inp[i];
-                sb.Append(", ");
-                sb.Append(b);
-            }
-            sb.Append(']');
-            return sb.ToString();
-        }
-
-        public static string ByteToString(List<byte> inp)
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append('[');
-            sb.Append(inp[0]);
-            for (int i = 1; i < inp.Count; i++)
-            {
-                byte b = inp[i];
-                sb.Append(", ");
-                sb.Append(b);
-            }
-            sb.Append(']');
-            return sb.ToString();
-        }
-
-        public static string ToFullString<T>(this IList<T> inp)
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append('[');
-            sb.Append(inp[0]);
-            for (int i = 1; i < inp.Count; i++)
-            {
-                string item = inp[i].ToString();
-                sb.Append(", ");
-                sb.Append(item);
-            }
-            sb.Append(']');
-            return sb.ToString();
-        }
-
-        public static string ToFullString<T>(this IEnumerable<T> inp)
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append('[');
-            foreach(T item in inp)
-            {
-                string str = item.ToString();
-                sb.Append(str);
-                sb.Append(", ");
-            }
-            sb.Remove(sb.Length - 2, 2);
-            return sb.ToString();
         }
 
         public static string FormatProfileName(string name)
@@ -480,6 +430,8 @@ namespace LedController
             }
         }
 
+        public static CColor BlendWith(this CColor c1, CColor c2, double t = 0.5) => Blend(c1, c2, t);
+
         public static CColor EqualBlend(IEnumerable<CColor> colors)
         {
             int l = colors.Count();
@@ -584,8 +536,42 @@ namespace LedController
                 foreach (var enu in enumerators) yield return enu.Current;
             }
         }
+
+        public static string ToFullString<T>(this IEnumerable<T> inp)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append('{');
+            foreach (T item in inp)
+            {
+                string str = item.ToString();
+                sb.Append(str);
+                sb.Append(", ");
+            }
+            sb.Remove(sb.Length - 2, 2);
+            sb.Append('}');
+            return sb.ToString();
+        }
     }
-    public class DirectBitmap : IDisposable
+
+    public static class ListExtensions
+    {
+        public static string ToFullString<T>(this IList<T> inp)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append('{');
+            sb.Append(inp[0]);
+            for (int i = 1; i < inp.Count; i++)
+            {
+                string item = inp[i].ToString();
+                sb.Append(", ");
+                sb.Append(item);
+            }
+            sb.Append('}');
+            return sb.ToString();
+        }
+    }
+
+        public class DirectBitmap : IDisposable
     {
         public Bitmap Bitmap { get; private set; }
         public Int32[] Bits { get; private set; }
@@ -840,46 +826,29 @@ namespace LedController
             return new StripInfo(Width, Height, Start, IsCw, MasterLength);
         }
 
-        public void AssignFrom(int index, List<CColor> c)
-        {
-            int i = 0;
-            int j = Filter(index);
-            while (i < c.Count)
-            {
-                colors[j] = c[i];
-                j = (j + 1) % Length;
-                i++;
-            }
+        public void AssignFrom(int index, IList<CColor> c)
+        {   for (   int i = 0, j = Filter(index)
+                ;   i < c.Count
+                ;   i++)
+            {   colors[j] = c[i]
+            ;   j = (j + 1) % Length
+            ;   }   
         }
 
-        public void AssignFrom(int index, CColor[] c)
-        {
-            int i = 0;
-            int j = Filter(index);
-            while (i < c.Length)
-            {
-                colors[j] = c[i];
-                j = (j + 1) % Length;
-                i++;
-            }
-        }
+            //int i = 0;
+            //int j = Filter(index);
+            //while (i < c.Count)
+            //{
+            //    colors[j] = c[i];
+            //    j = (j + 1) % Length;
+            //    i++;
+            //}
+        //}
 
-        public void AssignUpto(int index, List<CColor> c)
+        public void AssignUpto(int index, IList<CColor> c)
         {
             int i = c.Count - 1;
             int j = (Filter(index) + Length - c.Count + 1) % Length;
-            while (i >= 0)
-            {
-                colors[j] = c[i];
-                j = (j + 1) % Length;
-                i--;
-            }
-        }
-
-        public void AssignUpto(int index, CColor[] c)
-        {
-            int i = c.Length - 1;
-            int j = (Filter(index) + Length - c.Length + 1) % Length;
             while (i >= 0)
             {
                 colors[j] = c[i];
@@ -992,7 +961,7 @@ namespace LedController
     }
     public static class AspectRatio
     {
-        public static void EstimateAspectRatio(double ratio, out double w, out double h)
+        public static void Estimate(double ratio, out double w, out double h)
         {
             switch (Math.Round(ratio, 2))
             {
@@ -1047,7 +1016,7 @@ namespace LedController
         public RatioProfile() { }
         public RatioProfile(double ratio)
         {
-            AspectRatio.EstimateAspectRatio(ratio, out double w, out double h);
+            AspectRatio.Estimate(ratio, out double w, out double h);
             RatioWidth = w;
             RatioHeight = h;
         }

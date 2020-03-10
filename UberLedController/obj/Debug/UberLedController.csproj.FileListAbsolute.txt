@@ -68,3 +68,10 @@ C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\Ub
 C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\UberLedController.csproj.CopyComplete
 C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\UberLedController.exe
 C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\UberLedController.pdb
+C:\Users\Jesper\Documents\LedController project\LedController\UberLedController\obj\Debug\Controls\DeviceItem.g.cs
+C:\Users\Jesper\Documents\LedController project\LedController\UberLedController\obj\Debug\GeneratedInternalTypeHelper.g.cs
+C:\Users\Jesper\Documents\LedController project\LedController\UberLedController\obj\Debug\Controls\DeviceItem.baml
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\bin\Debug\UberLedController.xml
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\Controls\DeviceItem.g.cs
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\GeneratedInternalTypeHelper.g.cs
+C:\Users\jespe\Documents\Projekkies\LedController\UberLedController\obj\Debug\Controls\DeviceItem.baml
