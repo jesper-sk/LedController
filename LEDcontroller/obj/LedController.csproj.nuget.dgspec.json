@@ -43,6 +43,10 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[2.9.8, )"
+            },
+            "NumSharp": {
+              "target": "Package",
+              "version": "[0.20.5, )"
             }
           }
         }

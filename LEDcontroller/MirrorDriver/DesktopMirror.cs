@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.IO;
 using LedController;
 using static System.Math;
+using NumSharp;
 using System.Text;
 
 namespace Driver
@@ -461,6 +462,22 @@ namespace Driver
             result.UnlockBits(bmpData);
 
             return result;
+        }
+
+        public CColor[] Test(Rect[] rects, double precision)
+        {
+            if (State != MirrorState.Connected && State != MirrorState.Running)
+                throw new InvalidOperationException("In order to get current screen you must at least be connected to the driver");
+
+            int bytesPerPixel = bitmapBitsPerPixel / 8;
+
+            GetChangesBuffer buffer = (GetChangesBuffer)Marshal.PtrToStructure(_getChangesBuffer, typeof(GetChangesBuffer));
+            IntPtr pointer = buffer.UserBuffer;
+
+            unsafe
+            {
+                byte* origin = (byte*)pointer.ToPointer();
+            }
         }
 
         public CColor[] GetAvgCColorFromScreen(Rect[] rects, double precision)

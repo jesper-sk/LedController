@@ -4,6 +4,32 @@
         <name>UberLedController</name>
     </assembly>
     <members>
+        <member name="M:UberLedController.ClassExtensions.IntegerExtensions.HighLow(System.Int32,System.Int16@,System.Int16@)">
+            <summary>
+            Breaks the input int32 into high and low int16s.
+            </summary>
+            <param name="val">Input int32</param>
+            <param name="high">High int16</param>
+            <param name="low">Low int16</param>
+        </member>
+        <member name="M:UberLedController.ClassExtensions.IntegerExtensions.Isqrt(System.Int32)">
+            <summary>
+            Get the integer square root.
+            </summary>
+            <param name="n">Input integer</param>
+            <returns>The integer square root of the input</returns>
+        </member>
+        <member name="M:UberLedController.ClassExtensions.IntegerExtensions.Normalize(System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Alters the range of an integer.
+            </summary>
+            <param name="x">Input integer</param>
+            <param name="inLow">Current lower limit</param>
+            <param name="inHigh">Current upper limit</param>
+            <param name="outLow">Lower limit to normalise to</param>
+            <param name="outHigh">Upper limit to normalise to</param>
+            <returns></returns>
+        </member>
         <member name="T:UberLedController.App">
             <summary>
             Interaction logic for App.xaml
@@ -22,7 +48,7 @@
             Application Entry Point.
             </summary>
         </member>
-        <member name="T:UberLedController.Coloring.CColor">
+        <member name="T:UberLedController.Coloring.Color">
             <summary>
             Custom serializable color class
             </summary>

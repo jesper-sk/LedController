@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace UberLedController.Util
+namespace UberLedController.ClassExtensions
 {
     public static class FuncExtensions
     {

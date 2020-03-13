@@ -34,10 +34,10 @@ namespace LedController
             return large;
         }
 
-        public static List<T> Permute<T> ( IList<T> input
-                                         , Func<int, int> index )
+        public static T[] Permute<T> ( IList<T> input
+                                     , Func<int, int> index )
         {
-            List<T> result = new List<T>(input.Count);
+            T[] result = new T[input.Count];
             for ( int i = 0
                 ; i < input.Count
                 ; i++)
@@ -430,7 +430,7 @@ namespace LedController
             }
         }
 
-        public static CColor BlendWith(this CColor c1, CColor c2, double t = 0.5) => Blend(c1, c2, t);
+        public static CColor BlendWith(CColor c1, CColor c2, double t = 0.5) => Blend(c1, c2, t);
 
         public static CColor EqualBlend(IEnumerable<CColor> colors)
         {

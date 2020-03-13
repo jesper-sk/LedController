@@ -37,6 +37,10 @@
             "Extended.Wpf.Toolkit": {
               "target": "Package",
               "version": "[3.7.0, )"
+            },
+            "NumSharp": {
+              "target": "Package",
+              "version": "[0.20.5, )"
             }
           }
         }
